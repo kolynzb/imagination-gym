@@ -508,7 +508,7 @@ export const actions = {
   async copyInviteLink(roomCode?: string): Promise<string> {
     const s = get(state);
     const code = (roomCode || s.roomCode || 'GYM-CREW').toUpperCase().trim();
-    let link = `https://imagination-gym.vercel.app/?room=${encodeURIComponent(code)}`;
+    let link = `https://imagination-gym.collinsbenda.com/?room=${encodeURIComponent(code)}`;
     if (typeof window !== 'undefined' && window.location) {
       link = `${window.location.origin}/?room=${encodeURIComponent(code)}`;
     }
