@@ -9,7 +9,7 @@
   $: currentStep = s.onboardingStep;
 
   const ALL_KIT_ITEMS = [
-    { id: 'k_fineliner', t: 'Primary line pen', v: '0.5mm black fineliner', why: 'Ink is permanent — denies the eraser, forces planning, and exposes chicken-scratching.' },
+    { id: 'k_fineliner', t: 'Primary line pen', v: '0.5mm black fineliner', why: 'Ink is permanent: denies the eraser, forces planning, and exposes chicken-scratching.' },
     { id: 'k_ballpoint', t: 'Secondary tone pen', v: 'Standard ballpoint (Bic Cristal)', why: 'Responds to hand pressure for soft volumetric under-drawing and smooth cross-hatching.' },
     { id: 'k_paper', t: 'Paper', v: '80gsm unruled copy paper', why: 'Loose paper has zero preciousness. Burn 10 pages without flinching.' },
     { id: 'k_newsprint', t: 'Shoulder pad', v: 'A3 / 11×17 newsprint', why: 'You physically cannot draw from the wrist across 17 inches. Forces whole-arm pivot.' },
@@ -61,14 +61,14 @@
           <div class="step-meta">Step 1 of 3</div>
           <h1 class="step-heading">Eight weeks to draw from imagination</h1>
           <p class="step-intro">
-            You cannot draw from imagination what your brain cannot construct mechanically. So this is not a course about talent — it is eight weeks of isolating one technical variable a day until spatial construction becomes unconscious, leaving your mind free for storytelling.
+            You cannot draw from imagination what your brain cannot construct mechanically. So this is not a course about talent. It is eight weeks of isolating one technical variable a day until spatial construction becomes unconscious, leaving your mind free for storytelling.
           </p>
 
           <div class="video-embed-card">
             <div class="embed-wrapper">
               <iframe
                 src="https://www.youtube-nocookie.com/embed/zYzgxUVSpUc?rel=0&modestbranding=1"
-                title="brokendraw — giving away my entire drawing class"
+                title="brokendraw: giving away my entire drawing class"
                 allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowfullscreen
               ></iframe>
@@ -105,7 +105,7 @@
               <div class="table-row">
                 <span class="p-name">B · The drill</span>
                 <span class="p-time">45–60 min</span>
-                <span class="p-desc">The medicine. Isolates one variable — convergence, minor axes, boolean cuts — with no pressure to make finished artwork.</span>
+                <span class="p-desc">The medicine. Isolates one variable (convergence, minor axes, boolean cuts) with no pressure to make finished artwork.</span>
               </div>
               <div class="table-row">
                 <span class="p-name">C · The project</span>
@@ -122,7 +122,7 @@
 
           <div class="five-levels-section">
             <h2 class="sub-heading">What you're actually doing: 5 Levels</h2>
-            <p class="sub-desc">Twenty-five exercises arranged in five levels from brokendraw's book. The eight weeks are just a schedule laid over them — the levels are the real spine.</p>
+            <p class="sub-desc">Twenty-five exercises arranged in five levels from brokendraw's book. The eight weeks are just a schedule laid over them; the levels are the real spine.</p>
             <div class="levels-grid">
               <div class="level-box"><span class="lvl-num">L1</span><span class="lvl-name">Mechanics</span></div>
               <div class="level-box"><span class="lvl-num">L2</span><span class="lvl-name">Basic forms</span></div>
@@ -183,7 +183,7 @@
           <div class="callout-grid">
             <div class="callout-card">
               <h3 class="callout-title">Working Digitally?</h3>
-              <p class="callout-p">Hard round brush, size dynamics ON, opacity jitter OFF. Stabilization 0–15% for drills. And never zoom past 100% during construction — that is what causes bobblehead figures.</p>
+              <p class="callout-p">Hard round brush, size dynamics ON, opacity jitter OFF. Stabilization 0–15% for drills. And never zoom past 100% during construction; that is what causes bobblehead figures.</p>
             </div>
             <div class="callout-card">
               <h3 class="callout-title">One Thing to Buy</h3>

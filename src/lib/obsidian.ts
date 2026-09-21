@@ -24,10 +24,10 @@ export function formatObsidianDay(params: DailyExportParams): string {
     const isDone = !!completedParts[i];
     const check = isDone ? 'x' : ' ';
     const duration = part.m > 0 ? ` (${part.m}m)` : '';
-    return `- [${check}] **Part ${part.k} · ${part.t}${duration}:** ${part.p} — ${part.d}`;
+    return `- [${check}] **Part ${part.k} · ${part.t}${duration}:** ${part.p}: ${part.d}`;
   }).join('\n');
 
-  return `### ${dateStr} — Week ${weekNum} Day ${dayNum}: ${day.t}
+  return `### ${dateStr} · Week ${weekNum} Day ${dayNum}: ${day.t}
 *Curriculum: [[02 Sources/Courses/Drawing from Imagination in 8 Weeks - brokendraw|Drawing from Imagination in 8 Weeks]]*
 
 ${partsMarkdown}

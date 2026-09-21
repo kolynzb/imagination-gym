@@ -91,7 +91,7 @@
         pasteStatus = '✓ Synced to live room!';
       } catch (e) {
         console.error('Failed to sync to Convex:', e);
-        pasteStatus = 'Convex sync failed — using local';
+        pasteStatus = 'Convex sync failed: using local';
       }
     } else {
       // Generate code to clipboard

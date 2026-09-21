@@ -123,7 +123,7 @@
               <span class="kit-label">Brush:</span>
               <span class="kit-val">Hard round or 6B pencil</span>
             </div>
-            <p class="kit-why">Size dynamics ON for pressure-sensitive width. Opacity jitter OFF — semi-transparent overlaps hide structural errors.</p>
+            <p class="kit-why">Size dynamics ON for pressure-sensitive width. Opacity jitter OFF: semi-transparent overlaps hide structural errors.</p>
           </li>
           <li class="kit-item">
             <div class="kit-item-head">
@@ -175,9 +175,9 @@
       Imagination Gym is an open educational tracker and study companion. It contains no proprietary textbook pages. Please support the masters who created this pedagogy:
     </p>
     <ul class="credits-list">
-      <li><strong>brokendraw</strong> — The 8-week roadmap, 25 exercises, and weekly projects. <a href="https://brokendraw.com/book" target="_blank" rel="noreferrer">Get the Companion Book ↗</a></li>
-      <li><strong>Peter Han</strong> — Shoulder linework, dynamic sketching, and ellipse axes in <em>The Dynamic Bible</em>.</li>
-      <li><strong>Drawabox</strong> — The 250 Box Challenge, mechanical drills, and the 50% rule. <a href="https://drawabox.com/" target="_blank" rel="noreferrer">Drawabox.com ↗</a></li>
+      <li><strong>brokendraw</strong>: The 8-week roadmap, 25 exercises, and weekly projects. <a href="https://brokendraw.com/book" target="_blank" rel="noreferrer">Get the Companion Book ↗</a></li>
+      <li><strong>Peter Han</strong>: Shoulder linework, dynamic sketching, and ellipse axes in <em>The Dynamic Bible</em>.</li>
+      <li><strong>Drawabox</strong>: The 250 Box Challenge, mechanical drills, and the 50% rule. <a href="https://drawabox.com/" target="_blank" rel="noreferrer">Drawabox.com ↗</a></li>
     </ul>
   </footer>
 </div>
