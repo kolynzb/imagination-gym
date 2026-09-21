@@ -106,7 +106,7 @@ function getInitialState(): AppState {
     timerElapsed: 0,
     timerPartIndex: 0,
     onboarded: saved?.onboarded ?? false,
-    onboardingOpen: saved?.onboarded ? false : true,
+    onboardingOpen: saved?.onboarded ? false : !isInvited,
     onboardingStep: 1,
     kitChecked: saved?.kitChecked || {},
     authModalOpen: isInvited && !saved?.isSignedIn,

@@ -10,8 +10,8 @@
   $: s = $state;
   $: stats = $derivedStats;
 
-  let inputName = '';
-  let inputRoom = '';
+  let inputName = s.userName === 'You' ? '' : s.userName;
+  let inputRoom = s.invitedRoomCode || s.roomCode || 'GYM-CREW';
   let isSubmitting = false;
   let syncMessage = '';
   let isError = false;
