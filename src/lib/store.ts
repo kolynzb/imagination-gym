@@ -35,6 +35,10 @@ export interface AppState {
   kitChecked: Record<string, boolean>;
   authModalOpen: boolean;
   isSignedIn: boolean;
+  invitedRoomCode: string | null;
+  inviteBannerDismissed: boolean;
+  userEmail: string | null;
+  userAvatar: string | null;
 }
 
 function getInitialState(): AppState {
@@ -48,6 +52,23 @@ function getInitialState(): AppState {
       console.warn('Failed to load state from localStorage:', e);
     }
   }
+
+  // Parse invite / room parameter from URL: e.g. ?room=CREW-8MJE or ?invite=STUDIO-4K
+  let urlRoom: string | null = null;
+  if (typeof window !== 'undefined' && window.location?.search) {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const r = params.get('room') || params.get('invite');
+      if (r && r.trim()) {
+        urlRoom = r.trim().toUpperCase();
+      }
+    } catch (e) {
+      console.warn('Failed to parse URL query params:', e);
+    }
+  }
+
+  const activeRoom = urlRoom || saved?.roomCode || 'GYM-CREW';
+  const isInvited = !!urlRoom && urlRoom !== saved?.roomCode;
 
   return {
     view: 'today',
@@ -75,7 +96,7 @@ function getInitialState(): AppState {
     paceFlex: saved?.paceFlex ?? false,
     focus: false,
     activeExerciseDrawer: null,
-    roomCode: saved?.roomCode || 'GYM-CREW',
+    roomCode: activeRoom,
     userName: saved?.userName || 'You',
     localCrew: saved?.localCrew || [],
     timerRunning: false,
@@ -88,8 +109,12 @@ function getInitialState(): AppState {
     onboardingOpen: saved?.onboarded ? false : true,
     onboardingStep: 1,
     kitChecked: saved?.kitChecked || {},
-    authModalOpen: false,
-    isSignedIn: saved?.isSignedIn ?? false
+    authModalOpen: isInvited && !saved?.isSignedIn,
+    isSignedIn: saved?.isSignedIn ?? false,
+    invitedRoomCode: urlRoom,
+    inviteBannerDismissed: false,
+    userEmail: saved?.userEmail || null,
+    userAvatar: saved?.userAvatar || null
   };
 }
 
@@ -480,7 +505,39 @@ export const actions = {
     }
   },
 
-  async signIn(name: string, roomCode: string) {
+  async copyInviteLink(roomCode?: string): Promise<string> {
+    const s = get(state);
+    const code = (roomCode || s.roomCode || 'GYM-CREW').toUpperCase().trim();
+    let link = `https://imagination-gym.vercel.app/?room=${encodeURIComponent(code)}`;
+    if (typeof window !== 'undefined' && window.location) {
+      link = `${window.location.origin}/?room=${encodeURIComponent(code)}`;
+    }
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(link);
+      } catch (err) {
+        console.warn('Clipboard write failed:', err);
+      }
+    }
+    return link;
+  },
+
+  dismissInviteBanner() {
+    state.update((s) => ({ ...s, inviteBannerDismissed: true }));
+  },
+
+  acceptInvite(roomCode: string) {
+    const cleanRoom = roomCode.toUpperCase().trim();
+    state.update((s) => ({
+      ...s,
+      roomCode: cleanRoom,
+      invitedRoomCode: null,
+      inviteBannerDismissed: true,
+      authModalOpen: !s.isSignedIn
+    }));
+  },
+
+  async signIn(name: string, roomCode: string, email?: string, avatarUrl?: string, authId?: string) {
     const cleanName = name.trim();
     const cleanRoom = roomCode.toUpperCase().trim();
     if (!cleanName || !cleanRoom) return;
@@ -489,7 +546,11 @@ export const actions = {
       ...s,
       userName: cleanName,
       roomCode: cleanRoom,
-      isSignedIn: true
+      isSignedIn: true,
+      userEmail: email || s.userEmail || null,
+      userAvatar: avatarUrl || s.userAvatar || null,
+      invitedRoomCode: null,
+      inviteBannerDismissed: true
     }));
 
     // If Convex is available, sync and fetch existing profile
@@ -498,7 +559,10 @@ export const actions = {
         // @ts-ignore
         const member = await convex.mutation('crew:signInOrRegister', {
           roomCode: cleanRoom,
-          name: cleanName
+          name: cleanName,
+          email: email || undefined,
+          avatarUrl: avatarUrl || undefined,
+          authId: authId || undefined
         });
 
         if (member && member.doneJson) {
@@ -529,7 +593,10 @@ export const actions = {
     state.update((s) => ({
       ...s,
       userName: 'You',
-      isSignedIn: false
+      userEmail: null,
+      userAvatar: null,
+      isSignedIn: false,
+      authModalOpen: false
     }));
   }
 };
@@ -552,13 +619,26 @@ export const derivedStats = derived(state, ($s) => {
     }
   }
 
-  // Calculate Streak
+  // Calculate Streak: count consecutive completed days ending at today or yesterday
   let streak = 0;
   let currW = $s.cw;
   let currD = $s.cd;
+
+  const currentDay = weeks[currW - 1]?.days[currD - 1];
+  const currentDayDone = currentDay && currentDay.parts.length > 0 && currentDay.parts.every((_, i) => $s.done[`w${currW}d${currD}p${i}`]);
+
+  // If today is not done yet, check if yesterday was done to preserve the active streak
+  if (!currentDayDone) {
+    currD--;
+    if (currD < 1) {
+      currW--;
+      currD = 7;
+    }
+  }
+
   while (currW >= 1) {
     const day = weeks[currW - 1]?.days[currD - 1];
-    const isDone = day && day.parts.every((_, i) => $s.done[`w${currW}d${currD}p${i}`]);
+    const isDone = day && day.parts.length > 0 && day.parts.every((_, i) => $s.done[`w${currW}d${currD}p${i}`]);
     if (isDone) {
       streak++;
       currD--;

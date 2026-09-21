@@ -17,9 +17,13 @@ export default defineSchema({
     streak: v.number(),
     doneJson: v.optional(v.string()), // Full serialized checklist & notes for cross-device sync
     lastActive: v.number(),
+    email: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()),
+    authId: v.optional(v.string()),
   })
     .index("by_roomCode", ["roomCode"])
-    .index("by_roomCode_and_name", ["roomCode", "name"]),
+    .index("by_roomCode_and_name", ["roomCode", "name"])
+    .index("by_email", ["email"]),
 
   critPosts: defineTable({
     roomCode: v.string(),

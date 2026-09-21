@@ -81,14 +81,6 @@
       >
         <span>Today</span>
       </button>
-      <button
-        type="button"
-        class="nav-btn orientation-btn"
-        onclick={() => actions.openOnboarding()}
-      >
-        <span class="orientation-icon"><Icon name="goal" size={16} /></span>
-        <span>Start Here · Guide</span>
-      </button>
     </div>
 
     <div class="nav-section">
@@ -173,6 +165,17 @@
         <span>{stats.totalHoursNum}h logged</span>
         <span><Icon name="fire" size={15} /> {stats.streak} day streak</span>
       </div>
+    </div>
+
+    <div class="sidebar-secondary-actions">
+      <button
+        type="button"
+        class="replay-orientation-link"
+        onclick={() => actions.openOnboarding()}
+        title="Re-open the 3-step master orientation and roadmap guide"
+      >
+        <Icon name="goal" size={13} /> Replay Course Guide
+      </button>
     </div>
 
     <div class="theme-picker">
@@ -411,22 +414,6 @@
     color: var(--ink-55);
   }
 
-  .orientation-btn {
-    margin-top: 2px;
-    background: var(--sulfur-12);
-    border: 1px solid var(--sulfur-40);
-    color: var(--ink);
-  }
-
-  .orientation-btn:hover {
-    background: var(--sulfur-25);
-  }
-
-  .orientation-icon {
-    font-size: 14px;
-    margin-right: 4px;
-  }
-
   .start-mobile-btn {
     border-color: var(--accent) !important;
     font-weight: 700 !important;
@@ -566,6 +553,31 @@
     justify-content: space-between;
     font-size: 12px;
     color: var(--ink-62);
+  }
+
+  .sidebar-secondary-actions {
+    display: flex;
+    justify-content: center;
+  }
+
+  .replay-orientation-link {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-55);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 150ms ease;
+  }
+
+  .replay-orientation-link:hover {
+    color: var(--ink);
   }
 
   .theme-picker {

@@ -15,6 +15,20 @@
     </p>
   </header>
 
+  <!-- Course Orientation Hero Banner -->
+  <section class="orientation-hero-card">
+    <div class="hero-info-text">
+      <span class="hero-badge">COURSE ORIENTATION & ROADMAP</span>
+      <h2 class="hero-title">Giving away my entire drawing class</h2>
+      <p class="hero-desc">
+        Re-watch brokendraw's 43-minute master curriculum breakdown, review your 7-item physical/digital kit checklist, or walk through Day 1 again.
+      </p>
+    </div>
+    <button type="button" class="replay-guide-btn" onclick={() => actions.openOnboarding()}>
+      <Icon name="goal" size={16} /> Replay Course Orientation
+    </button>
+  </section>
+
   <!-- Three Anchor Rules -->
   <section class="section-block">
     <h2 class="section-title">The Three Anchor Rules</h2>
@@ -460,6 +474,77 @@
     color: var(--accent-ink);
     text-decoration: none;
     border-bottom: 1px solid var(--accent-14);
+  }
+
+  .orientation-hero-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 24px 28px;
+    border-radius: 24px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    margin-bottom: 32px;
+  }
+
+  .hero-info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 600px;
+  }
+
+  .hero-badge {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-size: 26px;
+    letter-spacing: 0.02em;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .hero-desc {
+    font-size: 14px;
+    color: var(--ink-78);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .replay-guide-btn {
+    appearance: none;
+    background: var(--accent);
+    color: #fff;
+    border: 0;
+    border-radius: 14px;
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    transition: transform 120ms ease;
+  }
+
+  .replay-guide-btn:active {
+    transform: scale(0.96);
+  }
+
+  @media (max-width: 760px) {
+    .orientation-hero-card {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
   }
 
   @media (max-width: 600px) {

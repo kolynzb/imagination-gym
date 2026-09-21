@@ -12,6 +12,42 @@ const memberDocValidator = v.object({
   streak: v.number(),
   doneJson: v.optional(v.string()),
   lastActive: v.number(),
+  email: v.optional(v.string()),
+  avatarUrl: v.optional(v.string()),
+  authId: v.optional(v.string()),
+});
+
+export const getRoomInfo = query({
+  args: { roomCode: v.string() },
+  returns: v.union(
+    v.null(),
+    v.object({
+      code: v.string(),
+      name: v.string(),
+      createdAt: v.number(),
+      memberCount: v.number(),
+      members: v.array(v.string()),
+    })
+  ),
+  handler: async (ctx, args) => {
+    const code = args.roomCode.toUpperCase().trim();
+    const room = await ctx.db
+      .query("rooms")
+      .withIndex("by_code", (q) => q.eq("code", code))
+      .first();
+    if (!room) return null;
+    const members = await ctx.db
+      .query("members")
+      .withIndex("by_roomCode", (q) => q.eq("roomCode", code))
+      .take(50);
+    return {
+      code: room.code,
+      name: room.name,
+      createdAt: room.createdAt,
+      memberCount: members.length,
+      members: members.map((m) => m.name),
+    };
+  },
 });
 
 export const getMembers = query({
@@ -76,6 +112,9 @@ export const signInOrRegister = mutation({
   args: {
     roomCode: v.string(),
     name: v.string(),
+    email: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()),
+    authId: v.optional(v.string()),
   },
   returns: v.union(v.null(), memberDocValidator),
   handler: async (ctx, args) => {
@@ -97,11 +136,18 @@ export const signInOrRegister = mutation({
       });
     }
 
-    // Find member
+    // Find member by roomCode + name, or by email if provided
     let member = await ctx.db
       .query("members")
       .withIndex("by_roomCode_and_name", (q) => q.eq("roomCode", code).eq("name", name))
       .first();
+
+    if (!member && args.email) {
+      member = await ctx.db
+        .query("members")
+        .withIndex("by_email", (q) => q.eq("email", args.email))
+        .first();
+    }
 
     if (!member) {
       const newId = await ctx.db.insert("members", {
@@ -112,12 +158,21 @@ export const signInOrRegister = mutation({
         hours: 0,
         streak: 0,
         lastActive: Date.now(),
+        email: args.email,
+        avatarUrl: args.avatarUrl,
+        authId: args.authId,
       });
       member = await ctx.db.get(newId);
     } else {
       await ctx.db.patch(member._id, {
         lastActive: Date.now(),
+        roomCode: code,
+        name: name || member.name,
+        ...(args.email ? { email: args.email } : {}),
+        ...(args.avatarUrl ? { avatarUrl: args.avatarUrl } : {}),
+        ...(args.authId ? { authId: args.authId } : {}),
       });
+      member = await ctx.db.get(member._id);
     }
 
     return member;

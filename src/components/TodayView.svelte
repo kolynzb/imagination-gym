@@ -54,6 +54,26 @@
 </script>
 
 <div class="today-view">
+  <!-- Crew Invitation Banner -->
+  {#if s.invitedRoomCode && !s.isSignedIn && !s.inviteBannerDismissed}
+    <div class="invite-top-banner">
+      <div class="invite-banner-inner">
+        <span class="invite-banner-icon">🎨</span>
+        <div class="invite-banner-msg">
+          You've been invited to join crew <strong>{s.invitedRoomCode}</strong>! Practice together and sync streaks on the shared leaderboard.
+        </div>
+      </div>
+      <div class="invite-banner-btns">
+        <button type="button" class="join-crew-btn" onclick={() => actions.acceptInvite(s.invitedRoomCode!)}>
+          Join Crew
+        </button>
+        <button type="button" class="dismiss-crew-btn" onclick={() => actions.dismissInviteBanner()} aria-label="Dismiss">
+          ✕
+        </button>
+      </div>
+    </div>
+  {/if}
+
   <!-- Schedule Shift Alert if behind -->
   {#if stats.missed.length > 0}
     <div class="schedule-alert">
@@ -745,6 +765,83 @@
   .ext-link:hover {
     color: var(--ink);
     border-bottom-color: var(--ink);
+  }
+
+  .invite-top-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-radius: 20px;
+    background: rgba(235, 94, 40, 0.08);
+    border: 1px solid rgba(235, 94, 40, 0.35);
+    margin-bottom: 24px;
+    animation: fadeIn 200ms var(--ease-out);
+  }
+
+  .invite-banner-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .invite-banner-icon {
+    font-size: 20px;
+  }
+
+  .invite-banner-msg {
+    font-size: 14px;
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .invite-banner-btns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .join-crew-btn {
+    appearance: none;
+    background: var(--accent);
+    color: #fff;
+    border: 0;
+    border-radius: 800px;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: transform 120ms ease;
+  }
+
+  .join-crew-btn:active {
+    transform: scale(0.96);
+  }
+
+  .dismiss-crew-btn {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    font-size: 16px;
+    color: var(--ink-55);
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 800px;
+    line-height: 1;
+  }
+
+  .dismiss-crew-btn:hover {
+    color: var(--ink);
+  }
+
+  @media (max-width: 600px) {
+    .invite-top-banner {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
   }
 
   @media (max-width: 980px) {

@@ -102,6 +102,13 @@
     setTimeout(() => (pasteStatus = ''), 3000);
   }
 
+  let inviteCopiedMsg = '';
+  async function handleCopyInviteLink() {
+    const link = await actions.copyInviteLink(s.roomCode);
+    inviteCopiedMsg = `✓ Invite link copied: ${link}`;
+    setTimeout(() => (inviteCopiedMsg = ''), 4000);
+  }
+
   function handlePaste() {
     if (!pasteVal.trim()) return;
     const ok = actions.pasteSyncCode(pasteVal);
@@ -211,6 +218,44 @@
       </div>
     </div>
   </header>
+
+  <!-- Pending Invitation Switch Banner -->
+  {#if s.invitedRoomCode && s.invitedRoomCode !== s.roomCode}
+    <div class="invite-switch-banner">
+      <div class="invite-banner-text">
+        <span class="invite-banner-icon">🎨</span>
+        <span>You were invited to join crew <strong>{s.invitedRoomCode}</strong>. Switch now to draw with this crew?</span>
+      </div>
+      <div class="invite-banner-actions">
+        <button type="button" class="switch-crew-btn" onclick={() => actions.acceptInvite(s.invitedRoomCode!)}>
+          Switch to {s.invitedRoomCode}
+        </button>
+        <button type="button" class="dismiss-crew-btn" onclick={() => actions.dismissInviteBanner()}>
+          Dismiss
+        </button>
+      </div>
+    </div>
+  {/if}
+
+  <!-- Crew Room Sharing Bar -->
+  <div class="crew-share-bar">
+    <div class="room-summary-chip">
+      <span class="room-tag-label">Room</span>
+      <span class="room-tag-value">{s.roomCode}</span>
+    </div>
+    <div class="share-actions-group">
+      <button type="button" class="action-chip-btn highlight" onclick={handleCopyInviteLink}>
+        <Icon name="copy" size={14} /> Copy Invite Link
+      </button>
+      <button type="button" class="action-chip-btn" onclick={() => actions.openAuthModal()}>
+        <Icon name="user" size={14} /> Profile & Switch Room
+      </button>
+    </div>
+  </div>
+
+  {#if inviteCopiedMsg}
+    <div class="invite-toast">{inviteCopiedMsg}</div>
+  {/if}
 
   <!-- Leaderboard Table -->
   <div class="table-card">
