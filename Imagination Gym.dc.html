@@ -1,0 +1,2170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&family=Bebas+Neue&display=swap" rel="stylesheet" />
+<title>Imagination Gym — draw from imagination in 8 weeks</title>
+<meta name="description" content="An eight-week daily training plan for drawing from imagination: warm-up, drill, project. Built from brokendraw's free drawing class." />
+<meta name="theme-color" content="#e2e2df" />
+<meta property="og:title" content="Imagination Gym" />
+<meta property="og:description" content="Eight weeks, 56 days, three parts a day. A training plan for drawing from imagination." />
+<meta property="og:type" content="website" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23070607'/%3E%3Ctext x='32' y='45' font-family='Impact,sans-serif' font-size='38' fill='%23fc5000' text-anchor='middle'%3EIG%3C/text%3E%3C/svg%3E" />
+<script src="./photo-slot.js"></script>
+<style>
+  :root {
+    --canvas:#e2e2df; --card:#f7f6f2; --ink:#070607;
+    --accent:#fc5000; --accent-ink:#b03500; --on-accent:#070607; --sulfur:#f5f28e;
+    --accent-14:rgba(252,80,0,0.14); --sulfur-band:#f5f28e;
+    --line:rgba(7,6,7,0.10); --line-2:rgba(7,6,7,0.20); --line-3:rgba(7,6,7,0.25); --track:rgba(7,6,7,0.08);
+    --ink-78:rgba(7,6,7,0.78); --ink-72:rgba(7,6,7,0.72); --ink-68:rgba(7,6,7,0.68);
+    --ink-62:rgba(7,6,7,0.66); --ink-55:rgba(7,6,7,0.64); --ink-42:rgba(7,6,7,0.62); --ink-35:rgba(7,6,7,0.62);
+  }
+  html[data-theme="dark"] {
+    --canvas:#121211; --card:#1d1d1b; --ink:#eceae4;
+    --accent:#ff5c12; --accent-ink:#ff5c12; --on-accent:#0d0c0b; --sulfur:#f5f28e;
+    --accent-14:rgba(255,92,18,0.18); --sulfur-band:rgba(245,242,142,0.26);
+    --line:rgba(236,234,228,0.14); --line-2:rgba(236,234,228,0.24); --line-3:rgba(236,234,228,0.30); --track:rgba(236,234,228,0.10);
+    --ink-78:rgba(236,234,228,0.80); --ink-72:rgba(236,234,228,0.74); --ink-68:rgba(236,234,228,0.70);
+    --ink-62:rgba(236,234,228,0.70); --ink-55:rgba(236,234,228,0.68); --ink-42:rgba(236,234,228,0.62); --ink-35:rgba(236,234,228,0.60);
+  }
+  html, body { margin: 0; padding: 0; background: var(--canvas); }
+  * { box-sizing: border-box; }
+  body { font-family: "DM Sans", system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; font-weight: 500; }
+  a { color: var(--accent-ink); text-decoration: none; border-bottom: 1px solid var(--accent-14); }
+  a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+  h1, h2, h3 { font-family: 'Bebas Neue', Impact, sans-serif; font-weight: 400; }
+  input, textarea, button, select { font: inherit; color: inherit; }
+  input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  ::placeholder { color: var(--ink-42); }
+  button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 860px) {
+    [data-focus-body] { flex-direction: column !important; }
+    [data-focus-rail] { flex: 0 0 auto !important; }
+    [data-shell] { flex-direction: column; }
+    [data-sidebar] { position: static !important; width: 100% !important; flex: none !important; height: auto !important; border-right: 0 !important; border-bottom: 1px solid var(--line); }
+    [data-nav] { flex-direction: row !important; flex-wrap: wrap; overflow: visible !important; }
+    [data-nav] > div { flex-direction: row !important; flex-wrap: wrap; align-items: center; margin-bottom: 0 !important; }
+    [data-pane] { padding: 28px 20px 64px !important; }
+    [data-mx-head] { display: none !important; }
+    [data-mx-row] { grid-template-columns: 1fr !important; }
+    [data-mx-label] { display: block; margin-bottom: 2px; }
+  }
+  [data-mx-label] { display: none; }
+  @keyframes igCount { from { width: 100%; } to { width: 0%; } }
+  @keyframes igRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  @keyframes igFall { from { transform: translate3d(0,0,0) rotate(0deg); } to { transform: translate3d(0,125vh,0) rotate(540deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    [data-confetti] { display: none; }
+    * { animation-duration: 0.001s !important; }
+  }
+  @media (max-width: 1140px) {
+    [data-rail] { position: static !important; align-self: stretch !important; }
+  }
+  @media (max-width: 1180px) {
+    [data-mx-head] { display: none !important; }
+    [data-mx-row] { grid-template-columns: 1fr !important; }
+    [data-mx-label] { display: block; margin-bottom: 2px; }
+  }
+  @media (max-width: 560px) {
+    [data-pane] h1 { font-size: 40px !important; }
+  }
+</style>
+</helmet>
+<sc-if value="{{ obOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed; inset:0; z-index:60; background:var(--canvas); overflow-y:auto; display:flex; flex-direction:column">
+
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:16px 28px; border-bottom:1px solid var(--line)">
+      <div style="display:flex; align-items:center; gap:11px; flex:0 0 auto">
+        <div style="flex:0 0 32px; height:32px; border-radius:16px; background:var(--ink); color:var(--canvas); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',Impact,sans-serif; font-size:19px; letter-spacing:0.04em; padding-left:2px">IG</div>
+        <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:21px; letter-spacing:0.03em; white-space:nowrap">Start here</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:16px">
+        <div style="display:flex; gap:6px; align-items:center">
+          <sc-for list="{{ obDots }}" as="dot" hint-placeholder-count="3">
+            <div style="{{ dot.style }}"></div>
+          </sc-for>
+        </div>
+        <button type="button" onClick="{{ obSkip }}" style="appearance:none; -webkit-appearance:none; font:inherit; background:transparent; border:0; cursor:pointer; min-height:44px; padding:0 10px; font-size:16px; color:var(--ink-62)" style-hover="color:var(--ink)">Skip, I know the method</button>
+      </div>
+    </div>
+
+    <div style="flex:1; width:100%; max-width:880px; margin:0 auto; padding:44px 28px 48px">
+
+      <sc-if value="{{ obStep1 }}" hint-placeholder-val="{{ true }}">
+        <div style="animation:igRise .32s ease-out">
+          <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">Step 1 of 3</div>
+          <h1 style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; font-size:64px; line-height:1.06; letter-spacing:0.02em; margin:8px 0 0; max-width:20ch">Eight weeks to draw from imagination</h1>
+          <p style="font-size:18px; line-height:1.6; color:var(--ink-78); max-width:62ch; margin:18px 0 0; text-wrap:pretty">You cannot draw from imagination what your brain cannot construct mechanically. So this is not a course about talent — it is eight weeks of isolating one technical variable a day until construction becomes unconscious, and your conscious mind is free for composition and storytelling.</p>
+
+          <div style="margin-top:28px; background:var(--card); border:1px solid var(--line); border-radius:24px; overflow:hidden">
+            <div style="position:relative; width:100%; aspect-ratio:16/9; background:var(--ink)">
+              <iframe src="https://www.youtube-nocookie.com/embed/zYzgxUVSpUc?rel=0&amp;modestbranding=1" title="brokendraw — giving away my entire drawing class" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="allowfullscreen" style="position:absolute; inset:0; width:100%; height:100%; border:0"></iframe>
+            </div>
+            <div style="padding:16px 20px">
+              <div style="font-size:16px; font-weight:700">Giving away my entire drawing class</div>
+              <div style="font-size:16px; color:var(--ink-62); margin-top:3px">brokendraw · 43 min · the video this whole plan is built from. Each week also links to its own timestamp.</div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin-top:40px">
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:20px 22px">
+              <div style="font-family:'Bebas Neue',Impact,sans-serif; letter-spacing:0.02em; font-size:32px; line-height:1.1">Medicine, not diet</div>
+              <div style="font-size:16px; line-height:1.6; color:var(--ink-72); margin-top:8px; text-wrap:pretty">Drills are medicine for a specific weakness. The project is the meal. Drills alone produce exercise technicians who can draw 250 perfect cubes and still freeze at a blank page.</div>
+            </div>
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:20px 22px">
+              <div style="font-family:'Bebas Neue',Impact,sans-serif; letter-spacing:0.02em; font-size:32px; line-height:1.1">The 50% rule</div>
+              <div style="font-size:16px; line-height:1.6; color:var(--ink-72); margin-top:8px; text-wrap:pretty">Day seven of every week belongs to joy, play and curiosity. Zero drills, zero self-critique. If all your drawing is rigorous evaluation, your brain learns to associate the sketchbook with failure.</div>
+            </div>
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:20px 22px">
+              <div style="font-family:'Bebas Neue',Impact,sans-serif; letter-spacing:0.02em; font-size:32px; line-height:1.1">Whole-arm pivot</div>
+              <div style="font-size:16px; line-height:1.6; color:var(--ink-72); margin-top:8px; text-wrap:pretty">Lock the wrist for long curves and perspective lines. Pivot from the shoulder and elbow. Cold hands draw from the wrist and produce timid, scratchy, hairy lines.</div>
+            </div>
+          </div>
+
+          <div style="margin-top:48px">
+            <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; letter-spacing:0.02em; margin:0; font-weight:400">A day has three parts</h2>
+            <div style="display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:24px; overflow:hidden; margin-top:18px">
+              <div style="display:flex; gap:18px; padding:16px 20px; background:var(--card); flex-wrap:wrap">
+                <div style="flex:0 0 150px; font-size:16px; font-weight:700">A · Warm-up</div>
+                <div style="flex:0 0 80px; font-size:16px; color:var(--ink-62); white-space:nowrap">10 min</div>
+                <div style="flex:1; min-width:220px; font-size:16px; line-height:1.55; color:var(--ink-68); text-wrap:pretty">Motor calibration. Activates the kinetic chain from core to shoulder so you commit clean single-pass strokes.</div>
+              </div>
+              <div style="display:flex; gap:18px; padding:16px 20px; background:var(--card); flex-wrap:wrap">
+                <div style="flex:0 0 150px; font-size:16px; font-weight:700">B · The drill</div>
+                <div style="flex:0 0 80px; font-size:16px; color:var(--ink-62); white-space:nowrap">45–60 min</div>
+                <div style="flex:1; min-width:220px; font-size:16px; line-height:1.55; color:var(--ink-68); text-wrap:pretty">The medicine. Isolates one variable — convergence, minor axes, boolean cuts, fabric tension — with no pressure to make a finished artwork.</div>
+              </div>
+              <div style="display:flex; gap:18px; padding:16px 20px; background:var(--card); flex-wrap:wrap">
+                <div style="flex:0 0 150px; font-size:16px; font-weight:700">C · The project</div>
+                <div style="flex:0 0 80px; font-size:16px; color:var(--ink-62); white-space:nowrap">30–45 min</div>
+                <div style="flex:1; min-width:220px; font-size:16px; line-height:1.55; color:var(--ink-68); text-wrap:pretty">The meal. Stress-tests the day's drill in a real creative problem, burning the mechanical skill into your visual library.</div>
+              </div>
+              <div style="display:flex; gap:18px; padding:16px 20px; background:var(--card); flex-wrap:wrap">
+                <div style="flex:0 0 150px; font-size:16px; font-weight:700">D · Day seven</div>
+                <div style="flex:0 0 80px; font-size:16px; color:var(--ink-62); white-space:nowrap">All day</div>
+                <div style="flex:1; min-width:220px; font-size:16px; line-height:1.55; color:var(--ink-68); text-wrap:pretty">Play. Doodles, fan art, imagination sketches. Scheduled recovery, not a skipped day.</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:48px">
+            <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; letter-spacing:0.02em; margin:0; font-weight:400">What you're actually doing</h2>
+            <p style="font-size:16px; line-height:1.62; color:var(--ink-78); max-width:62ch; margin:10px 0 0; text-wrap:pretty">Twenty-five exercises arranged in five levels, drawn from brokendraw's companion book. The eight weeks are just a schedule laid over them — the levels are the real spine.</p>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:24px; overflow:hidden; margin-top:18px">
+              <div style="background:var(--card); padding:16px 18px">
+                <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:26px; letter-spacing:0.02em">L1</div>
+                <div style="font-size:16px; color:var(--ink-72); margin-top:4px">Mechanics</div>
+              </div>
+              <div style="background:var(--card); padding:16px 18px">
+                <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:26px; letter-spacing:0.02em">L2</div>
+                <div style="font-size:16px; color:var(--ink-72); margin-top:4px">Basic forms</div>
+              </div>
+              <div style="background:var(--card); padding:16px 18px">
+                <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:26px; letter-spacing:0.02em">L3</div>
+                <div style="font-size:16px; color:var(--ink-72); margin-top:4px">Form control</div>
+              </div>
+              <div style="background:var(--card); padding:16px 18px">
+                <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:26px; letter-spacing:0.02em">L4</div>
+                <div style="font-size:16px; color:var(--ink-72); margin-top:4px">Construction</div>
+              </div>
+              <div style="background:var(--card); padding:16px 18px">
+                <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:26px; letter-spacing:0.02em">L5</div>
+                <div style="font-size:16px; color:var(--ink-72); margin-top:4px">Imagination</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:40px; border-top:1px solid var(--line); padding-top:24px; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:24px">
+            <div>
+              <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:34px; letter-spacing:0.02em; line-height:1">10–12 hrs a week</div>
+              <div style="font-size:16px; line-height:1.55; color:var(--ink-72); margin-top:6px">Roughly 90–120 minutes a day, six days on, one day of play.</div>
+            </div>
+            <div>
+              <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:34px; letter-spacing:0.02em; line-height:1">Three sources</div>
+              <div style="font-size:16px; line-height:1.55; color:var(--ink-72); margin-top:6px">Peter Han's <em>Dynamic Bible</em> for linework and ink discipline, Drawabox for the mechanical gym, brokendraw's book for the 25 exercises and weekly projects. This tracker is unofficial and contains none of their content — it points you at theirs.</div>
+            </div>
+            <div>
+              <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:34px; letter-spacing:0.02em; line-height:1">Goldilocks zone</div>
+              <div style="font-size:16px; line-height:1.55; color:var(--ink-72); margin-top:6px">Too easy is boredom, too hard is burnout. If a drill breaks you, add scaffolding — a ruled horizon, a pencil instead of a fineliner — then take it away.</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ obStep2 }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:igRise .32s ease-out">
+          <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">Step 2 of 3</div>
+          <h1 style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; font-size:64px; line-height:1.06; letter-spacing:0.02em; margin:8px 0 0; max-width:20ch">Pick a start date and get your kit</h1>
+
+          <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:22px 24px; margin-top:32px">
+            <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; font-weight:700">Day one falls on</div>
+            <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:12px">
+              <input type="date" value="{{ obStartVal }}" onChange="{{ obSetStart }}" style="padding:12px 14px; border:1px solid var(--line-2); border-radius:16px; background:var(--canvas); font-size:16px; min-height:48px" />
+              <div style="font-size:16px; color:var(--ink-72); min-width:0">{{ obStartHuman }} → finishes {{ obEndHuman }}</div>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:baseline; gap:16px; margin:48px 0 6px">
+            <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; letter-spacing:0.02em; margin:0; font-weight:400">Your kit</h2>
+            <div style="flex:1"></div>
+            <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62); white-space:nowrap">{{ obKitCount }}/{{ obKitTotal }} ticked</div>
+          </div>
+          <p style="font-size:16px; line-height:1.6; color:var(--ink-72); max-width:62ch; margin:0 0 18px; text-wrap:pretty">Nothing here is expensive. Loose copy paper over a bound sketchbook is deliberate: an expensive book triggers fear of ruining it, and you need to throw pages away without hesitating.</p>
+          <div style="display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:24px; overflow:hidden">
+            <sc-for list="{{ obKit }}" as="k" hint-placeholder-count="7">
+              <div style="display:flex; gap:16px; padding:16px 20px; background:var(--card); flex-wrap:wrap; align-items:flex-start">
+                <button type="button" aria-pressed="{{ k.on }}" aria-label="{{ k.label }}" onClick="{{ k.toggle }}" style="{{ k.box }}">{{ k.tick }}</button>
+                <div style="flex:0 0 140px; font-size:16px; color:var(--ink-72)">{{ k.t }}</div>
+                <div style="flex:0 0 180px; font-size:16px; font-weight:700">{{ k.v }}</div>
+                <div style="flex:1; min-width:220px; font-size:16px; line-height:1.55; color:var(--ink-68); text-wrap:pretty">{{ k.why }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px; margin-top:24px">
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:20px 22px">
+              <div style="font-family:'Bebas Neue',Impact,sans-serif; letter-spacing:0.02em; font-size:30px; line-height:1.1">Working digitally?</div>
+              <div style="font-size:16px; line-height:1.6; color:var(--ink-72); margin-top:8px; text-wrap:pretty">Hard round brush, size dynamics on, opacity jitter off. Stabilization 0–15% for drills. And never zoom past 100% during construction — that is what produces bobblehead figures. Full setup is under Method &amp; kit.</div>
+            </div>
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:20px 22px">
+              <div style="font-family:'Bebas Neue',Impact,sans-serif; letter-spacing:0.02em; font-size:30px; line-height:1.1">One thing to buy</div>
+              <div style="font-size:16px; line-height:1.6; color:var(--ink-72); margin-top:8px; text-wrap:pretty">Every drill references a page in brokendraw's companion book. The rest of the sources are free.</div>
+              <a href="https://brokendraw.com/book" target="_blank" rel="noreferrer" style="display:inline-block; font-size:16px; margin-top:10px">Get the book →</a>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ obStep3 }}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{ obHasDay }}" hint-placeholder-val="{{ true }}">
+          <div style="animation:igRise .32s ease-out">
+            <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">Step 3 of 3 · {{ obStartHuman }}</div>
+          <h1 style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; font-size:64px; line-height:1.06; letter-spacing:0.02em; margin:8px 0 0; max-width:20ch">{{ obD1Title }}</h1>
+          <p style="font-size:18px; line-height:1.6; color:var(--ink-78); max-width:62ch; margin:16px 0 0; text-wrap:pretty">This is day one, end to end. {{ obD1Mins }} minutes. Work top to bottom and tick each part as you finish it.</p>
+
+          <div style="display:flex; flex-direction:column; gap:12px; margin-top:32px">
+            <sc-for list="{{ obD1Parts }}" as="p" hint-placeholder-count="3">
+              <div style="background:var(--card); border:1px solid var(--line); border-left:8px solid var(--accent); border-radius:0 24px 24px 0; padding:20px 24px">
+                <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap">
+                  <span style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; letter-spacing:0.12em; text-transform:uppercase; white-space:nowrap; color:var(--accent-ink)">Part {{ p.k }} · {{ p.t }}</span>
+                  <span style="font-size:16px; color:var(--ink-62); white-space:nowrap">{{ p.m }}</span>
+                </div>
+                <div style="font-size:16px; line-height:1.6; color:var(--ink-78); margin-top:8px; max-width:66ch; text-wrap:pretty">{{ p.p }}</div>
+              </div>
+            </sc-for>
+          </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ obNoDay }}" hint-placeholder-val="{{ false }}">
+          <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">Step 3 of 3</div>
+          <h1 style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; font-size:64px; line-height:1.06; letter-spacing:0.02em; margin:8px 0 0">Loading day one…</h1>
+          <p style="font-size:18px; line-height:1.6; color:var(--ink-78); max-width:62ch; margin:16px 0 0; text-wrap:pretty">Fetching the eight-week plan. You can still start — Today will have it by the time you get there.</p>
+        </sc-if>
+      </sc-if>
+
+    </div>
+
+    <div style="position:sticky; bottom:0; background:var(--canvas); border-top:1px solid var(--line); padding:14px 28px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap">
+      <sc-if value="{{ obHasBack }}" hint-placeholder-val="{{ false }}">
+        <button type="button" onClick="{{ obBack }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:var(--ink); background:transparent; border:1.5px solid var(--line-2); cursor:pointer; min-height:48px; padding:0 22px; border-radius:800px; font-size:16px; font-weight:500; white-space:nowrap" style-hover="border-color:var(--ink)">← Back</button>
+      </sc-if>
+      <div style="flex:1"></div>
+      <button type="button" onClick="{{ obNext }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:var(--on-accent); background:var(--accent); border:1.5px solid var(--accent); cursor:pointer; min-height:48px; padding:0 28px; border-radius:800px; font-size:16px; font-weight:700; white-space:nowrap">{{ obNextLabel }}</button>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ celOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed; inset:0; z-index:70; background:var(--accent); color:var(--on-accent); overflow-y:auto; display:flex; justify-content:center; padding:40px 28px">
+    <div data-confetti aria-hidden="true" style="position:fixed; inset:0; overflow:hidden; pointer-events:none">
+      <sc-for list="{{ celConfetti }}" as="c" hint-placeholder-count="6">
+        <div style="{{ c.style }}"></div>
+      </sc-for>
+    </div>
+    <div style="position:relative; max-width:580px; width:100%; margin:auto; animation:igRise .4s ease-out">
+      <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; font-weight:700">Week {{ celWeek }} · Day {{ celDay }} complete</div>
+      <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; font-size:80px; line-height:0.94; letter-spacing:0.02em; margin:14px 0 0; text-wrap:pretty">{{ celTitle }}</h2>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:20px; margin-top:34px; padding-top:24px; border-top:1.5px solid var(--on-accent)">
+        <div>
+          <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:40px; line-height:1; letter-spacing:0.02em">{{ celParts }}</div>
+          <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; margin-top:4px">{{ celPartsLabel }}</div>
+        </div>
+        <div>
+          <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:40px; line-height:1; letter-spacing:0.02em">{{ celMinsBig }}</div>
+          <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; margin-top:4px">{{ celMinsLabel }}</div>
+        </div>
+        <div>
+          <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:40px; line-height:1; letter-spacing:0.02em">{{ celStreak }}</div>
+          <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; margin-top:4px">day streak</div>
+        </div>
+      </div>
+      <div style="font-size:18px; line-height:1.55; margin-top:28px; text-wrap:pretty">{{ celNextLabel }}</div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:20px">
+        <button type="button" onClick="{{ celNext }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:var(--accent); background:var(--on-accent); border:1.5px solid var(--on-accent); cursor:pointer; min-height:48px; padding:0 26px; border-radius:800px; font-size:16px; font-weight:700; white-space:nowrap">Go now →</button>
+        <button type="button" onClick="{{ celStay }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:var(--on-accent); background:transparent; border:1.5px solid var(--on-accent); cursor:pointer; min-height:48px; padding:0 22px; border-radius:800px; font-size:16px; font-weight:500; white-space:nowrap">Stay on this day</button>
+      </div>
+      <div style="height:4px; background:rgba(7,6,7,0.2); border-radius:800px; overflow:hidden; margin-top:26px">
+        <div style="height:100%; background:var(--on-accent); animation:igCount 7s linear forwards"></div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ isFocus }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed; inset:0; z-index:80; background:var(--canvas); display:flex; flex-direction:column">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:14px 22px; border-bottom:1px solid var(--line)">
+      <div style="min-width:0">
+        <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62); white-space:nowrap">Week {{ tWeekNum }} · Day {{ tDayNum }}</div>
+        <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:26px; letter-spacing:0.02em; line-height:1.1; margin-top:2px">{{ tDayTitle }}</div>
+      </div>
+      <button type="button" onClick="{{ focusClose }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:var(--ink); background:transparent; border:1.5px solid var(--line-2); cursor:pointer; min-height:44px; padding:0 20px; border-radius:800px; font-size:16px; font-weight:500; white-space:nowrap" style-hover="border-color:var(--ink)">Exit · Esc</button>
+    </div>
+
+    <div data-focus-body style="flex:1; min-height:0; display:flex; gap:18px; padding:18px 22px 22px">
+      <div style="flex:1 1 auto; min-width:0; min-height:0; border:1px solid var(--line); border-radius:24px; overflow:hidden; background:var(--card)">
+        <photo-slot id="{{ focusSlotId }}" shape="rect" placeholder="Drop your reference for this session"></photo-slot>
+      </div>
+
+      <div data-focus-rail style="flex:0 0 300px; display:flex; flex-direction:column; gap:14px; min-width:0">
+        <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:20px">
+          <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:84px; line-height:0.9; letter-spacing:0.04em; font-variant-numeric:tabular-nums">{{ tmDisplay }}</div>
+          <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62); margin-top:8px">{{ focusPlan }}</div>
+          <div style="height:5px; background:var(--track); border-radius:800px; overflow:hidden; margin-top:10px">
+            <div style="{{ focusBar }}"></div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:16px">
+            <button type="button" onClick="{{ tmToggle }}" style="{{ tmStyle }}">{{ tmLabel }}</button>
+            <button type="button" onClick="{{ tmLog }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:var(--ink); background:transparent; border:1.5px solid var(--line-2); margin:0; cursor:pointer; font-size:14px; font-weight:500; white-space:nowrap; min-height:44px; padding:0 20px; border-radius:800px" style-hover="border-color:var(--ink)">Log</button>
+            <button type="button" onClick="{{ tmReset }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:var(--ink-62); background:transparent; border:0; margin:0; cursor:pointer; font-size:14px; font-weight:500; white-space:nowrap; min-height:44px; padding:0 14px; border-radius:800px" style-hover="color:var(--ink)">Reset</button>
+          </div>
+          <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:14px; color:var(--ink-55); margin-top:12px">Space starts and pauses.</div>
+        </div>
+
+        <div style="flex:1; min-height:0; overflow-y:auto; display:flex; flex-direction:column; gap:10px">
+          <sc-for list="{{ tParts }}" as="p" hint-placeholder-count="3">
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:20px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start">
+              <button type="button" aria-pressed="{{ p.on }}" aria-label="{{ p.toggleLabel }}" onClick="{{ p.toggle }}" style="{{ p.box }}">{{ p.tick }}</button>
+              <div style="min-width:0">
+                <div style="font-size:16px; font-weight:700; line-height:1.3">{{ p.t }} · {{ p.mins }}</div>
+                <div style="font-size:16px; line-height:1.45; color:var(--ink-72); margin-top:4px; text-wrap:pretty">{{ p.purpose }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<div data-shell style="display:flex; align-items:stretch; min-height:100dvh; background:var(--canvas)">
+
+  <div data-sidebar style="width:252px; flex:0 0 252px; border-right:1px solid var(--line); background:var(--canvas); position:sticky; top:0; height:100dvh; display:flex; flex-direction:column">
+
+    <div style="display:flex; align-items:center; gap:11px; padding:20px 18px 18px; border-bottom:1px solid var(--line)">
+      <div style="flex:0 0 32px; height:32px; border-radius:16px; background:var(--ink); color:var(--canvas); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',Impact,sans-serif; font-size:19px; letter-spacing:0.04em; padding-left:2px">IG</div>
+      <div style="min-width:0">
+        <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:21px; line-height:1; letter-spacing:0.03em; white-space:nowrap">Imagination Gym</div>
+        <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:13px; color:var(--ink-62); margin-top:3px; white-space:nowrap">brokendraw · 8 weeks</div>
+      </div>
+    </div>
+
+    <button type="button" onClick="{{ jumpToday }}" style="{{ jumpStyle }}" style-hover="border-color:var(--ink)">
+      <div style="flex:1 1 auto; min-width:0; overflow:hidden">
+        <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:13px; color:var(--ink-62)">{{ jumpNote }}</div>
+        <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; font-weight:700; color:var(--ink); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">{{ jumpTitle }}</div>
+      </div>
+      <span style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62); flex:0 0 auto">→</span>
+    </button>
+
+    <div data-nav style="flex:1; min-height:0; overflow-y:auto; padding:6px 10px 18px; display:flex; flex-direction:column; gap:2px">
+      <sc-for list="{{ navGroups }}" as="g" hint-placeholder-count="4">
+        <div style="display:flex; flex-direction:column; gap:2px; margin-bottom:10px">
+          <sc-if value="{{ g.titled }}" hint-placeholder-val="{{ true }}">
+            <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:13px; font-weight:700; color:var(--ink-55); padding:12px 14px 5px">{{ g.label }}</div>
+          </sc-if>
+          <sc-for list="{{ g.items }}" as="item" hint-placeholder-count="2">
+            <button type="button" onClick="{{ item.go }}" style="{{ item.style }}" style-hover="background:var(--card); color:var(--ink)">
+              <span>{{ item.label }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="border-top:1px solid var(--line); padding:16px 18px 18px; display:flex; flex-direction:column; gap:12px">
+      <div>
+        <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; font-weight:700; color:var(--ink)">{{ nearGoal }}</div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; font-family:'DM Sans',system-ui,sans-serif; font-size:14px; color:var(--ink-62); margin-top:6px">
+          <span style="white-space:nowrap">{{ doneDays }}/56 days overall</span><span>{{ coursePct }}%</span>
+        </div>
+        <div style="height:5px; background:var(--track); border-radius:800px; overflow:hidden; margin-top:8px">
+          <div style="{{ courseBarStyle }}"></div>
+        </div>
+        <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:14px; color:var(--ink-62); margin-top:8px">{{ totalHours }} h logged · {{ streak }} day streak</div>
+      </div>
+      <div style="display:flex; gap:4px; padding:3px; background:var(--card); border:1px solid var(--line); border-radius:800px">
+        <button type="button" onClick="{{ themeLight.go }}" style="{{ themeLight.style }}">{{ themeLight.label }}</button>
+        <button type="button" onClick="{{ themeDark.go }}" style="{{ themeDark.style }}">{{ themeDark.label }}</button>
+      </div>
+      <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:14px; line-height:1.5; color:var(--ink-62)">Unofficial tracker for brokendraw's course. <button type="button" onClick="{{ goCredits }}" style="appearance:none; -webkit-appearance:none; font:inherit; background:transparent; border:0; padding:0; margin:0; cursor:pointer; color:var(--accent-ink); border-bottom:1px solid var(--accent-14)" style-hover="color:var(--ink); border-color:var(--ink)">Credits</button></div>
+    </div>
+  </div>
+
+  <div style="flex:1; min-width:0; display:flex; flex-direction:column">
+
+    <sc-if value="{{ isBooting }}" hint-placeholder-val="{{ false }}">
+      <div data-pane style="padding:46px 52px 80px; max-width:1100px; width:100%">
+        <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">Loading the eight-week plan…</div>
+        <div style="display:flex; flex-direction:column; gap:14px; margin-top:24px">
+          <sc-for list="{{ skeletons }}" as="s" hint-placeholder-count="3">
+            <div style="background:var(--card); border:1px solid var(--line); border-left:8px solid var(--track); border-radius:0 24px 24px 0; padding:24px 26px">
+              <div style="height:14px; width:140px; background:var(--track); border-radius:800px"></div>
+              <div style="height:22px; width:{{ s.w }}; background:var(--track); border-radius:800px; margin-top:14px"></div>
+              <div style="height:14px; width:60%; background:var(--track); border-radius:800px; margin-top:12px"></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isLoadErr }}" hint-placeholder-val="{{ false }}">
+      <div data-pane style="padding:46px 52px 80px; max-width:640px; width:100%">
+        <h1 style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; font-size:56px; line-height:1.08; letter-spacing:0.02em; margin:0">The plan didn't load</h1>
+        <p style="font-size:16px; line-height:1.6; color:var(--ink-78); margin:14px 0 0; text-wrap:pretty">The curriculum file could not be reached, so the weeks, days and exercises are missing. Your ticks, hours and notes are safe in this browser.</p>
+        <button type="button" onClick="{{ retryLoad }}" style="appearance:none; font:inherit; color:var(--on-accent); background:var(--accent); border:1.5px solid var(--accent); margin-top:24px; min-height:48px; padding:0 24px; border-radius:800px; cursor:pointer; font-weight:500">Try again</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isToday }}" hint-placeholder-val="{{ true }}">
+      <div data-pane style="padding:40px 44px 80px; max-width:1180px; width:100%">
+        <sc-if value="{{ tBehind }}" hint-placeholder-val="{{ false }}">
+          <div style="background:var(--sulfur-band); border:1px solid var(--line-2); border-radius:24px; padding:18px 22px; margin-bottom:24px; display:flex; gap:18px; align-items:center; flex-wrap:wrap">
+            <div style="flex:1 1 300px; min-width:0">
+              <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; font-weight:700; color:var(--ink)">{{ tBehindTitle }}</div>
+              <div style="font-size:16px; line-height:1.55; color:var(--ink-78); margin-top:4px; text-wrap:pretty">The reps only work daily, so don't double up to catch up. Either carry on from where you stopped, or move the whole schedule forward so the calendar matches reality.</div>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap">
+              <button type="button" onClick="{{ tGoOldest }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:var(--canvas); background:var(--ink); border:1.5px solid var(--ink); cursor:pointer; min-height:48px; padding:0 22px; border-radius:800px; font-size:16px; font-weight:700; white-space:nowrap">{{ tOldestLabel }}</button>
+              <button type="button" onClick="{{ tShift }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:var(--ink); background:transparent; border:1.5px solid var(--ink); cursor:pointer; min-height:48px; padding:0 22px; border-radius:800px; font-size:16px; font-weight:500; white-space:nowrap">Shift my schedule</button>
+            </div>
+          </div>
+        </sc-if>
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:22px">
+          <div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+              <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62); white-space:nowrap">Week {{ tWeekNum }} · Day {{ tDayNum }} — {{ tWeekTitle }}</div>
+              <sc-if value="{{ tShowDate }}" hint-placeholder-val="{{ true }}">
+                <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; white-space:nowrap; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-72); border:1px solid var(--line-2); border-radius:800px; padding:3px 11px">{{ tDate }}</div>
+              </sc-if>
+              <sc-if value="{{ tIsLive }}" hint-placeholder-val="{{ true }}">
+                <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; white-space:nowrap; letter-spacing:0.08em; text-transform:uppercase; color:var(--on-accent); background:var(--accent); border-radius:800px; padding:3px 11px">Today</div>
+              </sc-if>
+            </div>
+            <h1 style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; font-size:56px; line-height:1.1; letter-spacing:0.02em; margin:10px 0 0">{{ tDayTitle }}</h1>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px; font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-72)">
+              <span style="white-space:nowrap">{{ tMinsLabel }}</span>
+              <span style="width:3px; height:3px; border-radius:800px; background:var(--line-3)"></span>
+              <span style="white-space:nowrap">{{ tPartLabel }}</span>
+              <span style="width:3px; height:3px; border-radius:800px; background:var(--line-3)"></span>
+              <span style="white-space:nowrap; color:var(--ink); font-weight:700">{{ tLeftLabel }}</span>
+              <span style="width:3px; height:3px; border-radius:800px; background:var(--line-3)"></span>
+              <span style="white-space:nowrap; color:var(--ink-62)">press 1–9 to tick</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px">
+            <button onClick="{{ tPrev }}" style="font-size:14px; font-weight:500; white-space:nowrap; min-height:44px; padding:0 20px; background:transparent; border:1.5px solid var(--line-2); border-radius:800px; cursor:pointer; color:var(--ink)" style-hover="border-color:var(--ink)">← Prev</button>
+            <button onClick="{{ tNext }}" style="font-size:14px; font-weight:500; white-space:nowrap; min-height:44px; padding:0 20px; background:transparent; border:1.5px solid var(--line-2); border-radius:800px; cursor:pointer; color:var(--ink)" style-hover="border-color:var(--ink)">Next →</button>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap-reverse; align-items:flex-end; gap:26px; margin-top:26px">
+
+        <div style="flex:99999 1 430px; min-width:0; display:flex; flex-direction:column; gap:14px">
+          <sc-for list="{{ tParts }}" as="p" hint-placeholder-count="3">
+            <div style="{{ p.card }}">
+              <button type="button" aria-pressed="{{ p.on }}" aria-label="{{ p.toggleLabel }}" onClick="{{ p.toggle }}" style="{{ p.box }}" style-hover="border-color:var(--ink)">{{ p.tick }}</button>
+              <div style="min-width:0; flex:1">
+                <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap">
+                  <span style="{{ p.tag }}">Part {{ p.k }} · {{ p.t }}</span>
+                  <span style="font-size:12px; white-space:nowrap; color:var(--ink-55)">{{ p.mins }}</span>
+                  <sc-if value="{{ p.on }}" hint-placeholder-val="{{ false }}">
+                    <span style="{{ p.donePill }}">Done</span>
+                  </sc-if>
+                </div>
+                <div style="{{ p.purposeStyle }}">{{ p.purpose }}</div>
+                <div style="{{ p.bodyStyle }}">{{ p.d }}</div>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:12px">
+                  <sc-for list="{{ p.refs }}" as="r" hint-placeholder-count="1">
+                    <button type="button" onClick="{{ r.go }}" style="{{ r.style }}" style-hover="border-color:var(--ink); color:var(--ink)">{{ r.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+
+        <sc-if value="{{ tHasCounters }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-top:12px">
+            <div style="display:flex; align-items:baseline; gap:16px; margin-bottom:18px">
+              <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Reps to bank today</h2>
+              <div style="flex:1"></div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(196px,1fr)); gap:12px">
+              <sc-for list="{{ tCounters }}" as="c" hint-placeholder-count="2">
+                <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:15px 17px">
+                  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px">
+                    <span style="font-size:16px; color:var(--ink-78)">{{ c.t }}</span>
+                    <span style="font-family:'DM Sans',system-ui,sans-serif; font-size:14px">{{ c.v }}<span style="color:var(--ink-42)">/{{ c.target }}</span></span>
+                  </div>
+                  <div style="height:4px; background:var(--track); border-radius:800px; overflow:hidden; margin:11px 0 12px">
+                    <div style="{{ c.bar }}"></div>
+                  </div>
+                  <div style="display:flex; gap:6px">
+                    <button type="button" aria-label="Remove one" onClick="{{ c.dec }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; font-size:16px; min-width:56px; min-height:44px; padding:0 16px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--line-2); border-radius:800px; color:var(--ink-62)" style-hover="border-color:var(--ink); color:var(--ink)">−1</button>
+                    <button type="button" aria-label="Add one" onClick="{{ c.inc }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; font-size:16px; min-width:56px; min-height:44px; padding:0 16px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--line-2); border-radius:800px; color:var(--ink-62)" style-hover="border-color:var(--ink); color:var(--ink)">+1</button>
+                    <button type="button" aria-label="Add five" onClick="{{ c.inc5 }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; font-size:16px; min-width:56px; min-height:44px; padding:0 16px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--line-2); border-radius:800px; color:var(--ink-62)" style-hover="border-color:var(--ink); color:var(--ink)">+5</button>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ tIsRest }}" hint-placeholder-val="{{ false }}">
+          <div style="border-top:1px solid var(--line); padding-top:22px; margin-top:14px">
+            <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Close out week {{ tWeekNum }}</h2>
+            <p style="font-size:16px; line-height:1.6; color:var(--ink-72); max-width:62ch; margin:8px 0 0; text-wrap:pretty">Play is the work today. Before you start, spend five minutes here — the week only compounds if you name what broke.</p>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:24px; overflow:hidden; margin-top:18px">
+              <div style="background:var(--card); padding:15px 18px">
+                <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">Days done</div>
+                <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:38px; line-height:1; letter-spacing:0.02em; margin-top:5px">{{ tWeekDaysDone }}<span style="font-size:17px; color:var(--ink-55)">/7</span></div>
+              </div>
+              <div style="background:var(--card); padding:15px 18px">
+                <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">Logged</div>
+                <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:38px; line-height:1; letter-spacing:0.02em; margin-top:5px">{{ tWeekHoursLabel }}</div>
+              </div>
+              <div style="background:var(--card); padding:15px 18px">
+                <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">Week complete</div>
+                <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:38px; line-height:1; letter-spacing:0.02em; margin-top:5px">{{ tWeekPct }}%</div>
+              </div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:16px">
+              <sc-for list="{{ tWeekMs }}" as="m" hint-placeholder-count="2">
+                <button type="button" aria-pressed="{{ m.on }}" onClick="{{ m.toggle }}" style="{{ m.style }}" style-hover="border-color:var(--ink)">{{ m.tick }}{{ m.t }}</button>
+              </sc-for>
+            </div>
+            <textarea value="{{ tWeekNote }}" onChange="{{ tSetWeekNote }}" placeholder="What improved, and the one blind spot you found this week…" style="width:100%; box-sizing:border-box; margin-top:16px; min-height:96px; resize:vertical; padding:12px; border:1px solid var(--line-2); border-radius:16px; background:var(--card); font-size:16px; line-height:1.5"></textarea>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); align-items:start; gap:12px; margin-top:16px">
+              <sc-for list="{{ rubric }}" as="r" hint-placeholder-count="4">
+                <div style="background:var(--card); border:1px solid var(--line); border-radius:20px; padding:15px 17px">
+                  <div style="font-size:16px; font-weight:700; line-height:1.3">{{ r.t }}</div>
+                  <div style="font-size:16px; line-height:1.5; color:var(--ink-72); margin-top:6px; text-wrap:pretty">{{ r.fix }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="border-top:1px solid var(--line); padding-top:22px; margin-top:14px">
+          <div style="display:flex; align-items:baseline; gap:16px; flex-wrap:wrap">
+            <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Material for week {{ tWeekNum }}</h2>
+            <div style="flex:1"></div>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); align-items:start; gap:14px; margin-top:16px">
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:18px 20px">
+              <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; font-weight:700; white-space:nowrap">Read</div>
+              <div style="margin-top:14px">
+                <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">brokendraw book</div>
+                <sc-if value="{{ tBookHasHead }}" hint-placeholder-val="{{ true }}">
+                  <div style="font-size:16px; font-weight:700; margin-top:2px; text-wrap:pretty">{{ tBookHead }}</div>
+                </sc-if>
+                <div style="display:flex; flex-direction:column; gap:5px; margin-top:9px">
+                  <sc-for list="{{ tBookItems }}" as="i" hint-placeholder-count="4">
+                    <div style="font-size:16px; line-height:1.45; color:var(--ink-78); text-wrap:pretty">{{ i.t }}</div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="height:1px; background:var(--line); margin:15px 0"></div>
+              <div>
+                <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">The Dynamic Bible</div>
+                <sc-if value="{{ tHanHasHead }}" hint-placeholder-val="{{ true }}">
+                  <div style="font-size:16px; font-weight:700; margin-top:2px; text-wrap:pretty">{{ tHanHead }}</div>
+                </sc-if>
+                <div style="display:flex; flex-direction:column; gap:5px; margin-top:9px">
+                  <sc-for list="{{ tHanItems }}" as="i" hint-placeholder-count="3">
+                    <div style="font-size:16px; line-height:1.45; color:var(--ink-78); text-wrap:pretty">{{ i.t }}</div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            <sc-if value="{{ tHasDrills }}" hint-placeholder-val="{{ true }}">
+              <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:18px 20px">
+                <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; font-weight:700; white-space:nowrap">Drill sites &amp; boards</div>
+                <div style="display:flex; flex-direction:column; gap:9px; margin-top:10px">
+                  <sc-for list="{{ tDrills }}" as="l" hint-placeholder-count="2">
+                    <a href="{{ l.u }}" target="_blank" rel="noreferrer" style="font-size:16px; line-height:1.4">{{ l.l }}</a>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:18px 20px">
+              <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; font-weight:700; white-space:nowrap">Watch</div>
+              <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px">
+                <sc-for list="{{ tWatch }}" as="l" hint-placeholder-count="3">
+                  <a href="{{ l.u }}" target="_blank" rel="noreferrer" style="display:flex; gap:12px; align-items:center; border-bottom:0; color:var(--ink)">
+                    <div style="{{ l.thumbStyle }}"></div>
+                    <span style="font-size:16px; line-height:1.35; min-width:0">{{ l.l }}</span>
+                  </a>
+                </sc-for>
+              </div>
+              <button type="button" onClick="{{ goWeek }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:var(--ink); background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-size:16px; font-weight:500; min-height:44px; padding:0; margin-top:6px; white-space:nowrap; border-bottom:2px solid var(--accent)" style-hover="border-color:var(--ink)">Play them in the week brief →</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:20px; flex-wrap:wrap; border-top:1px solid var(--line); padding-top:20px; margin-top:22px">
+          <div style="min-width:0; flex:1 1 240px">
+            <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">Week {{ tWeekNum }} project</div>
+            <div style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; letter-spacing:0.02em; font-size:30px; line-height:1.2; margin-top:4px">{{ tProject }}</div>
+          </div>
+          <button type="button" onClick="{{ goWeek }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-size:16px; font-weight:500; white-space:nowrap; color:var(--ink); border-bottom:2px solid var(--accent); padding:10px 0; flex:0 0 auto" style-hover="border-color:var(--ink)">Open week brief →</button>
+        </div>
+
+        <button type="button" onClick="{{ tMarkAll }}" style="{{ tMarkStyle }}" style-hover="background:var(--ink); color:var(--canvas); border-color:var(--ink)">{{ tMarkLabel }}</button>
+        </div>
+
+        <div data-rail style="flex:1 1 310px; min-width:270px; position:sticky; top:26px; align-self:flex-end; display:flex; flex-direction:column; gap:12px">
+          <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:18px 20px 20px">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px">
+              <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; font-weight:700; color:var(--ink); white-space:nowrap">Focus timer</div>
+              <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:14px; color:var(--ink-62); white-space:nowrap">{{ tMins }} min planned</div>
+            </div>
+            <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:72px; line-height:0.95; letter-spacing:0.04em; margin-top:10px; font-variant-numeric:tabular-nums">{{ tmDisplay }}</div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:16px">
+              <button type="button" onClick="{{ tmToggle }}" style="{{ tmStyle }}">{{ tmLabel }}</button>
+              <button type="button" onClick="{{ focusOpen }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-size:14px; font-weight:500; white-space:nowrap; min-height:44px; padding:0 20px; border:1.5px solid var(--line-2); border-radius:800px; color:var(--ink)" style-hover="border-color:var(--ink)">Focus mode</button>
+              <button type="button" onClick="{{ tmLog }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-size:14px; font-weight:500; white-space:nowrap; min-height:44px; padding:0 20px; border:1.5px solid var(--line-2); border-radius:800px; color:var(--ink)" style-hover="border-color:var(--ink)">Log</button>
+              <button type="button" onClick="{{ tmReset }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-size:14px; font-weight:500; white-space:nowrap; min-height:44px; padding:0 16px; border-radius:800px; color:var(--ink-62)" style-hover="color:var(--ink)">Reset</button>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:24px; overflow:hidden">
+            <div style="background:var(--card); padding:13px 16px">
+              <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:14px; color:var(--ink-62)">Day done</div>
+              <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:32px; line-height:1; letter-spacing:0.02em; margin-top:5px">{{ tDonePart }}/{{ tPartCount }}</div>
+            </div>
+            <div style="background:var(--card); padding:13px 16px">
+              <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:14px; color:var(--ink-62)">Week {{ tWeekNum }}</div>
+              <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:32px; line-height:1; letter-spacing:0.02em; margin-top:5px">{{ tWeekPct }}%</div>
+            </div>
+          </div>
+
+          <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:18px 20px">
+            <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; font-weight:700; color:var(--ink)">Session log</div>
+            <div style="font-size:16px; color:var(--ink-62); margin-top:3px">Day {{ tDayNum }} only. The weekly reflection lives on Progress.</div>
+            <div style="display:flex; align-items:center; gap:10px; margin-top:12px">
+              <input value="{{ tHours }}" onChange="{{ tSetHours }}" placeholder="0.0" style="width:74px; padding:8px 10px; border:1px solid var(--line-2); border-radius:16px; background:var(--canvas); font-family:'DM Sans',system-ui,sans-serif; font-size:16px" />
+              <span style="font-size:16px; color:var(--ink-62)">hours today</span>
+            </div>
+            <textarea value="{{ tNote }}" onChange="{{ tSetNote }}" placeholder="Blind spot identified today…" style="width:100%; box-sizing:border-box; margin-top:12px; min-height:84px; resize:vertical; padding:10px; border:1px solid var(--line-2); border-radius:16px; background:var(--canvas); font-size:16px; line-height:1.5"></textarea>
+          </div>
+        </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isWeek }}" hint-placeholder-val="{{ true }}">
+      <div data-pane style="padding:46px 52px 80px; max-width:1040px; width:100%">
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:28px">
+          <sc-for list="{{ weekTabs }}" as="t" hint-placeholder-count="8">
+            <button type="button" onClick="{{ t.go }}" style="{{ t.style }}" style-hover="border-color:var(--ink)">W{{ t.n }}</button>
+          </sc-for>
+        </div>
+        <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62); white-space:nowrap">Week {{ wNum }} · {{ wSub }}</div>
+        <h1 style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; font-size:64px; line-height:1.08; letter-spacing:0.02em; margin:10px 0 0; max-width:22ch">{{ wTitle }}</h1>
+        <p style="font-size:18px; line-height:1.55; color:var(--ink-78); max-width:62ch; margin:18px 0 0; text-wrap:pretty">{{ wObjective }}</p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; margin-top:30px">
+          <div style="background:var(--canvas); border:1px solid var(--line); border-radius:24px; padding:20px 22px">
+            <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; font-weight:700; color:var(--ink)">Why this week matters</div>
+            <p style="font-size:16px; line-height:1.62; color:var(--ink-78); margin:10px 0 0; text-wrap:pretty">{{ wWhy }}</p>
+          </div>
+          <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:20px 22px; display:flex; flex-direction:column; gap:14px">
+            <div>
+              <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">Weekly project</div>
+              <div style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; letter-spacing:0.02em; font-size:30px; line-height:1.2; margin-top:6px">{{ wProject }}</div>
+            </div>
+            <div style="aspect-ratio:16/10; border:1px solid var(--line); border-radius:16px; overflow:hidden; background:var(--canvas)">
+              <photo-slot id="{{ wSlotId }}" shape="rect" placeholder="{{ wSlotHint }}"></photo-slot>
+            </div>
+            <div style="height:1px; background:var(--line)"></div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap">
+              <sc-for list="{{ wMilestones }}" as="m" hint-placeholder-count="2">
+                <button type="button" aria-pressed="{{ m.on }}" onClick="{{ m.toggle }}" style="{{ m.style }}" style-hover="border-color:var(--ink)">{{ m.tick }}{{ m.t }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:72px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Day by day</h2>
+          <div style="flex:1"></div>
+          <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">{{ wPct }}% complete</div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:24px; overflow:hidden">
+          <sc-for list="{{ wDays }}" as="d" hint-placeholder-count="7">
+            <button type="button" onClick="{{ d.go }}" style="{{ d.row }}" style-hover="background:var(--canvas)">
+              <div style="width:66px; flex:0 0 66px">
+                <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; color:var(--ink-55)">D{{ d.n }}</div>
+                <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; white-space:nowrap; color:var(--ink-42); margin-top:2px">{{ d.date }}</div>
+              </div>
+              <div style="flex:1; min-width:0">
+                <div style="font-size:16px; font-weight:500">{{ d.t }}</div>
+                <div style="font-size:16px; color:var(--ink-62); margin-top:3px">{{ d.summary }}</div>
+              </div>
+              <div style="display:flex; gap:4px; flex:0 0 auto">
+                <sc-for list="{{ d.chips }}" as="c" hint-placeholder-count="3">
+                  <span style="{{ c.style }}">{{ c.k }}</span>
+                </sc-for>
+              </div>
+              <div style="{{ d.mark }}">{{ d.tick }}</div>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); align-items:start; gap:16px; margin-top:34px">
+          <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:20px 22px">
+            <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; font-weight:700; color:var(--ink)">Reading</div>
+            <div style="margin-top:14px">
+              <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">brokendraw book</div>
+              <sc-if value="{{ wBookHasHead }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:16px; font-weight:700; margin-top:2px; text-wrap:pretty">{{ wBookHead }}</div>
+              </sc-if>
+              <div style="display:flex; flex-direction:column; gap:5px; margin-top:9px">
+                <sc-for list="{{ wBookItems }}" as="i" hint-placeholder-count="4">
+                  <div style="font-size:16px; line-height:1.45; color:var(--ink-78); text-wrap:pretty">{{ i.t }}</div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="height:1px; background:var(--line); margin:15px 0"></div>
+            <div>
+              <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">The Dynamic Bible</div>
+              <sc-if value="{{ wHanHasHead }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:16px; font-weight:700; margin-top:2px; text-wrap:pretty">{{ wHanHead }}</div>
+              </sc-if>
+              <div style="display:flex; flex-direction:column; gap:5px; margin-top:9px">
+                <sc-for list="{{ wHanItems }}" as="i" hint-placeholder-count="3">
+                  <div style="font-size:16px; line-height:1.45; color:var(--ink-78); text-wrap:pretty">{{ i.t }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          <sc-if value="{{ wHasLinks }}" hint-placeholder-val="{{ true }}">
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:20px 22px">
+              <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; font-weight:700; color:var(--ink)">Drill sites &amp; boards</div>
+              <div style="display:flex; flex-direction:column; gap:9px; margin-top:12px">
+                <sc-for list="{{ wLinks }}" as="l" hint-placeholder-count="3">
+                  <a href="{{ l.u }}" target="_blank" rel="noreferrer" style="font-size:16px; line-height:1.4">{{ l.l }}</a>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:48px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Watch this week</h2>
+          <div style="flex:1"></div>
+          <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">{{ wVideoCount }} videos</div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(288px,1fr)); gap:16px">
+          <sc-for list="{{ wVideos }}" as="v" hint-placeholder-count="4">
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; overflow:hidden">
+              <div style="position:relative; width:100%; aspect-ratio:16/9; background:var(--ink)">
+                <iframe src="{{ v.src }}" title="{{ v.l }}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="{{ true }}" referrerPolicy="strict-origin-when-cross-origin" style="position:absolute; inset:0; width:100%; height:100%; border:0; display:block"></iframe>
+              </div>
+              <div style="padding:13px 15px 15px">
+                <div style="font-size:14px; font-weight:500; line-height:1.4; letter-spacing:0">{{ v.l }}</div>
+                <a href="{{ v.u }}" target="_blank" rel="noreferrer" style="font-family:'DM Sans',system-ui,sans-serif; font-size:14px; letter-spacing:0.04em; display:inline-block; margin-top:10px; border-bottom:none">Open on YouTube ↗</a>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isRoadmap }}" hint-placeholder-val="{{ true }}">
+      <div data-pane style="padding:46px 52px 80px; max-width:1100px; width:100%">
+        <h1 style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; font-size:64px; line-height:1.08; letter-spacing:0.02em; margin:0">Eight weeks, one ladder</h1>
+        <p style="font-size:18px; line-height:1.55; color:var(--ink-78); max-width:62ch; margin:16px 0 0; text-wrap:pretty">Mechanics, form, manipulation, figure, anatomy, costume, surface, scene. Each week is the scaffolding for the next one, so nothing gets skipped.</p>
+
+        <div style="overflow-x:auto; margin-top:34px; background:var(--card); border:1px solid var(--line); border-radius:24px">
+          <div style="min-width:780px; display:grid; grid-template-columns:repeat(8,minmax(86px,1fr)); gap:10px; align-items:end; height:280px; padding:18px">
+            <sc-for list="{{ ladder }}" as="l" hint-placeholder-count="8">
+              <button type="button" onClick="{{ l.go }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; height:100%; display:flex; flex-direction:column; justify-content:flex-end; gap:8px; min-width:0; padding:0">
+                <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; color:var(--ink-62); text-align:center">{{ l.pct }}%</div>
+                <div style="{{ l.bar }}"><span style="{{ l.num }}">W{{ l.n }}</span></div>
+                <div style="font-size:12px; line-height:1.3; color:var(--ink-72); text-align:center; min-width:0; overflow-wrap:anywhere; text-wrap:pretty">{{ l.sub }}</div>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:24px; overflow:hidden; margin-top:24px">
+          <sc-for list="{{ rWeeks }}" as="w" hint-placeholder-count="8">
+            <button type="button" onClick="{{ w.go }}" style="{{ w.row }}" style-hover="background:var(--canvas)">
+              <div style="flex:0 0 58px; font-family:'DM Sans',system-ui,sans-serif; font-size:14px; color:var(--ink-55)">W{{ w.n }}</div>
+              <div style="flex:1.4; min-width:0">
+                <div style="font-size:16px; font-weight:500; letter-spacing:0">{{ w.title }}</div>
+                <div style="font-size:16px; color:var(--ink-62); margin-top:3px">{{ w.sub }}</div>
+              </div>
+              <div style="flex:1.2; min-width:0; font-size:16px; color:var(--ink-78); line-height:1.45">{{ w.project }}</div>
+              <div style="flex:0 0 130px; display:flex; align-items:center; gap:10px">
+                <div style="flex:1; height:4px; background:var(--track); border-radius:800px; overflow:hidden">
+                  <div style="{{ w.bar }}"></div>
+                </div>
+                <span style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; color:var(--ink-62); width:32px">{{ w.pct }}%</span>
+              </div>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:72px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">4-phase scene pipeline</h2>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:16px">
+          <sc-for list="{{ pipeline }}" as="p" hint-placeholder-count="4">
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:20px">
+              <div style="font-size:12px; font-weight:500; letter-spacing:0.08em; color:var(--ink-55)">{{ p.n }}</div>
+              <div style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; letter-spacing:0.02em; font-size:48px; margin-top:6px">{{ p.t }}</div>
+              <div style="display:flex; flex-direction:column; gap:7px; margin-top:14px">
+                <sc-for list="{{ p.items }}" as="it" hint-placeholder-count="3">
+                  <div style="font-size:16px; line-height:1.45; color:var(--ink-68)">{{ it.t }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:48px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Reading &amp; drill matrix</h2>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:14px">
+          <sc-for list="{{ matrixGroups }}" as="g" hint-placeholder-count="3">
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:22px 24px 24px">
+              <div style="display:flex; align-items:baseline; gap:12px; flex-wrap:wrap">
+                <div style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; letter-spacing:0.02em">{{ g.label }}</div>
+                <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:14px; color:var(--ink-62)">{{ g.span }}</div>
+              </div>
+              <div data-mx-head style="display:grid; grid-template-columns:48px 1.2fr 1fr 1fr; gap:20px; margin-top:18px; padding-bottom:10px; border-bottom:1px solid var(--line); font-family:'DM Sans',system-ui,sans-serif; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-55)">
+                <div>Wk</div>
+                <div>brokendraw book</div>
+                <div>The Dynamic Bible</div>
+                <div>Drill sites</div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:16px; margin-top:16px">
+                <sc-for list="{{ g.rows }}" as="m" hint-placeholder-count="3">
+                  <div data-mx-row style="display:grid; grid-template-columns:48px 1.2fr 1fr 1fr; gap:8px 20px">
+                    <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:14px; color:var(--ink-55)">W{{ m.n }}</div>
+                    <div style="font-size:16px; line-height:1.5; color:var(--ink-78); text-wrap:pretty"><span data-mx-label style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-55)">brokendraw book</span>{{ m.book }}</div>
+                    <div style="font-size:16px; line-height:1.5; color:var(--ink-78); text-wrap:pretty"><span data-mx-label style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-55)">The Dynamic Bible</span>{{ m.han }}</div>
+                    <div style="font-size:16px; line-height:1.5; color:var(--ink-68); text-wrap:pretty"><span data-mx-label style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-55)">Drill sites</span>{{ m.drills }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isExercises }}" hint-placeholder-val="{{ true }}">
+      <div data-pane style="padding:46px 52px 80px; max-width:1100px; width:100%">
+        <h1 style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; font-size:64px; line-height:1.08; letter-spacing:0.02em; margin:0">The 25 exercises</h1>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:24px">
+          <sc-for list="{{ exFilters }}" as="f" hint-placeholder-count="6">
+            <button type="button" onClick="{{ f.go }}" style="{{ f.style }}" style-hover="border-color:var(--ink)">{{ f.label }}</button>
+          </sc-for>
+        </div>
+        <sc-if value="{{ exEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:24px; border:1px dashed var(--line-2); border-radius:24px; padding:28px; font-size:16px; color:var(--ink-72)">Nothing at this level yet. Switch back to all 25.</div>
+        </sc-if>
+        <sc-for list="{{ exGroups }}" as="g" hint-placeholder-count="3">
+        <div style="margin-top:40px">
+        <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; letter-spacing:0.02em; color:var(--ink); margin:0 0 16px; font-weight:400">{{ g.label }}</h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(310px,1fr)); gap:14px">
+          <sc-for list="{{ g.items }}" as="e" hint-placeholder-count="5">
+            <div style="{{ e.card }}">
+              <div style="display:flex; gap:14px; align-items:flex-start">
+                <div style="flex:1; min-width:0">
+                  <div style="display:flex; align-items:baseline; justify-content:space-between; gap:10px">
+                    <div style="font-size:12px; white-space:nowrap; color:var(--ink-55)">Ex {{ e.n }} · p.{{ e.p }}</div>
+                    <div style="{{ e.lvlStyle }}">Level {{ e.lvl }}</div>
+                  </div>
+                  <div style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; letter-spacing:0.02em; font-size:48px; line-height:1.14; margin-top:6px">{{ e.name }}</div>
+                </div>
+                <div style="flex:0 0 96px; width:96px; height:96px; border:1px solid var(--line); border-radius:16px; overflow:hidden; background:var(--canvas)">
+                  <photo-slot id="{{ e.slotId }}" shape="rect" placeholder="{{ e.slotHint }}"></photo-slot>
+                </div>
+              </div>
+              <div style="font-size:16px; line-height:1.55; color:var(--ink-78); text-wrap:pretty">{{ e.purpose }}</div>
+              <div style="font-size:14px; font-weight:700; color:var(--ink); box-shadow:inset 0 -8px 0 var(--sulfur-band); align-self:flex-start">{{ e.reps }}</div>
+              <div style="height:1px; background:var(--track)"></div>
+              <div style="font-size:16px; line-height:1.5; color:var(--ink-78)"><span style="font-weight:700">Pitfall</span> {{ e.pit }}</div>
+              <div style="font-size:16px; line-height:1.5; color:var(--ink)"><span style="font-weight:700">Fix</span> {{ e.fix }}</div>
+              <div style="height:1px; background:var(--track)"></div>
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap">
+                <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; color:var(--ink-55)">Scheduled {{ e.used }}</div>
+                <sc-if value="{{ e.hasUse }}" hint-placeholder-val="{{ true }}">
+                  <button type="button" onClick="{{ e.goUse }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-size:14px; font-weight:500; white-space:nowrap; color:var(--ink); border-bottom:2px solid var(--accent); padding:8px 0">{{ e.useLabel }}</button>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isVault }}" hint-placeholder-val="{{ true }}">
+      <div data-pane style="padding:46px 52px 80px; max-width:1100px; width:100%">
+        <h1 style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; font-size:64px; line-height:1.08; letter-spacing:0.02em; margin:0">Every video, in order</h1>
+        <p style="font-size:16px; line-height:1.55; color:var(--ink-78); max-width:62ch; margin:16px 0 0; text-wrap:pretty">All 27 videos from the roadmap, grouped by where they land in the eight weeks. Play them here.</p>
+        <sc-for list="{{ vault }}" as="g" hint-placeholder-count="6">
+          <div style="margin-top:42px">
+            <div style="display:flex; align-items:baseline; gap:16px; margin-bottom:18px">
+              <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">{{ g.g }}</h2>
+              <div style="flex:1"></div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(288px,1fr)); gap:16px">
+              <sc-for list="{{ g.v }}" as="v" hint-placeholder-count="4">
+                <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; overflow:hidden">
+                  <div style="position:relative; width:100%; aspect-ratio:16/9; background:var(--ink)">
+                    <iframe src="{{ v.src }}" title="{{ v.t }}" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="{{ true }}" referrerPolicy="strict-origin-when-cross-origin" style="position:absolute; inset:0; width:100%; height:100%; border:0; display:block"></iframe>
+                  </div>
+                  <div style="padding:13px 15px 15px">
+                    <div style="font-size:14px; font-weight:500; line-height:1.4; letter-spacing:0">{{ v.t }}</div>
+                    <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; color:var(--ink-55); margin-top:7px">{{ v.by }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isProgress }}" hint-placeholder-val="{{ true }}">
+      <div data-pane style="padding:46px 52px 80px; max-width:1100px; width:100%">
+        <h1 style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; font-size:64px; line-height:1.08; letter-spacing:0.02em; margin:0">Progress &amp; accountability</h1>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:24px; overflow:hidden; margin:28px 0 40px">
+          <div style="background:var(--card); padding:17px 19px">
+            <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">Course</div>
+            <div style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; letter-spacing:0.02em; font-size:48px; margin-top:4px">{{ coursePct }}%</div>
+          </div>
+          <div style="background:var(--card); padding:17px 19px">
+            <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">Hours</div>
+            <div style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; letter-spacing:0.02em; font-size:48px; margin-top:4px">{{ totalHours }}</div>
+          </div>
+          <div style="background:var(--card); padding:17px 19px">
+            <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">Days done</div>
+            <div style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; letter-spacing:0.02em; font-size:48px; margin-top:4px">{{ daysDone }}<span style="font-size:18px; color:var(--ink-55)">/56</span></div>
+          </div>
+          <div style="background:var(--card); padding:17px 19px">
+            <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62)">Streak</div>
+            <div style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; letter-spacing:0.02em; font-size:48px; margin-top:4px">{{ streak }}</div>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin-bottom:18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">56-day calendar</h2>
+          <div style="flex:1"></div>
+          <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62); white-space:nowrap">{{ calNote }}</div>
+        </div>
+        <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:20px">
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:16px">
+            <span style="font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-62); white-space:nowrap">Start date</span>
+            <input type="date" value="{{ calStart }}" onChange="{{ setStart }}" style="padding:10px 12px; border:1px solid var(--line-2); border-radius:16px; background:var(--canvas); font-size:16px; min-height:44px" />
+            <div style="flex:1"></div>
+            <div style="display:flex; gap:4px; padding:3px; background:var(--canvas); border:1px solid var(--line); border-radius:800px">
+              <button type="button" onClick="{{ paceCal.go }}" style="{{ paceCal.style }}">{{ paceCal.label }}</button>
+              <button type="button" onClick="{{ paceFlx.go }}" style="{{ paceFlx.style }}">{{ paceFlx.label }}</button>
+            </div>
+          </div>
+          <p style="font-size:16px; line-height:1.55; color:var(--ink-72); margin:0 0 16px; max-width:62ch; text-wrap:pretty">{{ paceNote }}</p>
+          <div style="display:flex; flex-direction:column; gap:8px">
+            <sc-for list="{{ calWeeks }}" as="w" hint-placeholder-count="8">
+              <div style="display:flex; align-items:center; gap:10px">
+                <div style="flex:0 0 34px; font-family:'DM Sans',system-ui,sans-serif; font-size:12px; color:var(--ink-55)">W{{ w.n }}</div>
+                <div style="flex:1; min-width:0; display:grid; grid-template-columns:repeat(7,1fr); gap:8px">
+                  <sc-for list="{{ w.cells }}" as="c" hint-placeholder-count="7">
+                    <button type="button" onClick="{{ c.go }}" style="{{ c.cell }}">
+                      <span>{{ c.num }}</span>
+                      <span style="{{ c.mstyle }}">{{ c.mon }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:72px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Milestone counters</h2>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:12px">
+          <sc-for list="{{ counters }}" as="c" hint-placeholder-count="10">
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:15px 17px">
+              <div style="display:flex; align-items:baseline; justify-content:space-between; gap:8px">
+                <span style="font-size:16px; color:var(--ink-78)">{{ c.t }}</span>
+                <span style="font-family:'DM Sans',system-ui,sans-serif; font-size:14px">{{ c.v }}<span style="color:var(--ink-42)">/{{ c.target }}</span></span>
+              </div>
+              <div style="height:4px; background:var(--track); border-radius:800px; overflow:hidden; margin:11px 0 12px">
+                <div style="{{ c.bar }}"></div>
+              </div>
+              <div style="display:flex; gap:6px">
+                <button type="button" aria-label="Remove one" onClick="{{ c.dec }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; font-size:16px; min-width:56px; min-height:44px; padding:0 16px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--line-2); border-radius:800px; color:var(--ink-62)" style-hover="border-color:var(--ink); color:var(--ink)">−1</button>
+                <button type="button" aria-label="Add one" onClick="{{ c.inc }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; font-size:16px; min-width:56px; min-height:44px; padding:0 16px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--line-2); border-radius:800px; color:var(--ink-62)" style-hover="border-color:var(--ink); color:var(--ink)">+1</button>
+                <button type="button" aria-label="Add five" onClick="{{ c.inc5 }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; font-size:16px; min-width:56px; min-height:44px; padding:0 16px; display:inline-flex; align-items:center; justify-content:center; border:1px solid var(--line-2); border-radius:800px; color:var(--ink-62)" style-hover="border-color:var(--ink); color:var(--ink)">+5</button>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:48px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Weekly log</h2>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:24px; overflow:hidden">
+          <sc-for list="{{ logRows }}" as="r" hint-placeholder-count="8">
+            <div style="{{ r.row }}">
+              <div style="display:flex; align-items:center; gap:16px">
+                <div style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; color:var(--ink-55); flex:0 0 44px">W{{ r.n }}</div>
+                <div style="flex:1; min-width:0">
+                  <div style="font-size:16px; font-weight:500">{{ r.title }}</div>
+                  <div style="font-size:12px; color:var(--ink-62); margin-top:2px">{{ r.project }}</div>
+                </div>
+                <div style="flex:0 0 110px; display:flex; align-items:center; gap:9px">
+                  <div style="flex:1; height:4px; background:var(--track); border-radius:800px; overflow:hidden"><div style="{{ r.bar }}"></div></div>
+                  <span style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; color:var(--ink-62); width:30px">{{ r.pct }}%</span>
+                </div>
+                <div style="flex:0 0 78px; text-align:right; font-family:'DM Sans',system-ui,sans-serif; font-size:16px; color:var(--ink-72); white-space:nowrap">{{ r.hours }}</div>
+              </div>
+              <textarea value="{{ r.note }}" onChange="{{ r.setNote }}" placeholder="Key reflection & blind spot identified…" style="width:100%; margin-top:12px; min-height:56px; resize:vertical; padding:9px 10px; border:1px solid var(--line); border-radius:16px; background:var(--canvas); font-size:16px; line-height:1.5"></textarea>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:72px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Back up your progress</h2>
+        </div>
+        <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:22px 24px">
+          <p style="font-size:16px; line-height:1.6; color:var(--ink-78); margin:0; max-width:62ch; text-wrap:pretty">Every tick, hour, note and photo lives in this browser only. Clear your site data, switch device or open a private window and it is gone. Export a file now and again, especially before you reinstall anything.</p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:18px">
+            <button type="button" onClick="{{ doExport }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:var(--on-accent); background:var(--accent); border:1.5px solid var(--accent); cursor:pointer; min-height:48px; padding:0 24px; border-radius:800px; font-size:16px; font-weight:700; white-space:nowrap">Export my progress</button>
+            <label style="position:relative; display:inline-flex; align-items:center; min-height:48px; padding:0 22px; border:1.5px solid var(--line-2); border-radius:800px; font-size:16px; font-weight:500; cursor:pointer; white-space:nowrap" style-hover="border-color:var(--ink)">Import a file<input type="file" accept="application/json,.json" onChange="{{ doImport }}" style="position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer" /></label>
+            <div style="font-size:16px; color:{{ backupTone }}">{{ backupNote }}</div>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:72px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Self-critique rubric</h2>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:14px">
+          <sc-for list="{{ rubric }}" as="r" hint-placeholder-count="4">
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:19px 21px">
+              <div style="font-size:16px; font-weight:500; letter-spacing:0">{{ r.t }}</div>
+              <div style="font-size:16px; line-height:1.55; color:var(--ink-78); margin-top:9px">{{ r.err }}</div>
+              <div style="font-size:16px; line-height:1.55; color:var(--ink-78); margin-top:8px; text-wrap:pretty">{{ r.fix }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isMethod }}" hint-placeholder-val="{{ true }}">
+      <div data-pane style="padding:46px 52px 80px; max-width:1040px; width:100%">
+        <h1 style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; font-size:64px; line-height:1.08; letter-spacing:0.02em; margin:0">Method &amp; kit</h1>
+        <p style="font-size:18px; line-height:1.55; color:var(--ink-78); max-width:62ch; margin:16px 0 0; text-wrap:pretty">Every day is warm-up, drill, project, plus a rest day that is not optional. Roughly 10–12 hours a week, 90–120 minutes a day, six days on.</p>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:48px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Three anchor rules</h2>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px">
+          <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:22px 24px">
+            <div style="font-family:'Bebas Neue',Impact,sans-serif; letter-spacing:0.02em; font-size:34px; line-height:1.1">Medicine, not diet</div>
+            <div style="font-size:16px; line-height:1.6; color:var(--ink-72); margin-top:8px; text-wrap:pretty">Drills are medicine to fix a specific weakness, not a diet. The project is the meal. Drills without application produce exercise technicians who draw 250 perfect cubes and freeze at a blank page.</div>
+            <div style="font-size:14px; color:var(--ink-62); margin-top:12px">brokendraw, p. 4</div>
+          </div>
+          <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:22px 24px">
+            <div style="font-family:'Bebas Neue',Impact,sans-serif; letter-spacing:0.02em; font-size:34px; line-height:1.1">The 50% rule</div>
+            <div style="font-size:16px; line-height:1.6; color:var(--ink-72); margin-top:8px; text-wrap:pretty">Exactly half of your artistic life belongs to joy, play and curiosity. Day seven of every week is fan art, doodles and rough ideas with zero drills and zero self-critique.</div>
+            <div style="font-size:14px; color:var(--ink-62); margin-top:12px">Drawabox, Lesson 0</div>
+          </div>
+          <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:22px 24px">
+            <div style="font-family:'Bebas Neue',Impact,sans-serif; letter-spacing:0.02em; font-size:34px; line-height:1.1">Whole-arm pivot</div>
+            <div style="font-size:16px; line-height:1.6; color:var(--ink-72); margin-top:8px; text-wrap:pretty">Lock your wrist for long curves and perspective lines. Pivot from the shoulder and elbow. Drawing from the wrist produces timid, scratchy, hairy lines.</div>
+            <div style="font-size:14px; color:var(--ink-62); margin-top:12px">Peter Han, pp. 4–10</div>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:72px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Course start date</h2>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap">
+          <input type="date" value="{{ startVal }}" onChange="{{ setStart }}" style="padding:10px 14px; border:1px solid var(--line-2); border-radius:16px; background:var(--card); font-size:14px" />
+          <span style="font-size:16px; color:var(--ink-62)">Sets the date on all 56 days, the calendar and the “today” marker.</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin-top:30px">
+          <sc-for list="{{ partsDoc }}" as="p" hint-placeholder-count="4">
+            <div style="{{ p.card }}">
+              <div style="{{ p.tag }}">Part {{ p.k }} · {{ p.m }}</div>
+              <div style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; letter-spacing:0.02em; font-size:30px; line-height:1.15; margin-top:12px">{{ p.t }}</div>
+              <div style="font-size:14px; font-weight:500; margin-top:8px; color:var(--ink-78)">{{ p.h }}</div>
+              <div style="font-size:16px; line-height:1.6; color:var(--ink-68); margin-top:8px; text-wrap:pretty">{{ p.d }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:48px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Get the materials</h2>
+        </div>
+        <p style="font-size:16px; line-height:1.6; color:var(--ink-72); max-width:62ch; margin:0 0 18px; text-wrap:pretty">Every exercise reference in this plan points at a page in one of these. The companion book is the only one you genuinely cannot run the course without.</p>
+        <div style="display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:24px; overflow:hidden">
+          <sc-for list="{{ sources }}" as="s" hint-placeholder-count="5">
+            <div style="display:flex; gap:18px; padding:18px 20px; background:var(--card); flex-wrap:wrap">
+              <div style="flex:0 0 78px; height:108px; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--canvas)">
+                <photo-slot id="{{ s.slotId }}" shape="rect" placeholder="{{ s.slotHint }}"></photo-slot>
+              </div>
+              <div style="flex:0 0 130px; font-size:16px; color:var(--ink-72)">{{ s.t }}</div>
+              <div style="flex:0 0 220px; min-width:0">
+                <div style="font-size:16px; font-weight:700">{{ s.v }}</div>
+                <div style="font-size:16px; color:var(--ink-62); margin-top:2px">{{ s.by }}</div>
+                <sc-if value="{{ s.hasLink }}" hint-placeholder-val="{{ true }}">
+                  <a href="{{ s.u }}" target="_blank" rel="noreferrer" style="display:inline-block; font-size:16px; margin-top:8px">Open →</a>
+                </sc-if>
+              </div>
+              <div style="flex:1; min-width:220px; font-size:16px; line-height:1.55; color:var(--ink-68); text-wrap:pretty">{{ s.why }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:72px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Traditional kit</h2>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:24px; overflow:hidden">
+          <sc-for list="{{ kit }}" as="k" hint-placeholder-count="4">
+            <div style="display:flex; gap:18px; padding:16px 20px; background:var(--card); flex-wrap:wrap">
+              <div style="flex:0 0 150px; font-size:16px; color:var(--ink-72)">{{ k.t }}</div>
+              <div style="flex:0 0 190px; font-size:16px; font-weight:700; color:var(--ink)">{{ k.v }}</div>
+              <div style="flex:1; min-width:220px; font-size:16px; line-height:1.55; color:var(--ink-68); text-wrap:pretty">{{ k.why }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:48px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Digital setup</h2>
+        </div>
+        <p style="font-size:16px; line-height:1.6; color:var(--ink-72); max-width:62ch; margin:0 0 18px; text-wrap:pretty">iPad, Procreate, Photoshop or Clip Studio. Traditional is recommended for maximum growth, but the whole plan runs digitally if you configure it to behave like ink.</p>
+        <div style="display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:24px; overflow:hidden">
+          <sc-for list="{{ digital }}" as="k" hint-placeholder-count="4">
+            <div style="display:flex; gap:18px; padding:16px 20px; background:var(--card); flex-wrap:wrap">
+              <div style="flex:0 0 150px; font-size:16px; color:var(--ink-72)">{{ k.t }}</div>
+              <div style="flex:0 0 190px; font-size:16px; font-weight:700; color:var(--ink)">{{ k.v }}</div>
+              <div style="flex:1; min-width:220px; font-size:16px; line-height:1.55; color:var(--ink-68); text-wrap:pretty">{{ k.why }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:72px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Goldilocks scaffolding</h2>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px">
+          <sc-for list="{{ scaffold }}" as="s" hint-placeholder-count="3">
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:19px 21px">
+              <div style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; letter-spacing:0.02em; font-size:30px">{{ s.d }}</div>
+              <div style="display:flex; flex-direction:column; gap:7px; margin-top:14px">
+                <div style="font-size:16px; color:var(--ink-68)">Easier: {{ s.low }}</div>
+                <div style="font-size:16px; color:var(--ink-68)">Moderate: {{ s.mid }}</div>
+                <div style="font-size:16px; color:var(--ink); font-weight:500">Target: {{ s.high }}</div>
+              </div>
+              <div style="font-size:12px; line-height:1.55; color:var(--ink-62); margin-top:13px; padding-top:13px; border-top:1px solid var(--track); text-wrap:pretty">{{ s.fix }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:48px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Daily journal template</h2>
+        </div>
+        <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; padding:22px 24px">
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <sc-for list="{{ journal }}" as="j" hint-placeholder-count="7">
+              <div style="display:flex; gap:12px; align-items:flex-start">
+                <div style="flex:0 0 10px; height:10px; width:10px; border-radius:800px; border:1px solid var(--line-3); margin-top:6px"></div>
+                <div style="font-size:16px; line-height:1.5; color:var(--ink-78)">{{ j.t }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <button type="button" onClick="{{ copyJournal }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; margin-top:20px; font-size:14px; font-weight:500; white-space:nowrap; min-height:44px; padding:0 22px; border:1.5px solid var(--line-2); border-radius:800px; color:var(--ink)" style-hover="border-color:var(--ink)">Copy template</button>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:72px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Credits</h2>
+        </div>
+        <p style="font-size:16px; line-height:1.6; color:var(--ink-78); max-width:62ch; margin:0; text-wrap:pretty">This is an unofficial study tool, not a product of any of the people below. It holds no course content of its own — every exercise, page reference and drill points back at work that belongs to its author. Buy the book, watch the videos, use Drawabox for free.</p>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:16px">
+          <div style="font-size:16px; line-height:1.55; color:var(--ink-78)">The 8-week roadmap, the 25 exercises and the weekly projects are <strong style="font-weight:700">brokendraw's</strong>. <a href="https://brokendraw.com/book" target="_blank" rel="noreferrer">Get the book</a></div>
+          <div style="font-size:16px; line-height:1.55; color:var(--ink-78)">Shoulder linework, ghosting and form cuts are from <strong style="font-weight:700">Peter Han's</strong> <em>The Dynamic Bible</em>.</div>
+          <div style="font-size:16px; line-height:1.55; color:var(--ink-78)">The drill progressions, the 250 Box Challenge and the 50% rule are <strong style="font-weight:700">Drawabox</strong>. <a href="https://drawabox.com/" target="_blank" rel="noreferrer">drawabox.com</a></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isCrew }}" hint-placeholder-val="{{ true }}">
+      <div data-pane style="padding:46px 52px 80px; max-width:1100px; width:100%">
+        <h1 style="font-family:'Bebas Neue',Impact,sans-serif; font-weight:400; font-size:64px; line-height:1.08; letter-spacing:0.02em; margin:0">The crew</h1>
+        <p style="font-size:16px; line-height:1.55; color:var(--ink-78); max-width:62ch; margin:16px 0 0; text-wrap:pretty">Your own row updates itself from your log. Add a row per friend and keep their week, day and hours in sync at your weekly check-in.</p>
+
+        <div style="overflow-x:auto; border:1px solid var(--line); border-radius:24px; margin-top:28px">
+        <div style="min-width:640px; display:flex; flex-direction:column; gap:1px; background:var(--line)">
+          <div style="display:flex; gap:10px; padding:14px 20px; background:var(--canvas); font-size:12px; font-weight:500; white-space:nowrap; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-55)">
+            <div style="flex:0 0 34px">#</div>
+            <div style="flex:1 1 120px; min-width:90px">Artist</div>
+            <div style="flex:0 0 64px">Week</div>
+            <div style="flex:0 0 64px">Day</div>
+            <div style="flex:0 0 64px">Hours</div>
+            <div style="flex:0 0 96px">Through</div>
+            <div style="flex:0 0 26px"></div>
+          </div>
+          <sc-for list="{{ crewRows }}" as="c" hint-placeholder-count="3">
+            <div style="{{ c.row }}">
+              <div style="flex:0 0 34px; font-family:'DM Sans',system-ui,sans-serif; font-size:14px; color:var(--ink-55)">{{ c.rank }}</div>
+              <div style="flex:1 1 120px; min-width:90px; display:flex; align-items:center; gap:8px">
+                <input value="{{ c.name }}" onChange="{{ c.setName }}" readOnly="{{ c.locked }}" placeholder="Name" style="{{ c.nameStyle }}" />
+                <span style="{{ c.badgeStyle }}">{{ c.badge }}</span>
+              </div>
+              <input value="{{ c.week }}" onChange="{{ c.setWeek }}" readOnly="{{ c.locked }}" style="{{ c.cellStyle }}" />
+              <input value="{{ c.day }}" onChange="{{ c.setDay }}" readOnly="{{ c.locked }}" style="{{ c.cellStyle }}" />
+              <input value="{{ c.hours }}" onChange="{{ c.setHours }}" readOnly="{{ c.locked }}" style="{{ c.cellStyle }}" />
+              <div style="flex:0 0 96px; display:flex; align-items:center; gap:9px">
+                <div style="flex:1; min-width:0; height:4px; background:var(--track); border-radius:800px; overflow:hidden"><div style="{{ c.bar }}"></div></div>
+                <span style="font-family:'DM Sans',system-ui,sans-serif; font-size:12px; color:var(--ink-62); width:28px">{{ c.pct }}%</span>
+              </div>
+              <button type="button" aria-label="Remove row" onClick="{{ c.remove }}" style="{{ c.removeStyle }}" style-hover="color:var(--accent)">×</button>
+            </div>
+          </sc-for>
+        </div>
+        </div>
+        <sc-if value="{{ crewEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:14px; border:1px dashed var(--line-2); border-radius:24px; padding:20px 22px; font-size:16px; line-height:1.55; color:var(--ink-72); text-wrap:pretty">Only you so far. Add a row for a friend, or paste the code they sent you, and the board starts ranking.</div>
+        </sc-if>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; align-items:center">
+          <button type="button" onClick="{{ addMate }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-size:14px; font-weight:500; white-space:nowrap; min-height:44px; padding:0 24px; border:1.5px solid var(--line-2); border-radius:800px; color:var(--ink)" style-hover="border-color:var(--ink)">+ Add a friend</button>
+          <button type="button" onClick="{{ copyShare }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-size:14px; font-weight:500; white-space:nowrap; min-height:44px; padding:0 24px; border:1.5px solid var(--line-2); border-radius:800px; color:var(--ink)" style-hover="border-color:var(--ink)">Copy my code · {{ shareCode }}</button>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:12px">
+          <input value="{{ pasteVal }}" onChange="{{ setPaste }}" placeholder="Mia: IG-3.4.22" style="flex:1 1 240px; max-width:340px; padding:11px 14px; border:1px solid var(--line-2); border-radius:800px; background:var(--card); font-size:14px" />
+          <button type="button" onClick="{{ applyPaste }}" style="appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-size:14px; font-weight:500; white-space:nowrap; min-height:44px; padding:0 22px; border:1.5px solid var(--accent); background:var(--accent); border-radius:800px; color:var(--on-accent)">Add from code</button>
+          <span style="font-size:16px; color:var(--ink-62)">Everything is stored in this browser. Codes are how the crew syncs.</span>
+        </div>
+
+        <div style="display:flex; align-items:baseline; gap:16px; margin:72px 0 18px">
+          <h2 style="font-family:'Bebas Neue',Impact,sans-serif; font-size:30px; line-height:1.1; white-space:nowrap; letter-spacing:0.02em; color:var(--ink); margin:0; font-weight:400">Crit wall</h2>
+        </div>
+        <p style="font-size:16px; color:var(--ink-62); margin:0 0 20px">Drop a photo of the page, say what you want looked at. Use the rubric language: convergence, minor axes, overlap, tension points.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:16px">
+          <sc-for list="{{ critSlots }}" as="s" hint-placeholder-count="6">
+            <div style="background:var(--card); border:1px solid var(--line); border-radius:24px; overflow:hidden; display:flex; flex-direction:column">
+              <div style="background:var(--canvas); border-bottom:1px solid var(--line)">
+                <photo-slot id="{{ s.slotId }}" shape="rect"></photo-slot>
+              </div>
+              <div style="padding:14px 16px; display:flex; flex-direction:column; gap:9px">
+                <input value="{{ s.who }}" onChange="{{ s.setWho }}" placeholder="Who / W4 D3" style="width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:16px; background:var(--canvas); font-family:'DM Sans',system-ui,sans-serif; font-size:12px" />
+                <textarea value="{{ s.note }}" onChange="{{ s.setNote }}" placeholder="What should we look at?" style="width:100%; min-height:62px; resize:vertical; padding:8px 9px; border:1px solid var(--line); border-radius:16px; background:var(--canvas); font-size:16px; line-height:1.5"></textarea>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900},&quot;defaultView&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;today&quot;,&quot;week&quot;,&quot;roadmap&quot;,&quot;exercises&quot;,&quot;vault&quot;,&quot;progress&quot;,&quot;crew&quot;,&quot;method&quot;],&quot;default&quot;:&quot;today&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Behavior&quot;},&quot;compactSessions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
+const LS = 'imaginationGym.v1';
+const PM = {
+  A: { c: 'var(--on-accent)', bg: 'var(--sulfur)', line: 'var(--line)' },
+  B: { c: 'var(--on-accent)', bg: 'var(--accent)', line: 'var(--line)' },
+  C: { c: 'var(--canvas)', bg: 'var(--ink)', line: 'var(--line)' },
+  D: { c: 'var(--ink)', bg: 'var(--canvas)', line: 'var(--line)' }
+};
+const YT = /youtube\.com\/watch/;
+const EMBED = url => {
+  const m = /[?&]v=([\w-]+)/.exec(url), t = /[?&]t=(\d+)s?/.exec(url);
+  if (!m) return url;
+  return 'https://www.youtube-nocookie.com/embed/' + m[1] + '?rel=0&modestbranding=1' + (t ? '&start=' + t[1] : '');
+};
+const NAVBTN = on => 'appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; display:flex; align-items:center; width:100%; min-height:44px; padding:9px 14px; border-radius:16px; font-size:16px; white-space:nowrap;'
+  + (on ? 'background:var(--card); color:var(--ink); font-weight:700; box-shadow:inset 3px 0 0 var(--accent);' : 'color:var(--ink-72); font-weight:500;');
+const NAV_GROUPS = [
+  ['', [['today', 'Today']]],
+  ['Course', [['week', 'This week'], ['roadmap', 'Roadmap']]],
+  ['Library', [['exercises', '25 exercises'], ['vault', 'Video vault'], ['method', 'Method & kit']]],
+  ['Progress', [['progress', 'Stats & streak'], ['crew', 'The crew']]]
+];
+const NAV = [
+  ['today', 'Today'], ['week', 'This Week'], ['roadmap', 'Roadmap'],
+  ['exercises', '25 Exercises'], ['vault', 'Video Vault'], ['progress', 'Progress'], ['crew', 'The Crew'], ['method', 'Method & Kit']
+];
+const COUNTERS = [
+  { k: 'boxes', t: 'Boxes', target: 100 }, { k: 'cyl', t: 'Cylinders', target: 100 },
+  { k: 'sil', t: 'Silhouettes', target: 50 }, { k: 'sym', t: 'Symmetry shapes', target: 50 },
+  { k: 'refman', t: 'Ref mannequins', target: 50 }, { k: 'imgman', t: 'Imagination mannequins', target: 20 },
+  { k: 'intman', t: 'Interacting mannequins', target: 30 }, { k: 'texbar', t: 'Texture bars', target: 5 },
+  { k: 'blob', t: 'Textured blobs', target: 10 }, { k: 'highlight', t: 'Daily highlights', target: 56 }
+];
+
+const CMATCH = {
+  boxes: /\bboxes\b/i, cyl: /cylinder/i, sil: /silhouette/i, sym: /symmetr|mirror/i,
+  refman: /mannequin|box figure/i, imgman: /from imagination|imaginative/i, intman: /interact/i,
+  texbar: /texture bar|swatch|texture/i, blob: /blob|organic volume/i, highlight: /daily highlight/i
+};
+const ISO = d => { const x = new Date(d); return new Date(x.getTime() - x.getTimezoneOffset() * 60000).toISOString().slice(0, 10); };
+const YTID = u => { const m = /(?:v=|youtu\.be\/|embed\/)([\w-]{11})/.exec(u || ''); return m ? m[1] : ''; };
+const THUMB = u => { const id = YTID(u); return id ? 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg' : ''; };
+const mondayOf = d => { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; };
+const JOURNAL = ['Date / Week + Day', 'Session length', 'Drill worked: ', 'What improved: ', 'Blind spot found: ', 'Rubric check: convergence / minor axes / overlap / tension points', 'One thing to repeat tomorrow: '];
+
+class Component extends DCLogic {
+  state = {
+    data: null, view: 'today', cw: 1, cd: 1, done: {}, hours: {}, notes: {},
+    counters: {}, crew: [], crit: {}, exLevel: 0, openWeek: 1,
+    onboarded: false, obOpen: false, obStep: 1, kitOk: {}, celebrate: null, ms: {},
+    dayHours: {}, dayNotes: {}, backupAt: '', paceFlex: false, mig1: false, focus: false,
+    start: '', theme: 'light', exFocus: '', tRun: false, tAcc: 0, tAt: 0, paste: '', loadErr: false
+  };
+
+  componentWillMount() {
+    if (this.props.defaultView) this.state = { ...this.state, view: this.props.defaultView };
+  }
+
+  componentDidMount() {
+    let saved = null;
+    try {
+      saved = JSON.parse(localStorage.getItem(LS) || '{}');
+      if (saved && typeof saved === 'object') this.setState(saved, () => { this.applyTheme(); this.migrate(); });
+    } catch (e) { saved = null; }
+    if (!(saved && saved.onboarded)) this.setState({ obOpen: true, obStep: 1 });
+    if (!this.state.start) this.setState({ start: ISO(mondayOf(new Date())) });
+    this.applyTheme();
+    this._tick = setInterval(() => { if (this.state.tRun) this.forceUpdate(); }, 1000);
+    this._key = e => {
+      const tag = (e.target && e.target.tagName) || '';
+      const typing = tag === 'INPUT' || tag === 'TEXTAREA';
+      if (this.state.focus) {
+        if (e.key === 'Escape') { this.put({ focus: false }); return; }
+        if (e.code === 'Space' && !typing && tag !== 'BUTTON') { e.preventDefault(); this.timerToggle(); return; }
+      }
+      if (typing || this.state.obOpen || this.state.celebrate) return;
+      if (this.state.view === 'today' && /^[1-9]$/.test(e.key)) {
+        const i = Number(e.key) - 1;
+        const n = this.state.cw, d = this.state.cd;
+        const day = this.day(n, d);
+        if (!day || !day.parts[i]) return;
+        const k = this.key(n, d, i);
+        const done = { ...this.state.done };
+        done[k] = !done[k];
+        this.put({ done });
+        if (done[k] && day.parts.every((_, j) => done[this.key(n, d, j)])) this.celebrateDay(n, d);
+      }
+    };
+    document.addEventListener('keydown', this._key);
+    this.loadCurriculum();
+  }
+
+  loadCurriculum() {
+    this.setState({ loadErr: false });
+    import('./curriculum.js?r=' + Date.now())
+      .then(m => this.setState({ data: m, loadErr: false }))
+      .catch(e => { console.error(e); this.setState({ loadErr: true }); });
+  }
+  componentWillUnmount() {
+    clearInterval(this._tick);
+    clearTimeout(this._cel);
+    try { document.removeEventListener('keydown', this._key); } catch (e) {}
+  }
+
+  timerToggle() {
+    if (this.state.tRun) this.put({ tRun: false, tAcc: this.elapsed() });
+    else this.put({ tRun: true, tAt: Date.now() });
+  }
+
+  applyTheme() {
+    try { document.documentElement.setAttribute('data-theme', this.state.theme === 'dark' ? 'dark' : 'light'); } catch (e) {}
+  }
+  setTheme(t) { this.setState({ theme: t }, () => { this.applyTheme(); this.persist(); }); }
+
+  startDate() { return new Date((this.state.start || ISO(mondayOf(new Date()))) + 'T00:00:00'); }
+  dateOf(n, d) { const x = this.startDate(); x.setDate(x.getDate() + (n - 1) * 7 + (d - 1)); return x; }
+  dateLabel(n, d, o) { return this.dateOf(n, d).toLocaleDateString('en-GB', o || { weekday: 'short', day: 'numeric', month: 'short' }); }
+  liveIndex() {
+    const t = new Date(); t.setHours(0, 0, 0, 0);
+    return Math.round((t - this.startDate()) / 86400000);
+  }
+  isLive(n, d) { const l = this.liveDay(); return !!l && l.n === n && l.d === d; }
+  liveDay() {
+    if (this.state.paceFlex) return this.firstUnfinished();
+    const i = this.liveIndex();
+    return i < 0 || i > 55 ? null : { n: Math.floor(i / 7) + 1, d: i % 7 + 1 };
+  }
+
+  elapsed() { return (this.state.tAcc || 0) + (this.state.tRun ? Math.floor((Date.now() - this.state.tAt) / 1000) : 0); }
+  clock() {
+    const s = this.elapsed();
+    return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0');
+  }
+
+  refsIn(text) {
+    const out = []; const re = /Ex (\d{2})/g; let m;
+    while ((m = re.exec(text || ''))) if (out.indexOf(m[1]) < 0) out.push(m[1]);
+    return out;
+  }
+  exName(n) {
+    const d = this.state.data; if (!d) return '';
+    const e = d.EXERCISES.find(x => x.n === n); return e ? e.name : '';
+  }
+  usage(n) {
+    const out = [];
+    this.weeks().forEach(w => w.days.forEach((day, di) => {
+      const txt = day.parts.map(p => p.d + ' ' + p.p).join(' ');
+      if (this.refsIn(txt).indexOf(n) >= 0) out.push({ w: w.n, d: di + 1 });
+    }));
+    return out;
+  }
+
+  persist() {
+    const { data, celebrate, obOpen, ...rest } = this.state;
+    try { localStorage.setItem(LS, JSON.stringify(rest)); } catch (e) { /* quota */ }
+  }
+  put(patch) { this.setState(patch, () => this.persist()); }
+
+  weeks() { return (this.state.data && this.state.data.WEEKS) || []; }
+  week(n) { return this.weeks()[n - 1] || null; }
+  day(n, d) { const w = this.week(n); return w ? w.days[d - 1] : null; }
+  key(n, d, i) { return 'w' + n + 'd' + d + 'p' + i; }
+
+  dayDone(n, d) {
+    const day = this.day(n, d); if (!day) return false;
+    return day.parts.every((p, i) => this.state.done[this.key(n, d, i)]);
+  }
+  weekPct(n) {
+    const w = this.week(n); if (!w) return 0;
+    let tot = 0, dn = 0;
+    w.days.forEach((day, di) => day.parts.forEach((p, i) => { tot++; if (this.state.done[this.key(n, di + 1, i)]) dn++; }));
+    return tot ? Math.round(dn / tot * 100) : 0;
+  }
+  coursePct() {
+    const ws = this.weeks(); if (!ws.length) return 0;
+    return Math.round(ws.reduce((a, w) => a + this.weekPct(w.n), 0) / ws.length);
+  }
+  totalHours() {
+    return this.fmtHours(Object.values(this.state.dayHours || {}).reduce((a, v) => a + (parseFloat(v) || 0), 0));
+  }
+  streak() {
+    let s = 0, n = this.state.cw, d = this.state.cd;
+    while (n >= 1) {
+      if (this.dayDone(n, d)) { s++; d--; if (d < 1) { n--; d = 7; } } else break;
+    }
+    return s;
+  }
+  step(delta) {
+    let n = this.state.cw, d = this.state.cd + delta;
+    if (d > 7) { d = 1; n = Math.min(8, n + 1); }
+    if (d < 1) { d = 7; n = Math.max(1, n - 1); }
+    this.put({ cw: n, cd: d });
+  }
+  goto(n, d) { this.put({ cw: n, cd: d, view: 'today' }); }
+
+  doneDayCount() {
+    let c = 0;
+    for (let n = 1; n <= 8; n++) for (let d = 1; d <= 7; d++) if (this.dayDone(n, d)) c++;
+    return c;
+  }
+
+  jumpVals() {
+    const live = this.liveDay();
+    const onIt = this.state.view === 'today' && live && live.n === this.state.cw && live.d === this.state.cd;
+    const w = live ? this.week(live.n) : null;
+    const day = live ? this.day(live.n, live.d) : null;
+    return {
+      jumpNote: live ? 'Today · Week ' + live.n + ' Day ' + live.d : 'Course not started',
+      jumpTitle: day ? day.t : (w ? w.t : 'Set a start date'),
+      jumpToday: () => live ? this.goto(live.n, live.d) : this.put({ view: 'method' }),
+      jumpStyle: 'appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; width:calc(100% - 28px); display:flex; align-items:center; justify-content:space-between; gap:10px; margin:14px 14px 4px; padding:12px 14px; border-radius:24px; background:var(--card); border:1px solid '
+        + (onIt ? 'var(--accent)' : 'var(--line)')
+    };
+  }
+
+  parseRef(s) {
+    const str = String(s || '').trim();
+    const i = str.indexOf(' — ');
+    if (i < 0) {
+      const items = str ? str.split(', ').map(t => ({ t })) : [];
+      return { head: '', hasHead: false, items };
+    }
+    return { head: str.slice(0, i), hasHead: true, items: str.slice(i + 3).split(', ').map(t => ({ t })) };
+  }
+
+  migrate() {
+    if (this.state.mig1) return;
+    const dh = { ...(this.state.dayHours || {}) };
+    const dn = { ...(this.state.dayNotes || {}) };
+    Object.keys(this.state.hours || {}).forEach(k => {
+      if (/^\d+$/.test(k) && this.state.hours[k] && !dh['w' + k + 'd1']) dh['w' + k + 'd1'] = this.state.hours[k];
+    });
+    this.put({ dayHours: dh, dayNotes: dn, mig1: true });
+  }
+
+  dkey(n, d) { return 'w' + n + 'd' + d; }
+  weekHours(n) {
+    let t = 0;
+    for (let d = 1; d <= 7; d++) t += parseFloat((this.state.dayHours || {})[this.dkey(n, d)]) || 0;
+    return t;
+  }
+  fmtHours(v) { return v ? String(Number(v).toFixed(1)).replace(/\.0$/, '') : '0'; }
+
+  firstUnfinished() {
+    for (let n = 1; n <= 8; n++) for (let d = 1; d <= 7; d++) if (!this.dayDone(n, d)) return { n, d };
+    return null;
+  }
+  missedDays() {
+    if (this.state.paceFlex) return [];
+    const i = this.liveIndex();
+    if (i <= 0) return [];
+    const out = [];
+    for (let k = 0; k < Math.min(i, 56); k++) {
+      const n = Math.floor(k / 7) + 1, d = k % 7 + 1;
+      if (!this.dayDone(n, d)) out.push({ n, d });
+    }
+    return out;
+  }
+
+  async exportState() {
+    const { data, celebrate, obOpen, ...rest } = this.state;
+    const at = new Date().toISOString();
+    let photos = {};
+    try { photos = (window.photoSlots && await window.photoSlots.dump()) || {}; } catch (e) {}
+    const body = JSON.stringify({ app: 'imagination-gym', version: 1, exportedAt: at, state: rest, photos }, null, 2);
+    try {
+      const url = URL.createObjectURL(new Blob([body], { type: 'application/json' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'imagination-gym-' + at.slice(0, 10) + '.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      this.put({ backupAt: at });
+    } catch (e) { console.error(e); }
+  }
+  importState(file) {
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const parsed = JSON.parse(String(r.result));
+        const s = parsed && parsed.state ? parsed.state : parsed;
+        if (!s || typeof s !== 'object') throw new Error('bad file');
+        const { data, celebrate, obOpen, ...clean } = s;
+        this.setState({ ...clean, obOpen: false, celebrate: null }, () => { this.applyTheme(); this.persist(); });
+        if (parsed && parsed.photos && window.photoSlots) window.photoSlots.restore(parsed.photos);
+      } catch (e) { console.error(e); this.put({ importErr: true }); }
+    };
+    r.readAsText(file);
+  }
+
+  celebrateDay(n, d) {
+    clearTimeout(this._cel);
+    this.put({ celebrate: { n, d }, tRun: false });
+    this._cel = setTimeout(() => this.advanceCel(), 7000);
+  }
+  advanceCel() {
+    clearTimeout(this._cel);
+    const c = this.state.celebrate; if (!c) return;
+    let n = c.n, d = c.d + 1;
+    if (d > 7) { d = 1; n = Math.min(8, n + 1); }
+    this.put({ celebrate: null, cw: n, cd: d, view: 'today', tAcc: 0, tRun: false });
+  }
+  dismissCel() { clearTimeout(this._cel); this.put({ celebrate: null }); }
+
+  celVals() {
+    const c = this.state.celebrate;
+    if (!c) return { celOpen: false };
+    const day = this.day(c.n, c.d);
+    const nd = c.d < 7 ? { n: c.n, d: c.d + 1 } : (c.n < 8 ? { n: c.n + 1, d: 1 } : null);
+    const ndDay = nd ? this.day(nd.n, nd.d) : null;
+    return {
+      celOpen: true, celWeek: c.n, celDay: c.d,
+      celTitle: day ? day.t : 'Day complete',
+      celParts: day ? day.parts.length : 0,
+      celPartsLabel: (day && day.parts.length === 1) ? 'part banked' : 'parts banked',
+      celMins: day ? day.parts.reduce((a, p) => a + (p.m || 0), 0) : 0,
+      celMinsBig: (day && day.parts.reduce((a, p) => a + (p.m || 0), 0) > 0)
+        ? day.parts.reduce((a, p) => a + (p.m || 0), 0) : 'All',
+      celMinsLabel: (day && day.parts.reduce((a, p) => a + (p.m || 0), 0) > 0) ? 'minutes planned' : 'day of play',
+      celStreak: this.streak(),
+      celNextLabel: ndDay
+        ? 'Up next, Week ' + nd.n + ' Day ' + nd.d + ': ' + ndDay.t
+        : 'That was the last day. Eight weeks done.',
+      celNext: () => this.advanceCel(),
+      celStay: () => this.dismissCel(),
+      celConfetti: Array.from({ length: 40 }, (_, i) => {
+        const col = ['var(--on-accent)', 'var(--sulfur)', 'var(--canvas)'][i % 3];
+        return {
+          style: 'position:absolute; top:-10vh; left:' + (i * 41 % 100) + '%; width:' + (5 + i * 7 % 5)
+            + 'px; height:' + (9 + i * 11 % 8) + 'px; background:' + col + '; opacity:0.92; animation:igFall '
+            + (2.4 + (i * 13 % 14) / 10) + 's linear ' + ((i * 29 % 22) / 10) + 's infinite'
+        };
+      })
+    };
+  }
+
+  obVals() {
+    const step = this.state.obStep || 1;
+    const kit = (this.state.data && this.state.data.KIT) || [];
+    const ok = this.state.kitOk || {};
+    const d1 = this.day(1, 1);
+    return {
+      obOpen: !!this.state.obOpen,
+      obStep1: step === 1, obStep2: step === 2, obStep3: step === 3,
+      obHasBack: step > 1,
+      obDots: [1, 2, 3].map(i => ({
+        style: 'height:8px; border-radius:800px; width:' + (i === step ? '24px' : '8px')
+          + '; background:' + (i <= step ? 'var(--accent)' : 'var(--line-2)')
+      })),
+      obBack: () => this.put({ obStep: Math.max(1, step - 1) }),
+      obNext: () => step < 3
+        ? this.put({ obStep: step + 1 })
+        : this.put({ obOpen: false, onboarded: true, view: 'today', cw: 1, cd: 1 }),
+      obNextLabel: step === 1 ? 'Set my start date →' : step === 2 ? 'Preview day one →' : 'Start day one →',
+      obSkip: () => this.put({ obOpen: false, onboarded: true }),
+      obStartVal: this.state.start,
+      obSetStart: e => this.put({ start: e.target.value }),
+      obStartHuman: this.dateLabel(1, 1, { weekday: 'long', day: 'numeric', month: 'long' }),
+      obEndHuman: this.dateLabel(8, 7, { day: 'numeric', month: 'long' }),
+      obKitCount: kit.filter((k, i) => ok[i]).length,
+      obKitTotal: kit.length,
+      obKit: kit.map((k, i) => ({
+        t: k.t, v: k.v, why: k.why, on: !!ok[i], tick: ok[i] ? '✓' : '',
+        label: (ok[i] ? 'Untick ' : 'Tick ') + k.v,
+        toggle: () => { const m = { ...ok }; m[i] = !m[i]; this.put({ kitOk: m }); },
+        box: 'appearance:none; -webkit-appearance:none; font:inherit; margin:0; cursor:pointer; flex:0 0 24px; width:24px; height:24px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--canvas); border:1.5px solid '
+          + (ok[i] ? 'var(--ink)' : 'var(--line-3)') + '; background:' + (ok[i] ? 'var(--ink)' : 'var(--canvas)')
+      })),
+      obD1Title: d1 ? d1.t : '',
+      obD1Mins: d1 ? d1.parts.reduce((a, p) => a + (p.m || 0), 0) : 0,
+      obD1Parts: d1 ? d1.parts.map(p => ({ k: p.k, t: p.t, p: p.p, m: p.m ? p.m + ' min' : 'all day' })) : [],
+      obHasDay: !!d1, obNoDay: !d1
+    };
+  }
+
+  nearGoal() {
+    const n = this.state.cw, d = this.state.cd;
+    const day = this.day(n, d);
+    if (!day) return 'Pick a day to start';
+    const left = day.parts.filter((p, i) => !this.state.done[this.key(n, d, i)]).length;
+    if (left) return left === 1 ? '1 part left today' : left + ' parts left today';
+    let doneInWeek = 0;
+    for (let i = 1; i <= 7; i++) if (this.dayDone(n, i)) doneInWeek++;
+    return doneInWeek === 7 ? 'Week ' + n + ' complete' : doneInWeek + ' of 7 days this week';
+  }
+
+  navVals() {
+    return NAV.map(([id, label]) => {
+      const on = this.state.view === id;
+      return {
+        label, go: () => this.put({ view: id }),
+        style: 'appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; display:flex; align-items:center; width:100%; min-height:44px; padding:9px 14px; border-radius:16px; font-size:16px; white-space:nowrap;'
+          + (on
+            ? 'background:var(--card); color:var(--ink); font-weight:700; box-shadow:inset 3px 0 0 var(--accent);'
+            : 'color:var(--ink-72); font-weight:500;')
+      };
+    });
+  }
+
+  navGroupVals() {
+    const mk = (id, label) => ({
+      label, go: () => this.put({ view: id }),
+      style: NAVBTN(this.state.view === id && !this.state.obOpen)
+    });
+    const groups = NAV_GROUPS.map(([label, items]) => ({
+      label, titled: !!label, items: items.map(([id, l]) => mk(id, l))
+    }));
+    groups[0].items.unshift({
+      label: 'Start here',
+      go: () => this.put({ obOpen: true, obStep: 1 }),
+      style: NAVBTN(!!this.state.obOpen)
+    });
+    return groups;
+  }
+
+  todayVals() {
+    const n = this.state.cw, d = this.state.cd;
+    const w = this.week(n), day = this.day(n, d);
+    if (!w || !day) return {};
+    const parts = day.parts.map((p, i) => {
+      const meta = PM[p.k], k = this.key(n, d, i), on = !!this.state.done[k];
+      return {
+        k: p.k, t: p.t, purpose: p.p, d: p.d,
+        toggleLabel: (on ? 'Mark incomplete: ' : 'Mark complete: ') + p.t,
+        mins: p.m ? p.m + ' min' : 'all day',
+        tick: on ? '✓' : '',
+        card: 'display:flex; gap:16px; align-items:flex-start; background:var(--card); border:1px solid var(--line); border-left:8px solid '
+          + meta.bg + '; border-radius:0 24px 24px 0; padding:24px 26px;',
+        on,
+        donePill: "font-family:'DM Sans',system-ui,sans-serif; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; white-space:nowrap; color:var(--canvas); background:var(--ink); border-radius:800px; padding:4px 11px",
+        box: 'appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; flex:0 0 24px; width:24px; height:24px; padding:0; border-radius:16px; border:1px solid ' + (on ? 'var(--ink)' : 'var(--line-3)')
+          + '; background:' + (on ? 'var(--ink)' : 'var(--canvas)') + '; color:var(--canvas); display:flex; align-items:center; justify-content:center; font-size:14px; cursor:pointer; margin-top:2px',
+        tag: "font-family:'DM Sans',system-ui,sans-serif; font-size:12px; letter-spacing:0.12em; text-transform:uppercase; color:" + meta.c
+          + '; background:' + meta.bg + '; padding:4px 12px; border-radius:800px; white-space:nowrap',
+        purposeStyle: 'font-size:16px; font-weight:500; margin-top:10px; letter-spacing:0',
+        bodyStyle: (this.props.compactSessions ? 'display:none;' : '')
+          + 'font-size:16px; line-height:1.62; color:var(--ink-68); margin-top:5px; max-width:66ch; text-wrap:pretty',
+        refs: this.refsIn(p.d + ' ' + p.p).map(rn => ({
+          label: 'Ex ' + rn + (this.exName(rn) ? ' · ' + this.exName(rn) : '') + ' →',
+          go: () => this.put({ view: 'exercises', exLevel: 0, exFocus: rn }),
+          style: "appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; font-size:14px; letter-spacing:0.04em; min-height:44px; padding:0 15px; border:1px solid var(--line-2); border-radius:800px; white-space:nowrap; color:var(--ink-72)"
+        })),
+        toggle: () => {
+          const done = { ...this.state.done }; done[k] = !done[k]; this.put({ done });
+          if (done[k] && day.parts.every((_, j) => done[this.key(n, d, j)])) this.celebrateDay(n, d);
+        }
+      };
+    });
+    const dn = parts.filter(p => p.tick).length;
+    const allDone = dn === parts.length;
+    const missed = this.missedDays().filter(m => !(m.n === n && m.d === d));
+    const oldest = missed[0] || null;
+    const planMins = day.parts.reduce((a, p) => a + (p.m || 0), 0);
+    const txt = day.t + ' ' + day.parts.map(p => p.d + ' ' + p.p).join(' ');
+    const bump = (k, v) => () => {
+      const counters = { ...this.state.counters };
+      counters[k] = Math.max(0, (counters[k] || 0) + v);
+      this.put({ counters });
+    };
+    const tCounters = COUNTERS.filter(c => CMATCH[c.k] && CMATCH[c.k].test(txt)).slice(0, 4).map(c => {
+      const v = this.state.counters[c.k] || 0, pct = Math.min(100, Math.round(v / c.target * 100));
+      return {
+        t: c.t, v, target: c.target, inc: bump(c.k, 1), inc5: bump(c.k, 5), dec: bump(c.k, -1),
+        bar: 'height:100%; width:' + pct + '%; background:' + (pct === 100 ? 'var(--accent)' : 'var(--ink)')
+      };
+    });
+    return {
+      tDate: this.dateLabel(n, d), tIsLive: this.isLive(n, d),
+      tCounters, tHasCounters: tCounters.length > 0,
+      tmDisplay: this.clock(), tmLabel: this.state.tRun ? 'Pause' : 'Start',
+      tmStyle: 'appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-size:14px; font-weight:500; min-height:44px; padding:0 20px; border-radius:800px; white-space:nowrap; border:1.5px solid var(--accent); background:'
+        + (this.state.tRun ? 'transparent; color:var(--ink)' : 'var(--accent); color:var(--on-accent)'),
+      tmToggle: () => this.timerToggle(),
+      tmReset: () => this.put({ tRun: false, tAcc: 0 }),
+      tmLog: () => {
+        const h = this.elapsed() / 3600; if (h <= 0) return;
+        const dayHours = { ...(this.state.dayHours || {}) };
+        const k = this.dkey(n, d);
+        dayHours[k] = ((parseFloat(dayHours[k]) || 0) + h).toFixed(1);
+        this.put({ dayHours, tRun: false, tAcc: 0 });
+      },
+      tWeekNum: n, tDayNum: d, tWeekTitle: w.title, tDayTitle: day.t, tProject: w.project,
+      tParts: parts, tPartCount: parts.length, tDonePart: dn,
+      tLeftLabel: allDone ? 'All done' : (parts.length - dn) + ' left',
+      tMins: day.parts.reduce((a, p) => a + (p.m || 0), 0),
+      tMinsLabel: day.parts.reduce((a, p) => a + (p.m || 0), 0) > 0
+        ? day.parts.reduce((a, p) => a + (p.m || 0), 0) + ' min total'
+        : 'All day',
+      tPartLabel: parts.length + (parts.length === 1 ? ' part' : ' parts'),
+      tWeekPct: this.weekPct(n),
+      tBook: w.book, tHan: w.han,
+      tBookHead: this.parseRef(w.book).head, tBookItems: this.parseRef(w.book).items, tBookHasHead: this.parseRef(w.book).hasHead,
+      tHanHead: this.parseRef(w.han).head, tHanItems: this.parseRef(w.han).items, tHanHasHead: this.parseRef(w.han).hasHead,
+      tDrills: w.links.filter(l => !YT.test(l.u)),
+      tHasDrills: w.links.filter(l => !YT.test(l.u)).length > 0,
+      tWatch: w.links.filter(l => YT.test(l.u)).map(l => ({
+        l: l.l, u: l.u,
+        thumbStyle: 'flex:0 0 96px; width:96px; height:54px; border-radius:10px; background:var(--ink) center/cover no-repeat'
+          + (THUMB(l.u) ? '; background-image:url(' + THUMB(l.u) + ')' : '')
+      })),
+      tPrev: () => this.step(-1), tNext: () => this.step(1),
+      goWeek: () => this.put({ view: 'week', openWeek: n }),
+      tHours: (this.state.dayHours || {})[this.dkey(n, d)] || '',
+      tNote: (this.state.dayNotes || {})[this.dkey(n, d)] || '',
+      tSetHours: e => { const dayHours = { ...(this.state.dayHours || {}) }; dayHours[this.dkey(n, d)] = e.target.value; this.put({ dayHours }); },
+      tSetNote: e => { const dayNotes = { ...(this.state.dayNotes || {}) }; dayNotes[this.dkey(n, d)] = e.target.value; this.put({ dayNotes }); },
+      tShowDate: !this.state.paceFlex,
+      tIsRest: day.parts.length === 1 && day.parts[0].k === 'D',
+      tWeekDaysDone: [1, 2, 3, 4, 5, 6, 7].filter(x => this.dayDone(n, x)).length,
+      tWeekHoursLabel: this.fmtHours(this.weekHours(n)) + ' h',
+      tWeekNote: this.state.notes[n] || '',
+      tSetWeekNote: e => { const notes = { ...this.state.notes }; notes[n] = e.target.value; this.put({ notes }); },
+      tWeekMs: ((w.milestones) || []).map((t, i) => {
+        const mk = 'w' + n + 'm' + i, on = !!(this.state.ms || {})[mk];
+        return {
+          t, on, tick: on ? '✓\u00a0' : '',
+          toggle: () => { const ms = { ...(this.state.ms || {}) }; ms[mk] = !ms[mk]; this.put({ ms }); },
+          style: "appearance:none; -webkit-appearance:none; font:inherit; margin:0; text-align:left; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; font-size:16px; min-height:44px; padding:0 16px; display:inline-flex; align-items:center; border-radius:800px; border:1.5px solid "
+            + (on ? 'var(--ink); background:var(--ink); color:var(--canvas)' : 'var(--line-2); background:transparent; color:var(--ink-72)')
+        };
+      }),
+      isFocus: !!this.state.focus,
+      focusOpen: () => this.put({ focus: true }),
+      focusClose: () => this.put({ focus: false }),
+      focusSlotId: 'focus-' + this.dkey(n, d),
+      focusPlan: planMins ? Math.floor(this.elapsed() / 60) + ' of ' + planMins + ' min planned' : Math.floor(this.elapsed() / 60) + ' min · no set length today',
+      focusBar: 'height:100%; background:var(--accent); width:' + (planMins ? Math.min(100, Math.round(this.elapsed() / 60 / planMins * 100)) : 0) + '%',
+      tBehind: missed.length > 0,
+      tBehindTitle: missed.length === 1 ? 'One day is still unticked behind you' : missed.length + ' days are still unticked behind you',
+      tOldestLabel: oldest ? 'Go to W' + oldest.n + ' D' + oldest.d + ' →' : 'Carry on →',
+      tGoOldest: () => oldest ? this.goto(oldest.n, oldest.d) : null,
+      tShift: () => {
+        const x = this.startDate();
+        x.setDate(x.getDate() + missed.length);
+        this.put({ start: ISO(x) });
+      },
+      tMarkLabel: allDone ? 'Go to next day' : 'Mark whole day complete',
+      tMarkStyle: "appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; margin-top:26px; align-self:flex-start; font-size:16px; font-weight:500; min-height:48px; padding:0 24px; border:1.5px solid " + (allDone ? 'var(--ink)' : 'var(--accent)') + "; border-radius:800px; cursor:pointer; background:"
+        + (allDone ? 'transparent; color:var(--ink)' : 'var(--accent); color:var(--on-accent)'),
+      tMarkAll: () => {
+        if (allDone) { this.step(1); return; }
+        const done = { ...this.state.done };
+        day.parts.forEach((p, i) => { done[this.key(n, d, i)] = true; });
+        const patch = { done };
+        const el = this.elapsed() / 3600;
+        if (el > 0.01) {
+          const dayHours = { ...(this.state.dayHours || {}) };
+          const k = this.dkey(n, d);
+          dayHours[k] = ((parseFloat(dayHours[k]) || 0) + el).toFixed(1);
+          patch.dayHours = dayHours;
+          patch.tAcc = 0;
+        }
+        this.put(patch);
+        this.celebrateDay(n, d);
+      }
+    };
+  }
+
+  weekVals() {
+    const n = this.state.openWeek, w = this.week(n);
+    const tabs = this.weeks().map(x => ({
+      n: x.n, go: () => this.put({ openWeek: x.n }),
+      style: "appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-size:14px; font-weight:500; min-height:44px; padding:0 18px; border-radius:800px; border:1.5px solid "
+        + (x.n === n ? 'var(--accent)' : 'var(--line-2)') + '; background:' + (x.n === n ? 'var(--accent)' : 'transparent')
+        + '; color:' + (x.n === n ? 'var(--on-accent)' : 'var(--ink)')
+    }));
+    if (!w) return { weekTabs: tabs };
+    return {
+      weekTabs: tabs, wNum: n, wTitle: w.title, wSub: w.sub, wObjective: w.objective, wWhy: w.why,
+      wProject: w.project, wBook: w.book, wHan: w.han, wPct: this.weekPct(n),
+      wSlotId: 'week-' + n + '-project',
+      wSlotHint: 'Reference for ' + w.project,
+      wBookHead: this.parseRef(w.book).head, wBookItems: this.parseRef(w.book).items, wBookHasHead: this.parseRef(w.book).hasHead,
+      wHanHead: this.parseRef(w.han).head, wHanItems: this.parseRef(w.han).items, wHanHasHead: this.parseRef(w.han).hasHead,
+      wLinks: w.links.filter(l => !YT.test(l.u)),
+      wHasLinks: w.links.filter(l => !YT.test(l.u)).length > 0,
+      wVideos: w.links.filter(l => YT.test(l.u)).map(l => ({ l: l.l, u: l.u, src: EMBED(l.u) })),
+      wVideoCount: w.links.filter(l => YT.test(l.u)).length,
+      wMilestones: (w.milestones || []).map((t, i) => {        const mk = 'w' + n + 'm' + i, on = !!(this.state.ms || {})[mk];
+        return {
+          t, on, tick: on ? '✓ ' : '',
+          toggle: () => { const ms = { ...(this.state.ms || {}) }; ms[mk] = !ms[mk]; this.put({ ms }); },
+          style: "appearance:none; -webkit-appearance:none; font:inherit; margin:0; text-align:left; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; font-size:16px; min-height:44px; padding:0 16px; display:inline-flex; align-items:center; border-radius:800px; border:1.5px solid "
+            + (on ? 'var(--ink); background:var(--ink); color:var(--canvas)' : 'var(--line-2); background:transparent; color:var(--ink-72)')
+        };
+      }),
+      wDays: w.days.map((day, di) => {
+        const dn = di + 1, on = this.dayDone(n, dn);
+        const mins = day.parts.reduce((a, p) => a + (p.m || 0), 0);
+        return {
+          n: dn, t: day.t, tick: on ? '✓' : '', date: this.dateLabel(n, dn, { day: 'numeric', month: 'short' }),
+          summary: (mins ? mins + ' min · ' : '') + day.parts.map(p => p.p).join(' · '),
+          go: () => this.goto(n, dn),
+          row: 'appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:16px; padding:16px 20px; background:' + (on ? 'var(--canvas)' : 'var(--card)')
+            + (this.isLive(n, dn) ? '; box-shadow:inset 3px 0 0 var(--accent)' : ''),
+          mark: 'flex:0 0 22px; width:22px; height:22px; border-radius:800px; display:flex; align-items:center; justify-content:center; font-size:12px; border:1px solid '
+            + (on ? 'var(--ink)' : 'var(--line-2)') + '; background:' + (on ? 'var(--ink)' : 'transparent') + '; color:var(--canvas)',
+          chips: day.parts.map(p => ({
+            k: p.k,
+            style: "font-family:'DM Sans',system-ui,sans-serif; font-size:12px; width:20px; height:20px; display:flex; align-items:center; justify-content:center; border-radius:800px; color:"
+              + PM[p.k].c + '; background:' + PM[p.k].bg
+          }))
+        };
+      })
+    };
+  }
+
+  refVals() {
+    const d = this.state.data;
+    const lvl = this.state.exLevel;
+    const filters = [0, 1, 2, 3, 4, 5].map(l => ({
+      label: l === 0 ? 'All 25' : 'Level ' + l,
+      go: () => this.put({ exLevel: l }),
+      style: "appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-size:14px; font-weight:500; min-height:44px; padding:0 18px; border-radius:800px; border:1.5px solid "
+        + (lvl === l ? 'var(--accent)' : 'var(--line-2)') + '; background:' + (lvl === l ? 'var(--accent)' : 'transparent')
+        + '; color:' + (lvl === l ? 'var(--on-accent)' : 'var(--ink)')
+    }));
+    const focus = this.state.exFocus;
+    const ex = d ? d.EXERCISES.filter(e => !lvl || e.lvl === lvl).map(e => {
+      const use = this.usage(e.n);
+      return {
+      ...e,
+      slotId: 'ex-ref-' + e.n,
+      slotHint: 'Drop a reference',
+      card: 'background:var(--card); border:1px solid ' + (focus === e.n ? 'var(--accent)' : 'var(--line)')
+        + '; border-radius:24px; padding:20px 22px; display:flex; flex-direction:column; gap:10px'
+        + (focus === e.n ? '; box-shadow:0 0 0 3px var(--accent-14)' : ''),
+      used: use.length ? use.map(u => 'W' + u.w + '\u00A0D' + u.d).join(' · ') : 'Reference only',
+      hasUse: use.length > 0,
+      goUse: use.length ? () => this.put({ view: 'today', cw: use[0].w, cd: use[0].d, exFocus: '' }) : () => {},
+      useLabel: use.length ? 'Jump to W' + use[0].w + ' D' + use[0].d + ' →' : '',
+      lvlStyle: "font-size:12px; font-weight:500; white-space:nowrap; letter-spacing:0.08em; text-transform:uppercase; padding:4px 12px; border-radius:800px; color:"
+        + ['var(--on-accent)', 'var(--on-accent)', 'var(--accent-ink)', 'var(--accent-ink)', 'var(--canvas)', 'var(--on-accent)'][e.lvl]
+        + '; background:' + ['var(--sulfur)', 'var(--sulfur)', 'var(--accent-14)', 'var(--accent-14)', 'var(--ink)', 'var(--sulfur)'][e.lvl]
+    }; }) : [];
+    const PHASE = ['var(--sulfur)', 'var(--sulfur)', 'var(--accent)', 'var(--accent)', 'var(--accent)', 'var(--ink)', 'var(--ink)', 'var(--ink)'];
+    const LVL_LABEL = ['', 'Level 1 · mechanics', 'Level 2 · basic forms', 'Level 3 · form control', 'Level 4 · construction', 'Level 5 · imagination'];
+    const exGroups = lvl
+      ? (ex.length ? [{ label: LVL_LABEL[lvl], items: ex }] : [])
+      : [1, 2, 3, 4, 5].map(l => ({ label: LVL_LABEL[l], items: ex.filter(e => e.lvl === l) })).filter(g => g.items.length);
+    const CLUSTERS = [[1, 3, 'Construction'], [4, 6, 'The figure'], [7, 8, 'Surface and scene']];
+    const mrows = this.weeks().map(w => ({
+      n: w.n, book: w.book, han: w.han,
+      drills: w.links.filter(l => !YT.test(l.u)).map(l => l.l).join(' · ') || 'No set drill'
+    }));
+    return {
+      exFilters: filters, exList: ex, exGroups, exEmpty: ex.length === 0,
+      matrixGroups: CLUSTERS.map(([a, b, label]) => ({
+        label, span: 'W' + a + '–W' + b, rows: mrows.filter(r => r.n >= a && r.n <= b)
+      })),
+      ladder: this.weeks().map((w, i) => ({
+        n: w.n, sub: w.sub, title: w.title, pct: this.weekPct(w.n),
+        bar: 'width:100%; height:' + (26 + i * 9.6) + '%; min-height:26px; background:' + PHASE[i]
+          + '; border-radius:16px 16px 0 0; display:flex; align-items:flex-start; justify-content:center; padding-top:7px',
+        num: "font-family:'Bebas Neue',Impact,sans-serif; font-size:22px; letter-spacing:0.02em; color:"
+          + (i < 5 ? 'var(--on-accent)' : 'var(--canvas)'),
+        go: () => this.put({ view: 'week', openWeek: w.n })
+      })),
+      matrix: this.weeks().map(w => ({
+        n: w.n, title: w.title, book: w.book, han: w.han,
+        drills: w.links.filter(l => !YT.test(l.u)).map(l => l.l).join(' · ') || '—',
+        row: 'display:flex; gap:18px; padding:16px 20px; background:var(--card); flex-wrap:wrap'
+      })),
+      pipeline: d ? d.PIPELINE.map(p => ({ ...p, items: p.items.map(t => ({ t })) })) : [],
+      rWeeks: this.weeks().map(w => {
+        const pct = this.weekPct(w.n), cur = w.n === this.state.cw;
+        return {
+          n: w.n, title: w.title, sub: w.sub, project: w.project, pct,
+          go: () => this.put({ view: 'week', openWeek: w.n }),
+          row: 'appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; width:100%; display:flex; align-items:center; gap:18px; padding:18px 20px; background:' + (cur ? 'var(--canvas)' : 'var(--card)'),
+          bar: 'height:100%; width:' + pct + '%; background:' + (pct === 100 ? 'var(--accent)' : 'var(--ink)')
+        };
+      })
+    };
+  }
+
+  progressVals() {
+    const d = this.state.data;
+    let daysDone = 0;
+    this.weeks().forEach(w => w.days.forEach((day, di) => { if (this.dayDone(w.n, di + 1)) daysDone++; }));
+    const bump = (k, n) => () => {
+      const counters = { ...this.state.counters };
+      counters[k] = Math.max(0, (counters[k] || 0) + n);
+      this.put({ counters });
+    };
+    const live = this.liveIndex();
+    const calWeeks = this.weeks().map(w => ({
+      n: w.n,
+      cells: w.days.map((day, di) => {
+        const dn = di + 1, on = this.dayDone(w.n, dn), now = this.isLive(w.n, dn);
+        const rest = day.parts.length === 1 && day.parts[0].k === 'D';
+        return {
+          num: this.dateLabel(w.n, dn, { day: 'numeric' }),
+          mon: this.dateLabel(w.n, dn, { month: 'short' }),
+          go: () => this.goto(w.n, dn),
+          cell: 'appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; aspect-ratio:1/1; border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:14px; font-weight:500; text-align:center; border:1px solid '
+            + (now ? 'var(--accent)' : 'var(--line)')
+            + '; background:' + (on ? 'var(--ink)' : rest ? 'var(--track)' : 'var(--card)')
+            + '; color:' + (on ? 'var(--canvas)' : 'var(--ink-72)')
+            + (now ? '; box-shadow:0 0 0 3px var(--accent-14)' : ''),
+          mstyle: "font-family:'DM Sans',system-ui,sans-serif; font-size:12px; opacity:0.6"
+        };
+      })
+    }));
+    return {
+      daysDone, calWeeks,
+      calStart: this.state.start,
+      setStart: e => this.put({ start: e.target.value }),
+      calNote: live < 0 ? 'Course starts ' + this.dateLabel(1, 1)
+        : live > 55 ? 'Course window ended ' + this.dateLabel(8, 7)
+        : 'Calendar day ' + (live + 1) + ' of 56 · ' + this.dateLabel(Math.floor(live / 7) + 1, live % 7 + 1),
+      counters: COUNTERS.map(c => {
+        const v = this.state.counters[c.k] || 0;
+        const pct = Math.min(100, Math.round(v / c.target * 100));
+        return {
+          t: c.t, v, target: c.target, inc: bump(c.k, 1), inc5: bump(c.k, 5), dec: bump(c.k, -1),
+          bar: 'height:100%; width:' + pct + '%; background:' + (pct === 100 ? 'var(--accent)' : 'var(--ink)')
+        };
+      }),
+      logRows: this.weeks().map(w => {
+        const pct = this.weekPct(w.n);
+        return {
+          n: w.n, title: w.title, project: w.project, pct,
+          hours: this.fmtHours(this.weekHours(w.n)) + ' h', note: this.state.notes[w.n] || '',
+          row: 'background:var(--card); padding:17px 20px',
+          bar: 'height:100%; width:' + pct + '%; background:' + (pct === 100 ? 'var(--accent)' : 'var(--ink)'),
+          setNote: e => { const notes = { ...this.state.notes }; notes[w.n] = e.target.value; this.put({ notes }); }
+        };
+      }),
+      rubric: d ? d.RUBRIC : [],
+      kit: d ? d.KIT : [],
+      digital: d ? d.DIGITAL : [],
+      sources: d ? d.SOURCES.map((s, i) => ({ ...s, hasLink: !!s.u, slotId: 'source-' + i, slotHint: 'Cover' })) : [],
+      scaffold: d ? d.SCAFFOLD : [],
+      partsDoc: d ? d.PARTS_DOC.map(p => ({
+        ...p,
+        card: 'background:var(--card); border-top:8px solid ' + PM[p.k].bg + '; border-radius:24px; padding:24px',
+        tag: 'font-size:12px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-62)'
+      })) : []
+    };
+  }
+
+  crewVals() {
+    const me = {
+      id: 'me', name: 'You', locked: true, week: this.state.cw, day: this.state.cd,
+      hours: this.totalHours(), pct: this.coursePct()
+    };
+    const mates = this.state.crew.map(c => ({
+      ...c, locked: false,
+      pct: Math.min(100, Math.round(((Number(c.week) - 1) * 7 + Number(c.day)) / 56 * 100) || 0)
+    }));
+    const all = [me, ...mates].sort((a, b) => (parseFloat(b.hours) || 0) - (parseFloat(a.hours) || 0));
+    const setField = (id, f) => e => {
+      const crew = this.state.crew.map(c => (c.id === id ? { ...c, [f]: e.target.value } : c));
+      this.put({ crew });
+    };
+    const cell = 'flex:0 0 64px; width:64px; min-width:0; padding:7px 9px; border:1px solid var(--line); border-radius:16px; background:var(--canvas); font-size:14px; font-weight:500';
+    return {
+      crewRows: all.map((c, i) => ({
+        rank: String(i + 1).padStart(2, '0'), name: c.name, week: c.week, day: c.day, hours: c.hours,
+        pct: c.pct, locked: c.locked,
+        badge: c.locked ? 'you' : '', badgeStyle: c.locked
+          ? "font-family:'DM Sans',system-ui,sans-serif; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--on-accent); background:var(--accent); padding:4px 10px; border-radius:800px"
+          : 'display:none',
+        row: 'display:flex; align-items:center; gap:10px; padding:14px 20px; background:' + (c.locked ? 'var(--canvas)' : 'var(--card)'),
+        nameStyle: 'flex:1 1 90px; min-width:0; padding:7px 9px; border:1px solid ' + (c.locked ? 'transparent' : 'var(--line)')
+          + '; border-radius:16px; background:' + (c.locked ? 'transparent' : 'var(--canvas)') + '; font-size:14px; font-weight:500',
+        cellStyle: cell,
+        bar: 'height:100%; width:' + c.pct + '%; background:' + (c.locked ? 'var(--ink)' : 'var(--ink-55)'),
+        removeStyle: 'appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; flex:0 0 26px; text-align:center; font-size:18px; min-height:44px; color:' + (c.locked ? 'transparent' : 'var(--ink-35)')
+          + '; cursor:' + (c.locked ? 'default' : 'pointer'),
+        setName: setField(c.id, 'name'), setWeek: setField(c.id, 'week'),
+        setDay: setField(c.id, 'day'), setHours: setField(c.id, 'hours'),
+        remove: c.locked ? () => {} : () => this.put({ crew: this.state.crew.filter(x => x.id !== c.id) })
+      })),
+      shareCode: 'IG-' + this.state.cw + '.' + this.state.cd + '.' + (this.totalHours() || '0'),
+      copyShare: () => {
+        const code = 'IG-' + this.state.cw + '.' + this.state.cd + '.' + (this.totalHours() || '0');
+        try { navigator.clipboard.writeText(code); } catch (e) {}
+      },
+      pasteVal: this.state.paste,
+      setPaste: e => this.setState({ paste: e.target.value }),
+      applyPaste: () => {
+        const m = /^\s*(?:([^:]+):)?\s*IG-(\d+)\.(\d+)\.([\d.]+)\s*$/i.exec(this.state.paste || '');
+        if (!m) return;
+        const crew = [...this.state.crew, { id: 'm' + Date.now(), name: (m[1] || 'Friend').trim(), week: m[2], day: m[3], hours: m[4] }];
+        this.put({ crew, paste: '' });
+      },
+      addMate: () => this.put({
+        crew: [...this.state.crew, { id: 'm' + Date.now(), name: '', week: '1', day: '1', hours: '' }]
+      }),
+      critSlots: [1, 2, 3, 4, 5, 6].map(i => {
+        const c = this.state.crit[i] || {};
+        const set = f => e => {
+          const crit = { ...this.state.crit, [i]: { ...c, [f]: e.target.value } };
+          this.put({ crit });
+        };
+        return { slotId: 'crit-' + i, who: c.who || '', note: c.note || '', setWho: set('who'), setNote: set('note') };
+      })
+    };
+  }
+
+  renderVals() {
+    const v = this.state.view;
+    const ready = !!this.state.data;
+    const paceBtn = flex => ({
+      label: flex ? 'Self-paced' : 'Calendar',
+      go: () => this.put({ paceFlex: flex }),
+      style: "appearance:none; -webkit-appearance:none; font:inherit; margin:0; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; font-size:16px; min-height:44px; padding:0 18px; border-radius:800px; border:0; white-space:nowrap; "
+        + (!!this.state.paceFlex === flex ? 'background:var(--ink); color:var(--canvas); font-weight:700' : 'background:transparent; color:var(--ink-62); font-weight:500')
+    });
+    const themeBtn = t => ({
+      label: t === 'light' ? 'Light' : 'Dark',
+      go: () => this.setTheme(t),
+      style: "appearance:none; -webkit-appearance:none; font:inherit; color:inherit; background:transparent; border:0; margin:0; text-align:left; cursor:pointer; font-family:'DM Sans',system-ui,sans-serif; font-size:14px; font-weight:500; flex:1; text-align:center; min-height:38px; padding:7px 12px; border-radius:800px; white-space:nowrap;"
+        + 'background:' + (this.state.theme === t ? 'var(--ink)' : 'transparent')
+        + '; color:' + (this.state.theme === t ? 'var(--canvas)' : 'var(--ink-62)')
+    });
+    return {
+      navGroups: this.navGroupVals(),
+      nearGoal: this.nearGoal(),
+      ...this.obVals(),
+      ...this.celVals(),
+      doneDays: this.doneDayCount(),
+      ...this.jumpVals(),
+      themeLight: themeBtn('light'), themeDark: themeBtn('dark'),
+      goCredits: () => this.put({ view: 'method' }),
+      journal: JOURNAL.map(t => ({ t })),
+      copyJournal: () => { try { navigator.clipboard.writeText(JOURNAL.join('\n')); } catch (e) {} },
+      startVal: this.state.start,
+      setStart: e => this.put({ start: e.target.value }),
+      paceCal: paceBtn(false), paceFlx: paceBtn(true),
+      paceNote: this.state.paceFlex
+        ? 'Self-paced: the plan advances when you finish a day, not when the calendar does. Dates are hidden and nothing counts as missed.'
+        : 'Calendar-paced: each day is pinned to a real date and the app tells you when you have fallen behind.',
+      doExport: () => this.exportState(),
+      doImport: e => { const f = e.target.files && e.target.files[0]; this.importState(f); e.target.value = ''; },
+      backupNote: this.state.backupAt
+        ? 'Last export ' + new Date(this.state.backupAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+        : (this.doneDayCount() > 0 ? 'Never exported. You have work here to lose.' : 'Never exported.'),
+      backupTone: (!this.state.backupAt && this.doneDayCount() > 0) ? 'var(--accent-ink)' : 'var(--ink-62)',
+      coursePct: this.coursePct(), totalHours: this.totalHours(), streak: this.streak(),
+      courseBarStyle: 'height:100%; width:' + this.coursePct() + '%; background:var(--ink)',
+      isBooting: !ready && !this.state.loadErr,
+      isLoadErr: this.state.loadErr,
+      retryLoad: () => this.loadCurriculum(),
+      skeletons: [1, 2, 3].map(i => ({ i, w: [70, 92, 54][i - 1] + '%' })),
+      crewEmpty: this.state.crew.length === 0,
+      isToday: ready && v === 'today', isWeek: ready && v === 'week', isRoadmap: ready && v === 'roadmap',
+      isExercises: ready && v === 'exercises', isVault: ready && v === 'vault',
+      vault: this.state.data ? this.state.data.VAULT.map(g => ({
+        g: g.g,
+        v: g.v.map(x => ({ t: x.t, by: x.by, src: 'https://www.youtube-nocookie.com/embed/' + x.id + '?rel=0&modestbranding=1' }))
+      })) : [], isProgress: ready && v === 'progress', isCrew: ready && v === 'crew', isMethod: ready && v === 'method',
+      ...this.todayVals(),
+      ...this.weekVals(),
+      ...this.refVals(),
+      ...this.progressVals(),
+      ...this.crewVals()
+    };
+  }
+}
+
+</script>
+</body>
+</html>

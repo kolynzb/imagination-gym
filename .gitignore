@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Production build outputs
+dist/
+.vercel/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Scratch & test outputs
+scratch/
+test-results/
+
+# Editor & OS files
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# TypeScript cache
+*.tsbuildinfo

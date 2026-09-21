@@ -1,0 +1,719 @@
+<script lang="ts">
+  import { state, actions, derivedStats } from '../lib/store';
+  import { isConvexEnabled } from '../lib/convex';
+  import Icon from './Icon.svelte';
+
+  let s = $state;
+  let stats = $derivedStats;
+
+  $: s = $state;
+  $: stats = $derivedStats;
+
+  let inputName = '';
+  let inputRoom = '';
+  let isSubmitting = false;
+  let syncMessage = '';
+  let isError = false;
+
+  let prevModalOpen = false;
+
+  $: if (s.authModalOpen && !prevModalOpen) {
+    inputName = s.userName === 'You' ? '' : s.userName;
+    inputRoom = s.roomCode || 'GYM-CREW';
+    syncMessage = '';
+    isError = false;
+  }
+  $: prevModalOpen = s.authModalOpen;
+
+  const convexLive = isConvexEnabled();
+
+  async function handleSubmit(e: SubmitEvent) {
+    e.preventDefault();
+    const cleanName = inputName.trim();
+    const cleanRoom = inputRoom.toUpperCase().trim();
+
+    if (!cleanName) {
+      syncMessage = 'Please enter an artist handle / name.';
+      isError = true;
+      return;
+    }
+    if (!cleanRoom) {
+      syncMessage = 'Please enter a room code (e.g. GYM-CREW).';
+      isError = true;
+      return;
+    }
+
+    isSubmitting = true;
+    syncMessage = 'Connecting & syncing progress...';
+    isError = false;
+
+    try {
+      await actions.signIn(cleanName, cleanRoom);
+      syncMessage = '✓ Signed in and synced!';
+      setTimeout(() => {
+        actions.closeAuthModal();
+      }, 700);
+    } catch (err) {
+      console.error(err);
+      syncMessage = 'Sync failed. Storing locally instead.';
+      isError = true;
+    } finally {
+      isSubmitting = false;
+    }
+  }
+
+  async function handleManualSync() {
+    isSubmitting = true;
+    syncMessage = 'Syncing to cloud...';
+    isError = false;
+    const ok = await actions.syncToCloud();
+    isSubmitting = false;
+    if (ok) {
+      syncMessage = '✓ Synced with Convex cloud!';
+    } else {
+      syncMessage = 'Convex not connected. Progress saved locally.';
+    }
+    setTimeout(() => {
+      syncMessage = '';
+    }, 3000);
+  }
+
+  function handleSignOut() {
+    actions.signOut();
+    syncMessage = 'Signed out. Now using local profile.';
+    setTimeout(() => {
+      syncMessage = '';
+    }, 2000);
+  }
+
+  function generateRoomCode(): string {
+    const prefixes = ['GYM', 'STUDIO', 'ATELIER', 'CREW', 'INK', 'CUBE', 'LINE'];
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+    let code = '';
+    for (let i = 0; i < 4; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return `${prefix}-${code}`;
+  }
+
+  function handleGenerateRoomCode() {
+    inputRoom = generateRoomCode();
+    syncMessage = `Generated new room code: ${inputRoom}`;
+    isError = false;
+    setTimeout(() => {
+      if (syncMessage.startsWith('Generated')) syncMessage = '';
+    }, 2500);
+  }
+
+  function handleCopyRoomCode() {
+    navigator.clipboard.writeText(s.roomCode);
+    syncMessage = `✓ Copied room code: ${s.roomCode}`;
+    setTimeout(() => (syncMessage = ''), 3000);
+  }
+
+  function handleCopyShareCode() {
+    navigator.clipboard.writeText(`${s.userName}: ${stats.shareCode}`);
+    syncMessage = `✓ Copied code: ${s.userName}: ${stats.shareCode}`;
+    setTimeout(() => (syncMessage = ''), 3000);
+  }
+</script>
+
+{#if s.authModalOpen}
+  <div class="auth-overlay" role="dialog" aria-modal="true" aria-label="Artist profile and cloud sync">
+    <button
+      type="button"
+      class="backdrop-btn"
+      onclick={() => actions.closeAuthModal()}
+      aria-label="Close dialog"
+    ></button>
+
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-title-group">
+          <div class="auth-badge">PROFILE & SYNC</div>
+          <h2 class="auth-heading">Artist Cloud Sync</h2>
+        </div>
+        <button
+          type="button"
+          class="close-btn"
+          onclick={() => actions.closeAuthModal()}
+          aria-label="Close"
+        >
+          <Icon name="cancel" size={16} />
+        </button>
+      </div>
+
+      <div class="status-banner" class:online={convexLive}>
+        <div class="status-dot"></div>
+        <div class="status-info">
+          {#if convexLive}
+            <span class="status-title">Convex BaaS Connected</span>
+            <span class="status-desc">Real-time sync enabled across devices & crew members.</span>
+          {:else}
+            <span class="status-title">Offline Local Mode</span>
+            <span class="status-desc">Progress saved locally in browser. Add VITE_CONVEX_URL for cloud sync.</span>
+          {/if}
+        </div>
+      </div>
+
+      {#if s.isSignedIn}
+        <!-- ALREADY SIGNED IN -->
+        <div class="signed-in-section">
+          <div class="profile-summary">
+            <div class="avatar-lg">
+              {s.userName ? s.userName.charAt(0).toUpperCase() : 'A'}
+            </div>
+            <div class="profile-details">
+              <div class="profile-handle">{s.userName}</div>
+              <div class="profile-room-row">
+                <span class="profile-room-tag">Room: <strong>{s.roomCode}</strong></span>
+                <button type="button" class="copy-room-btn" onclick={handleCopyRoomCode}>
+                  <Icon name="copy" size={13} /> Copy
+                </button>
+              </div>
+              <div class="profile-stats-row">
+                <span>Week {s.cw} · Day {s.cd}</span>
+                <span>{stats.totalHoursNum}h logged</span>
+                <span><Icon name="fire" size={14} /> {stats.streak}d streak</span>
+              </div>
+            </div>
+          </div>
+
+          {#if syncMessage}
+            <div class="sync-alert" class:error={isError}>{syncMessage}</div>
+          {/if}
+
+          <div class="action-buttons">
+            <button
+              type="button"
+              class="btn-primary"
+              disabled={isSubmitting}
+              onclick={handleManualSync}
+            >
+              {isSubmitting ? 'Syncing...' : 'Sync Cloud Now'}
+            </button>
+            <button
+              type="button"
+              class="btn-secondary"
+              onclick={handleSignOut}
+            >
+              Sign Out / Switch
+            </button>
+          </div>
+        </div>
+      {:else}
+        <!-- SIGN IN FORM -->
+        <form class="auth-form" onsubmit={handleSubmit}>
+          <p class="auth-intro">
+            No password required. Pick an artist handle and crew room code. Your 56-day progress, timer logs, and notes will sync across your devices.
+          </p>
+
+          <div class="form-group">
+            <label for="artist-name">Artist Handle / Name</label>
+            <input
+              id="artist-name"
+              type="text"
+              class="text-input"
+              placeholder="e.g. Kofi, Elena, Ghoster"
+              bind:value={inputName}
+              required
+            />
+            <span class="field-hint">Your public identity on the Crew leaderboard.</span>
+          </div>
+
+          <div class="form-group">
+            <div class="field-label-row">
+              <label for="room-code">Crew Room Code</label>
+              <button
+                type="button"
+                class="generate-code-btn"
+                onclick={handleGenerateRoomCode}
+                title="Auto-generate a new unique room code"
+              >
+                <Icon name="dice" size={15} /> Auto-Generate New Code
+              </button>
+            </div>
+            <div class="room-input-box">
+              <input
+                id="room-code"
+                type="text"
+                class="text-input code-input"
+                placeholder="GYM-CREW"
+                bind:value={inputRoom}
+                required
+              />
+              {#if inputRoom !== 'GYM-CREW'}
+                <button
+                  type="button"
+                  class="reset-public-btn"
+                  onclick={() => (inputRoom = 'GYM-CREW')}
+                  title="Switch back to public gym room"
+                >
+                  Use Public (GYM-CREW)
+                </button>
+              {/if}
+            </div>
+            <span class="field-hint">
+              Join an existing crew with their code, or click <strong>Auto-Generate</strong> to create a private room and invite friends.
+            </span>
+          </div>
+
+          {#if syncMessage}
+            <div class="sync-alert" class:error={isError}>{syncMessage}</div>
+          {/if}
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary" disabled={isSubmitting}>
+              {isSubmitting ? 'Connecting...' : 'Sign In & Sync Device'}
+            </button>
+          </div>
+        </form>
+      {/if}
+
+      <!-- Quick Share Code -->
+      <div class="sync-code-box">
+        <div class="sync-code-header">
+          <span class="sync-code-label">Quick Share Code (Offline Sync)</span>
+          <button type="button" class="copy-btn" onclick={handleCopyShareCode}>
+            Copy Code
+          </button>
+        </div>
+        <div class="sync-code-preview">
+          <code>{s.userName}: {stats.shareCode}</code>
+        </div>
+      </div>
+    </div>
+  </div>
+{/if}
+
+<style>
+  .auth-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 160;
+    background: rgba(7, 6, 7, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    animation: fadeIn 200ms var(--ease-out);
+  }
+
+  .backdrop-btn {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .auth-card {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    background: var(--canvas);
+    border: 1px solid var(--line-2);
+    border-radius: 28px;
+    padding: 32px 28px;
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+    transform-origin: center;
+    animation: modalEnter 220ms var(--ease-out);
+  }
+
+  @keyframes modalEnter {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .auth-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+
+  .auth-badge {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent-ink);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .auth-heading {
+    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-size: 32px;
+    letter-spacing: 0.02em;
+    margin: 0;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .close-btn {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    font-size: 20px;
+    color: var(--ink-62);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 800px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .close-btn:hover {
+    color: var(--ink);
+  }
+
+  .status-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 16px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    margin-bottom: 24px;
+  }
+
+  .status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 800px;
+    background: var(--ink-55);
+    flex: 0 0 10px;
+  }
+
+  .status-banner.online .status-dot {
+    background: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+  }
+
+  .status-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .status-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .status-desc {
+    font-size: 12px;
+    color: var(--ink-62);
+  }
+
+  .auth-intro {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-78);
+    margin: 0 0 20px;
+  }
+
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .field-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .generate-code-btn {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    color: var(--accent-ink);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .generate-code-btn:hover {
+    opacity: 0.8;
+  }
+
+  .room-input-box {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .reset-public-btn {
+    appearance: none;
+    background: var(--card);
+    border: 1px dashed var(--line-2);
+    border-radius: 800px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-62);
+    cursor: pointer;
+    width: fit-content;
+    transition: all 0.15s ease;
+  }
+
+  .reset-public-btn:hover {
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  label {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .text-input {
+    appearance: none;
+    background: var(--card);
+    border: 1px solid var(--line-2);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 15px;
+    color: var(--ink);
+    font-family: inherit;
+  }
+
+  .text-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .code-input {
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+  }
+
+  .field-hint {
+    font-size: 12px;
+    color: var(--ink-62);
+  }
+
+  .sync-alert {
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--sulfur);
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .sync-alert.error {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  .btn-primary {
+    appearance: none;
+    flex: 1;
+    background: var(--accent);
+    color: var(--on-accent);
+    border: 0;
+    padding: 12px 20px;
+    border-radius: 800px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    transition: opacity 0.15s ease;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.92;
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-secondary {
+    appearance: none;
+    background: transparent;
+    border: 1.5px solid var(--line-2);
+    color: var(--ink-78);
+    padding: 12px 20px;
+    border-radius: 800px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .btn-secondary:hover {
+    background: var(--card);
+    color: var(--ink);
+  }
+
+  .signed-in-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .profile-summary {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 18px 20px;
+  }
+
+  .avatar-lg {
+    width: 52px;
+    height: 52px;
+    border-radius: 26px;
+    background: var(--ink);
+    color: var(--canvas);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-size: 28px;
+    flex: 0 0 52px;
+  }
+
+  .profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .profile-handle {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .profile-room-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .profile-room-tag {
+    font-size: 13px;
+    color: var(--ink-62);
+  }
+
+  .copy-room-btn {
+    appearance: none;
+    background: var(--canvas);
+    border: 1px solid var(--line-2);
+    border-radius: 800px;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-78);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .copy-room-btn:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+  }
+
+  .profile-stats-row {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--ink-78);
+    margin-top: 4px;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+  }
+
+  .sync-code-box {
+    border-top: 1px solid var(--line);
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .sync-code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .sync-code-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink-62);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .copy-btn {
+    appearance: none;
+    background: transparent;
+    border: 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-ink);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  .sync-code-preview {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--ink-78);
+  }
+</style>

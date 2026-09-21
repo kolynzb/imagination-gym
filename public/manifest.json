@@ -1,0 +1,23 @@
+{
+  "name": "Imagination Gym",
+  "short_name": "ImaginationGym",
+  "description": "An eight-week daily training plan for drawing from imagination: warm-up, drill, project. Built from brokendraw's drawing class.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e2e2df",
+  "theme_color": "#070607",
+  "icons": [
+    {
+      "src": "/icons/pencil.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/goal.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
