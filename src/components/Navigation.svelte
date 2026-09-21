@@ -30,7 +30,7 @@
 <!-- Desktop Sidebar (Hidden on <= 860px) -->
 <aside class="desktop-sidebar">
   <div class="brand">
-    <div class="logo">IG</div>
+    <img src="/android-chrome-192x192.png" alt="Imagination Gym" class="brand-logo-img" />
     <div class="brand-text">
       <div class="title">Imagination Gym</div>
       <div class="subtitle">brokendraw · 8 weeks</div>
@@ -254,7 +254,10 @@
     <button type="button" class="backdrop-btn" onclick={() => (mobileMenuOpen = false)} aria-label="Close menu"></button>
     <div class="mobile-sheet">
       <div class="sheet-head">
-        <span class="sheet-title">More Views</span>
+        <div class="sheet-title-row">
+          <img src="/android-chrome-192x192.png" alt="Imagination Gym" class="brand-logo-img-sm" />
+          <span class="sheet-title">Imagination Gym</span>
+        </div>
         <button type="button" class="close-btn" onclick={() => (mobileMenuOpen = false)}><Icon name="cancel" size={14} /></button>
       </div>
       <div class="sheet-links">
@@ -307,19 +310,21 @@
     border-bottom: 1px solid var(--line);
   }
 
-  .logo {
-    flex: 0 0 32px;
-    height: 32px;
-    border-radius: 16px;
-    background: var(--ink);
-    color: var(--canvas);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Bebas Neue', Impact, sans-serif;
-    font-size: 19px;
-    letter-spacing: 0.04em;
-    padding-left: 2px;
+  .brand-logo-img {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    object-fit: cover;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(252, 80, 0, 0.25);
+  }
+
+  .brand-logo-img-sm {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    object-fit: cover;
   }
 
   .title {
@@ -707,6 +712,12 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
+    }
+
+    .sheet-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .sheet-title {

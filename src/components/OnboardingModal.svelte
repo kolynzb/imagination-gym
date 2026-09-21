@@ -37,7 +37,7 @@
     <!-- Top Header -->
     <header class="ob-header">
       <div class="brand-group">
-        <div class="logo">IG</div>
+        <img src="/android-chrome-192x192.png" alt="Imagination Gym" class="ob-logo-img" />
         <span class="ob-title">Start Here</span>
       </div>
 
@@ -268,17 +268,13 @@
     gap: 12px;
   }
 
-  .logo {
+  .ob-logo-img {
     width: 32px;
     height: 32px;
-    border-radius: 16px;
-    background: var(--ink);
-    color: var(--canvas);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Bebas Neue', Impact, sans-serif;
-    font-size: 19px;
+    border-radius: 8px;
+    object-fit: cover;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(252, 80, 0, 0.25);
   }
 
   .ob-title {

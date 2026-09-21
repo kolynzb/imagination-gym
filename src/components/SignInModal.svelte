@@ -167,8 +167,11 @@
     <div class="auth-card">
       <div class="auth-header">
         <div class="auth-title-group">
-          <div class="auth-badge">PROFILE & SYNC</div>
-          <h2 class="auth-heading">Artist Cloud Sync</h2>
+          <img src="/android-chrome-192x192.png" alt="Imagination Gym" class="auth-modal-logo" />
+          <div class="auth-title-texts">
+            <div class="auth-badge">PROFILE & SYNC</div>
+            <h2 class="auth-heading">Artist Cloud Sync</h2>
+          </div>
         </div>
         <button
           type="button"
@@ -432,6 +435,22 @@
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 20px;
+  }
+
+  .auth-title-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .auth-modal-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(252, 80, 0, 0.3);
+    flex-shrink: 0;
   }
 
   .auth-badge {
