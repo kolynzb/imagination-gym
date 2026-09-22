@@ -15,6 +15,6 @@ export default defineConfig({
     command: 'pnpm run dev --host 127.0.0.1 --port 5180 --strictPort',
     url: 'http://127.0.0.1:5180',
     reuseExistingServer: false,
-    env: { VITE_CONVEX_URL: '', VITE_GOOGLE_CLIENT_ID: '' },
+    env: { VITE_CONVEX_URL: '', VITE_GOOGLE_CLIENT_ID: 'playwright-client-id' },
   },
 });

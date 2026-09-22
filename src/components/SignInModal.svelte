@@ -17,7 +17,6 @@
   let isError = false;
 
   let prevModalOpen = false;
-  let googleBtnSlot: HTMLElement | null = null;
   const hasGoogleAuth = isGoogleAuthAvailable();
 
   $: if (s.authModalOpen && !prevModalOpen) {
@@ -28,8 +27,8 @@
   }
   $: prevModalOpen = s.authModalOpen;
 
-  $: if (googleBtnSlot && hasGoogleAuth && !s.isSignedIn) {
-    renderGoogleButton(googleBtnSlot, handleGoogleLogin);
+  function mountGoogleButton(container: HTMLElement) {
+    void renderGoogleButton(container, handleGoogleLogin);
   }
 
   const convexLive = isConvexEnabled();
@@ -274,7 +273,7 @@
           <!-- Google Auth Section -->
           <div class="google-auth-section">
             {#if hasGoogleAuth}
-              <div class="google-slot-wrap" bind:this={googleBtnSlot}></div>
+              <div class="google-slot-wrap" use:mountGoogleButton></div>
               <div class="or-separator">
                 <span class="sep-line"></span>
                 <span class="sep-text">OR ENTER ARTIST HANDLE</span>

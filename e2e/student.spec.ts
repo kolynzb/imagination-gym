@@ -172,3 +172,24 @@ test('unreadable stored progress is not overwritten by defaults', async ({ page 
   await page.locator('#note-input').fill('New work');
   expect(await page.evaluate(() => localStorage.getItem('imaginationGym.v2'))).toBe(raw);
 });
+
+
+test('Google sign-in button is not recreated by timer ticks', async ({ page }) => {
+  await page.route('https://accounts.google.com/gsi/client', route => route.fulfill({
+    contentType: 'application/javascript',
+    body: `window.google = { accounts: { id: {
+      initialize() {},
+      renderButton(container) {
+        window.googleRenderCount = (window.googleRenderCount || 0) + 1;
+        container.innerHTML = '<button>Test Google sign-in</button>';
+      }
+    } } };`,
+  }));
+  await page.clock.install();
+  await startCourse(page);
+  await page.getByRole('button', { name: 'The Crew', exact: true }).click();
+  await page.getByRole('button', { name: 'Profile & Switch Room' }).click();
+  await expect(page.getByRole('button', { name: 'Test Google sign-in', exact: true })).toBeVisible();
+  await page.clock.fastForward(3000);
+  expect(await page.evaluate('window.googleRenderCount')).toBe(1);
+});
