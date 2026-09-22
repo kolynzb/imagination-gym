@@ -13,7 +13,7 @@ declare global {
   }
 }
 
-const CONVEX_URL = import.meta.env.VITE_CONVEX_URL || '';
+const CONVEX_URL = (import.meta.env.VITE_CONVEX_URL || '').trim().replace(/\/+$/, '');
 const CONVEX_SITE_URL = import.meta.env.VITE_CONVEX_SITE_URL || '';
 
 export let convex: ConvexClient | null = null;
