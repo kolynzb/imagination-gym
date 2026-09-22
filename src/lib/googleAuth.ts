@@ -10,9 +10,26 @@ export interface GoogleUserPayload {
   sub: string;
 }
 
+export interface GoogleCredential {
+  credential: string;
+  profile: GoogleUserPayload;
+}
+
+interface GoogleIdentityApi {
+  accounts?: {
+    id?: {
+      initialize: (options: { client_id: string; callback: (response: { credential: string }) => void }) => void;
+      renderButton: (container: HTMLElement, options: Record<string, string | number>) => void;
+    };
+  };
+}
+
+function googleIdentity(): GoogleIdentityApi | undefined {
+  return (window as Window & { google?: GoogleIdentityApi }).google;
+}
+
 export function getGoogleClientId(): string {
-  // @ts-ignore
-  return (import.meta.env?.VITE_GOOGLE_CLIENT_ID || '').trim();
+  return ((import.meta as unknown as { env?: Record<string, string | undefined> }).env?.VITE_GOOGLE_CLIENT_ID || '').trim();
 }
 
 export function isGoogleAuthAvailable(): boolean {
@@ -23,8 +40,7 @@ let scriptLoadPromise: Promise<void> | null = null;
 
 export function loadGoogleIdentityScript(): Promise<void> {
   if (typeof window === 'undefined') return Promise.resolve();
-  // @ts-ignore
-  if (window.google?.accounts?.id) return Promise.resolve();
+  if (googleIdentity()?.accounts?.id) return Promise.resolve();
 
   if (!scriptLoadPromise) {
     scriptLoadPromise = new Promise((resolve, reject) => {
@@ -67,15 +83,14 @@ export function parseJwtPayload(token: string): GoogleUserPayload | null {
 
 export async function renderGoogleButton(
   container: HTMLElement,
-  onSuccess: (user: GoogleUserPayload) => void
+  onSuccess: (result: GoogleCredential) => void
 ): Promise<boolean> {
   const clientId = getGoogleClientId();
   if (!clientId) return false;
 
   try {
     await loadGoogleIdentityScript();
-    // @ts-ignore
-    const google = window.google;
+    const google = googleIdentity();
     if (!google?.accounts?.id) return false;
 
     google.accounts.id.initialize({
@@ -83,7 +98,7 @@ export async function renderGoogleButton(
       callback: (response: { credential: string }) => {
         if (response.credential) {
           const user = parseJwtPayload(response.credential);
-          if (user) onSuccess(user);
+          if (user) onSuccess({ credential: response.credential, profile: user });
         }
       },
     });

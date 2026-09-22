@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { VAULT } from '../lib/curriculum';
   import { state, actions, derivedStats } from '../lib/store';
   import Icon from './Icon.svelte';
 
@@ -271,7 +272,7 @@
           Roadmap & 4-Phase Pipeline
         </button>
         <button class="sheet-btn" class:active={s.view === 'vault'} onclick={() => setView('vault')}>
-          Video Vault (All 27 Videos)
+          Video Vault ({VAULT.reduce((count, group) => count + group.v.length, 0)} Videos)
         </button>
         <button class="sheet-btn" class:active={s.view === 'progress'} onclick={() => setView('progress')}>
           Stats, 56-Day Calendar & Backup

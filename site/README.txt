@@ -1,14 +1,10 @@
-Imagination Gym — deploy folder
-Generated 2026-09-21 from "Imagination Gym.dc.html".
+LEGACY NOTICE: this folder is an obsolete static prototype and is not the deploy source.
+The current deploy artifact is the root dist/ directory produced by pnpm run build.
 
-To publish:
-  1. Go to app.netlify.com/drop (free, no account needed to test).
-  2. Drag this whole "site" folder onto the page.
-  3. You get a public URL immediately. Rename it in Site settings.
-     (Cloudflare Pages and GitHub Pages work the same way.)
+Do not publish or regenerate this folder. Use the root dist/ directory instead.
 
-Must be served over http(s) — opening index.html by double-clicking
-will fail, because curriculum.js loads as a module.
+This prototype was intended to be served over http(s), but it is no longer
+supported because the current app builds to root dist/.
 
 Files:
   index.html     the app (a copy of the .dc.html source)
@@ -16,4 +12,4 @@ Files:
   curriculum.js  all 8 weeks of course content
   photo-slot.js  image slots, stored in the visitor's browser (IndexedDB)
 
-Regenerate this folder after any edit to the source file.
+This folder is retained only as historical reference.

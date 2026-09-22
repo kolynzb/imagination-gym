@@ -10,6 +10,9 @@
   $: currentDay = currentWeek?.days[s.cd - 1];
 
   let refImage: string | null = null;
+  let referenceError = '';
+  let isDraggingReference = false;
+  const MAX_REFERENCE_BYTES = 10 * 1024 * 1024;
 
   function close() {
     actions.setFocus(false);
@@ -25,7 +28,7 @@
 
   function formatTime(totalSeconds: number): string {
     const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
+    const secs = Math.floor(totalSeconds) % 60;
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   }
 
@@ -34,15 +37,35 @@
       ? formatTime(s.timerRemaining)
       : formatTime(s.timerElapsed);
 
-  function handleFileSelect(e: Event) {
-    const input = e.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        refImage = reader.result as string;
-      };
-      reader.readAsDataURL(input.files[0]);
+  function processReferenceFile(file: File | undefined) {
+    referenceError = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      referenceError = 'Choose an image file.';
+      return;
     }
+    if (file.size > MAX_REFERENCE_BYTES) {
+      referenceError = 'Reference images must be 10 MB or smaller.';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      refImage = reader.result as string;
+    };
+    reader.onerror = () => {
+      referenceError = 'That image could not be read.';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handleFileSelect(e: Event) {
+    processReferenceFile((e.target as HTMLInputElement).files?.[0]);
+  }
+
+  function handleReferenceDrop(e: DragEvent) {
+    e.preventDefault();
+    isDraggingReference = false;
+    processReferenceFile(e.dataTransfer?.files?.[0]);
   }
 </script>
 
@@ -68,11 +91,18 @@
           <button type="button" class="remove-img-btn" onclick={() => (refImage = null)}><Icon name="cancel" size={14} /></button>
         </div>
       {:else}
-        <label class="drop-zone">
+        <label
+          class="drop-zone"
+          class:dragging={isDraggingReference}
+          ondragover={(e) => { e.preventDefault(); isDraggingReference = true; }}
+          ondragleave={() => (isDraggingReference = false)}
+          ondrop={handleReferenceDrop}
+        >
           <input type="file" accept="image/*" onchange={handleFileSelect} />
           <span class="drop-icon"><Icon name="image" size={32} /></span>
           <span class="drop-label">Drop reference photo here, or click to upload</span>
           <span class="drop-sub">Prop reference / Pose / Anatomy target</span>
+          {#if referenceError}<span class="drop-error" role="alert">{referenceError}</span>{/if}
         </label>
       {/if}
     </div>
@@ -231,6 +261,12 @@
     text-align: center;
   }
 
+  .drop-zone.dragging {
+    outline: 2px solid var(--accent);
+    outline-offset: -10px;
+    background: var(--canvas);
+  }
+
   .drop-zone input {
     display: none;
   }
@@ -251,6 +287,12 @@
     font-size: 13px;
     color: var(--ink-62);
     margin-top: 4px;
+  }
+
+  .drop-error {
+    color: var(--danger, #9d2b2b);
+    font-size: 13px;
+    margin-top: 12px;
   }
 
   .img-wrapper {

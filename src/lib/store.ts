@@ -1,7 +1,9 @@
 import { writable, derived, get } from 'svelte/store';
 import { WEEKS, type Week, type Day, type DayPart } from './curriculum';
 import { playChime, playBlip } from './audio';
-import { convex, isConvexEnabled } from './convex';
+import { api, clearCloudAuth, convex, isConvexEnabled } from './convex';
+import { calendarDayIndex, formatLocalDate, getMondayOf as localMondayOf, shiftLocalDate, parseLocalDate } from './dates';
+import { parseProgress, parseCloudProgress, serializeProgress, type Progress } from './progress';
 
 export const LS_KEY = 'imaginationGym.v2';
 
@@ -28,6 +30,7 @@ export interface AppState {
   timerTargetSeconds: number; // e.g. 600 for 10 min
   timerRemaining: number;
   timerElapsed: number;
+  timerStartedAt: number | null;
   timerPartIndex: number; // 0, 1, 2 for parts A, B, C
   onboarded: boolean;
   onboardingOpen: boolean;
@@ -41,15 +44,49 @@ export interface AppState {
   userAvatar: string | null;
 }
 
+function sessionTimer(cw: number, cd: number) {
+  const seconds = (WEEKS[cw - 1].days[cd - 1].parts[0]?.m || 0) * 60;
+  const timerMode: AppState['timerMode'] = seconds > 0 ? 'countdown' : 'stopwatch';
+  return { timerMode, timerPartIndex: 0, timerTargetSeconds: seconds, timerRemaining: seconds,
+    timerRunning: false, timerElapsed: 0, timerStartedAt: null };
+}
+
+let localLoadFailed = false;
+
 function getInitialState(): AppState {
-  const defaultMonday = getMondayOf(new Date()).toISOString().slice(0, 10);
+  const defaultStart = formatLocalDate(new Date());
   let saved: Partial<AppState> | null = null;
   if (typeof window !== 'undefined') {
     try {
       const raw = localStorage.getItem(LS_KEY) || localStorage.getItem('imaginationGym.v1');
-      if (raw) saved = JSON.parse(raw);
+      if (raw) {
+        const parsed: unknown = JSON.parse(raw);
+        const progress = parseProgress(parsed);
+        saved = { ...progress };
+        if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+          const legacy = parsed as Record<string, unknown>;
+          if (typeof legacy.roomCode === 'string') saved.roomCode = legacy.roomCode;
+          if (typeof legacy.userName === 'string') saved.userName = legacy.userName;
+          if (legacy.theme === 'light' || legacy.theme === 'dark') saved.theme = legacy.theme;
+          if (typeof legacy.onboarded === 'boolean') saved.onboarded = legacy.onboarded;
+          if (Array.isArray(legacy.localCrew)) {
+            saved.localCrew = legacy.localCrew.filter((member: unknown): member is AppState['localCrew'][number] => {
+              if (typeof member !== 'object' || member === null) return false;
+              return 'id' in member && typeof member.id === 'string'
+                && 'name' in member && typeof member.name === 'string'
+                && 'week' in member && typeof member.week === 'number' && Number.isInteger(member.week) && member.week >= 1 && member.week <= 8
+                && 'day' in member && typeof member.day === 'number' && Number.isInteger(member.day) && member.day >= 1 && member.day <= 7
+                && 'hours' in member && typeof member.hours === 'number' && Number.isFinite(member.hours) && member.hours >= 0
+                && 'streak' in member && typeof member.streak === 'number' && Number.isFinite(member.streak) && member.streak >= 0;
+            });
+          }
+          if (typeof legacy.userEmail === 'string' || legacy.userEmail === null) saved.userEmail = legacy.userEmail;
+          if (typeof legacy.userAvatar === 'string' || legacy.userAvatar === null) saved.userAvatar = legacy.userAvatar;
+        }
+      }
     } catch (e) {
-      console.warn('Failed to load state from localStorage:', e);
+      localLoadFailed = true;
+      console.warn('Stored progress could not be read. Leaving it untouched:', e);
     }
   }
 
@@ -91,7 +128,7 @@ function getInitialState(): AppState {
       blob: 0,
       highlight: 0
     },
-    start: saved?.start || defaultMonday,
+    start: saved?.start || defaultStart,
     theme: saved?.theme || 'light',
     paceFlex: saved?.paceFlex ?? false,
     focus: false,
@@ -99,62 +136,108 @@ function getInitialState(): AppState {
     roomCode: activeRoom,
     userName: saved?.userName || 'You',
     localCrew: saved?.localCrew || [],
-    timerRunning: false,
-    timerMode: 'countdown',
-    timerTargetSeconds: 600, // 10 min warmup default
-    timerRemaining: 600,
-    timerElapsed: 0,
-    timerPartIndex: 0,
+    ...sessionTimer(saved?.cw || 1, saved?.cd || 1),
     onboarded: saved?.onboarded ?? false,
     onboardingOpen: saved?.onboarded ? false : !isInvited,
     onboardingStep: 1,
     kitChecked: saved?.kitChecked || {},
     authModalOpen: isInvited && !saved?.isSignedIn,
-    isSignedIn: saved?.isSignedIn ?? false,
+    isSignedIn: false,
     invitedRoomCode: urlRoom,
     inviteBannerDismissed: false,
-    userEmail: saved?.userEmail || null,
-    userAvatar: saved?.userAvatar || null
+    userEmail: null,
+    userAvatar: null
   };
 }
 
 export function getMondayOf(d: Date): Date {
-  const x = new Date(d);
-  x.setHours(0, 0, 0, 0);
-  x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
-  return x;
+  return localMondayOf(d);
 }
 
 export const state = writable<AppState>(getInitialState());
+export const localSaveFailed = writable(false);
+export const cloudStatus = writable<{ status: 'local' | 'syncing' | 'synced' | 'error'; message: string }>({ status: 'local', message: 'Saved on this device.' });
+let authAttempt = 0;
+let cloudVersion = 0;
+let cloudSyncQueue = Promise.resolve(false);
+const DEVICE_BACKUP_KEY = `${LS_KEY}.beforeCloudRestore`;
+let deviceBackup: Progress | null = null;
+try {
+  const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(DEVICE_BACKUP_KEY) : null;
+  if (raw) deviceBackup = parseProgress(JSON.parse(raw));
+} catch { /* An unreadable recovery file must not prevent local practice. */ }
+export const hasDeviceBackup = writable(deviceBackup !== null);
 
 let cloudSyncTimer: ReturnType<typeof setTimeout> | null = null;
+let cloudRestoreComplete = false;
 function triggerDebouncedCloudSync() {
   if (typeof window === 'undefined') return;
   if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
   cloudSyncTimer = setTimeout(() => {
-    actions.syncToCloud().catch(() => {});
+    if (cloudRestoreComplete) actions.syncToCloud().catch(() => {});
   }, 1500);
 }
 
 // Auto-persist to localStorage on state changes (memoized to avoid write churn during timer ticks)
 if (typeof window !== 'undefined') {
   let lastPersistedJson = '';
+  let lastObservedJson = '';
   state.subscribe((s) => {
+    const { timerRunning, timerElapsed, timerRemaining, timerStartedAt, focus, activeExerciseDrawer, onboardingOpen, authModalOpen, isSignedIn, userEmail, userAvatar, ...persisted } = s;
+    const currentJson = JSON.stringify(persisted);
+    document.documentElement.setAttribute('data-theme', s.theme);
+    if (currentJson !== lastObservedJson) {
+      lastObservedJson = currentJson;
+      if (s.isSignedIn && isConvexEnabled() && cloudRestoreComplete) triggerDebouncedCloudSync();
+    }
     try {
-      const { timerRunning, timerElapsed, timerRemaining, focus, activeExerciseDrawer, onboardingOpen, authModalOpen, ...persisted } = s;
-      const currentJson = JSON.stringify(persisted);
+      if (localLoadFailed) throw new Error('Stored progress could not be read. Import a valid backup before replacing it.');
       if (currentJson !== lastPersistedJson) {
-        lastPersistedJson = currentJson;
         localStorage.setItem(LS_KEY, currentJson);
-        document.documentElement.setAttribute('data-theme', s.theme);
-        if (s.isSignedIn && isConvexEnabled()) {
-          triggerDebouncedCloudSync();
-        }
+        lastPersistedJson = currentJson;
+        localSaveFailed.set(false);
       }
     } catch {
-      // quota or private mode
+      localSaveFailed.set(true);
     }
   });
+}
+
+function settleTimer(s: AppState, now = Date.now()): AppState {
+  if (!s.timerRunning || s.timerStartedAt === null) return s;
+  const delta = Math.max(0, now - s.timerStartedAt) / 1000;
+  const counted = s.timerMode === 'countdown' ? Math.min(delta, s.timerRemaining) : delta;
+  const remaining = s.timerMode === 'countdown' ? Math.max(0, s.timerRemaining - counted) : 0;
+  const finished = s.timerMode === 'countdown' && remaining === 0;
+  if (finished) playChime(528, 3.5);
+  return {
+    ...s,
+    timerElapsed: s.timerElapsed + counted,
+    timerRemaining: remaining,
+    timerRunning: !finished,
+    timerStartedAt: finished ? null : now,
+  };
+}
+
+function creditTimer(s: AppState): AppState {
+  const settled = settleTimer(s);
+  const key = `w${s.cw}d${s.cd}`;
+  const hours = Number(settled.dayHours[key] || 0) + settled.timerElapsed / 3600;
+  return {
+    ...settled,
+    dayHours: settled.timerElapsed > 0
+      ? { ...settled.dayHours, [key]: Math.min(24, hours).toFixed(6) }
+      : settled.dayHours,
+    timerElapsed: 0,
+    timerRunning: false,
+    timerStartedAt: null,
+    timerRemaining: settled.timerTargetSeconds,
+  };
+}
+
+function navigateDay(s: AppState, cw: number, cd: number): AppState {
+  if (cw === s.cw && cd === s.cd) return s;
+  return { ...creditTimer(s), cw, cd, ...sessionTimer(cw, cd) };
 }
 
 // Timer ticker loop
@@ -163,27 +246,7 @@ let timerInterval: ReturnType<typeof setInterval> | null = null;
 if (typeof window !== 'undefined') {
   timerInterval = setInterval(() => {
     state.update((s) => {
-      if (!s.timerRunning) return s;
-
-      const nextElapsed = s.timerElapsed + 1;
-      let nextRemaining = s.timerRemaining - 1;
-
-      if (s.timerMode === 'countdown' && nextRemaining <= 0) {
-        nextRemaining = 0;
-        playChime(528, 3.5); // Warm resonant chime!
-        return {
-          ...s,
-          timerRunning: false,
-          timerElapsed: nextElapsed,
-          timerRemaining: 0
-        };
-      }
-
-      return {
-        ...s,
-        timerElapsed: nextElapsed,
-        timerRemaining: nextRemaining
-      };
+      return settleTimer(s);
     });
   }, 1000);
 }
@@ -199,6 +262,8 @@ export const actions = {
   },
 
   setStartDate(start: string) {
+    if (!start) return;
+    parseLocalDate(start);
     state.update((s) => ({ ...s, start }));
   },
 
@@ -206,8 +271,10 @@ export const actions = {
     state.update((s) => ({ ...s, paceFlex }));
   },
 
-  setRoomCode(roomCode: string) {
-    state.update((s) => ({ ...s, roomCode: roomCode.toUpperCase().trim() }));
+  async setRoomCode(roomCode: string) {
+    const s = get(state);
+    try { await actions.signIn(s.userName, roomCode, s.isSignedIn); }
+    catch { /* The cloud status explains the failure; keep the current room. */ }
   },
 
   setUserName(userName: string) {
@@ -227,26 +294,22 @@ export const actions = {
   },
 
   jumpToDay(cw: number, cd: number) {
-    state.update((s) => ({ ...s, cw, cd, view: 'today' }));
+    if (!Number.isFinite(cw) || !Number.isFinite(cd)) return;
+    const week = Math.min(8, Math.max(1, Math.trunc(cw)));
+    const day = Math.min(7, Math.max(1, Math.trunc(cd)));
+    state.update((s) => ({ ...navigateDay(s, week, day), view: 'today' }));
   },
 
   stepDay(delta: number) {
+    if (!Number.isFinite(delta)) return;
     state.update((s) => {
-      let n = s.cw;
-      let d = s.cd + delta;
-      if (d > 7) {
-        d = 1;
-        n = Math.min(8, n + 1);
-      }
-      if (d < 1) {
-        d = 7;
-        n = Math.max(1, n - 1);
-      }
-      return { ...s, cw: n, cd: d };
+      const index = Math.min(55, Math.max(0, (s.cw - 1) * 7 + s.cd - 1 + Math.trunc(delta)));
+      return navigateDay(s, Math.floor(index / 7) + 1, index % 7 + 1);
     });
   },
 
   togglePart(cw: number, cd: number, partIndex: number) {
+    if (!WEEKS[cw - 1]?.days[cd - 1]?.parts[partIndex]) return;
     state.update((s) => {
       const key = `w${cw}d${cd}p${partIndex}`;
       const done = { ...s.done, [key]: !s.done[key] };
@@ -255,6 +318,7 @@ export const actions = {
   },
 
   setPartDone(cw: number, cd: number, partIndex: number, isDone: boolean) {
+    if (!WEEKS[cw - 1]?.days[cd - 1]?.parts[partIndex]) return;
     state.update((s) => {
       const key = `w${cw}d${cd}p${partIndex}`;
       const done = { ...s.done, [key]: isDone };
@@ -274,20 +338,14 @@ export const actions = {
         done[`w${cw}d${cd}p${i}`] = isDone;
       });
 
-      // Auto-log hours if timer has elapsed time
-      let dayHours = { ...s.dayHours };
-      if (isDone && s.timerElapsed > 60) {
-        const hKey = `w${cw}d${cd}`;
-        const prevH = parseFloat(dayHours[hKey] || '0') || 0;
-        const addH = s.timerElapsed / 3600;
-        dayHours[hKey] = (prevH + addH).toFixed(1);
-      }
-
-      return { ...s, done, dayHours };
+      const logged = isDone && cw === s.cw && cd === s.cd ? creditTimer(s) : s;
+      return { ...logged, done };
     });
   },
 
   setDayHours(cw: number, cd: number, hours: string) {
+    if (hours !== '' && (!Number.isFinite(Number(hours)) || Number(hours) < 0 || Number(hours) > 24)) return;
+    hours = hours.trim() === '' ? '' : String(Number(hours));
     state.update((s) => {
       const dayHours = { ...s.dayHours, [`w${cw}d${cd}`]: hours };
       return { ...s, dayHours };
@@ -325,83 +383,84 @@ export const actions = {
     });
   },
 
-  // Timer Controls
+  // Each interval has its own remaining time; elapsed time is unlogged session time.
   selectTimerPart(partIndex: number, minutes: number) {
-    state.update((s) => {
-      const targetSeconds = minutes * 60;
-      return {
-        ...s,
-        timerMode: 'countdown',
-        timerPartIndex: partIndex,
-        timerTargetSeconds: targetSeconds,
-        timerRemaining: targetSeconds,
-        timerRunning: false
-      };
-    });
+    if (!Number.isInteger(partIndex) || partIndex < 0 || !Number.isFinite(minutes) || minutes < 0) return;
+    state.update((s) => ({
+      ...settleTimer(s),
+      timerMode: minutes > 0 ? 'countdown' : 'stopwatch',
+      timerPartIndex: partIndex,
+      timerTargetSeconds: minutes * 60,
+      timerRemaining: minutes * 60,
+      timerRunning: false,
+      timerStartedAt: null,
+    }));
+  },
+
+  startStopwatch(partIndex: number) {
+    actions.selectTimerPart(partIndex, 0);
   },
 
   toggleTimer() {
     state.update((s) => {
-      const nextRun = !s.timerRunning;
-      if (nextRun) {
-        playBlip(660);
-      } else {
-        playBlip(440);
-      }
-      return { ...s, timerRunning: nextRun };
+      const settled = settleTimer(s);
+      const nextRun = !settled.timerRunning;
+      playBlip(nextRun ? 660 : 440);
+      return {
+        ...settled,
+        timerRemaining: nextRun && settled.timerMode === 'countdown' && settled.timerRemaining <= 0
+          ? settled.timerTargetSeconds : settled.timerRemaining,
+        timerRunning: nextRun,
+        timerStartedAt: nextRun ? Date.now() : null,
+      };
     });
   },
 
   resetTimer() {
     state.update((s) => ({
-      ...s,
-      timerRunning: false,
-      timerRemaining: s.timerTargetSeconds,
-      timerElapsed: 0
+      ...s, timerRunning: false, timerElapsed: 0,
+      timerRemaining: s.timerTargetSeconds, timerStartedAt: null,
     }));
   },
 
   logTimerElapsed(cw: number, cd: number) {
-    state.update((s) => {
-      const hoursToAdd = s.timerElapsed / 3600;
-      if (hoursToAdd <= 0.01) return s;
-
-      const key = `w${cw}d${cd}`;
-      const currentHours = parseFloat(s.dayHours[key] || '0') || 0;
-      const dayHours = {
-        ...s.dayHours,
-        [key]: (currentHours + hoursToAdd).toFixed(1)
-      };
-
-      return {
-        ...s,
-        dayHours,
-        timerRunning: false,
-        timerElapsed: 0,
-        timerRemaining: s.timerTargetSeconds
-      };
-    });
+    state.update((s) => cw === s.cw && cd === s.cd ? creditTimer(s) : s);
   },
 
   // Schedule Shift (move start date by N missed days)
   shiftSchedule(daysToShift: number) {
     state.update((s) => {
-      const current = new Date(s.start + 'T00:00:00');
-      current.setDate(current.getDate() + daysToShift);
-      return { ...s, start: current.toISOString().slice(0, 10) };
+      return { ...s, start: shiftLocalDate(s.start, daysToShift) };
     });
+  },
+
+  importBackup(data: unknown): void {
+    const progress = parseProgress(data);
+    localLoadFailed = false;
+    actions.signOut();
+    state.update((s) => ({ ...s, ...progress, ...sessionTimer(progress.cw, progress.cd), isSignedIn: false }));
+  },
+
+  restoreDeviceBackup() {
+    if (!deviceBackup) throw new Error('No previous device backup is available.');
+    actions.importBackup(deviceBackup);
+  },
+
+  exportBackup(): Progress {
+    return serializeProgress(get(state));
   },
 
   // Crew & Code Sync (Prevents Duplication Bug!)
   pasteSyncCode(rawCode: string) {
-    const match = /^\s*(?:([^:]+):)?\s*IG-(\d+)\.(\d+)\.([\d.]+)\s*$/i.exec(rawCode);
+    const match = /^\s*(?:([^:]+):)?\s*IG-([1-8])\.([1-7])\.(\d+(?:\.\d+)?)\s*$/i.exec(rawCode);
     if (!match) return false;
 
     const name = (match[1] || 'Friend').trim();
     const week = parseInt(match[2], 10) || 1;
     const day = parseInt(match[3], 10) || 1;
     const hours = parseFloat(match[4]) || 0;
-    const streak = Math.max(1, (week - 1) * 7 + day);
+    if (!Number.isFinite(hours) || hours < 0) return false;
+    const streak = 0; // The share code contains no streak information.
 
     state.update((s) => {
       // Check if friend with this name already exists -> update in place!
@@ -478,31 +537,31 @@ export const actions = {
 
   async syncToCloud() {
     const s = get(state);
+    const client = convex;
+    if (!s.isSignedIn || !client || !cloudRestoreComplete) return false;
+    const attempt = authAttempt;
     const stats = get(derivedStats);
-    if (!s.isSignedIn || !convex) return false;
-    try {
-      const donePayload = JSON.stringify({
-        done: s.done,
-        dayHours: s.dayHours,
-        dayNotes: s.dayNotes,
-        ms: s.ms,
-        counters: s.counters
-      });
-      // @ts-ignore
-      await convex.mutation('crew:syncProgress', {
-        roomCode: s.roomCode,
-        name: s.userName,
-        week: s.cw,
-        day: s.cd,
-        hours: parseFloat(stats.totalHoursNum) || 0,
-        streak: stats.streak,
-        doneJson: donePayload
-      });
-      return true;
-    } catch (e) {
-      console.warn('Convex sync error:', e);
-      return false;
-    }
+    const payload = {
+      roomCode: s.roomCode, week: s.cw, day: s.cd,
+      hours: Number(stats.totalHoursNum), streak: stats.streak,
+      doneJson: JSON.stringify(serializeProgress(s)),
+    };
+    cloudSyncQueue = cloudSyncQueue.then(async () => {
+      if (attempt !== authAttempt || !cloudRestoreComplete) return false;
+      cloudStatus.set({ status: 'syncing', message: 'Saving progress to cloud...' });
+      try {
+        const version = await client.mutation(api.crew.syncProgress, { ...payload, expectedVersion: cloudVersion });
+        if (attempt === authAttempt) {
+          cloudVersion = version;
+          cloudStatus.set({ status: 'synced', message: 'Cloud progress saved.' });
+        }
+        return true;
+      } catch {
+        if (attempt === authAttempt) cloudStatus.set({ status: 'error', message: 'Cloud save failed or another device has newer progress. Your work is saved here. Sign in again to restore cloud progress.' });
+        return false;
+      }
+    });
+    return cloudSyncQueue;
   },
 
   async copyInviteLink(roomCode?: string): Promise<string> {
@@ -528,6 +587,11 @@ export const actions = {
 
   acceptInvite(roomCode: string) {
     const cleanRoom = roomCode.toUpperCase().trim();
+    const current = get(state);
+    if (current.isSignedIn) {
+      void actions.setRoomCode(cleanRoom);
+      return;
+    }
     state.update((s) => ({
       ...s,
       roomCode: cleanRoom,
@@ -537,67 +601,76 @@ export const actions = {
     }));
   },
 
-  async signIn(name: string, roomCode: string, email?: string, avatarUrl?: string, authId?: string) {
+  async signIn(name: string, roomCode: string, cloudSignIn = false) {
     const cleanName = name.trim();
     const cleanRoom = roomCode.toUpperCase().trim();
-    if (!cleanName || !cleanRoom) return;
+    if (!cleanName || !/^[A-Z0-9-]{3,48}$/.test(cleanRoom)) throw new Error('Enter a name and a room code of 3 to 48 letters, numbers or hyphens.');
+    const attempt = ++authAttempt;
+    cloudRestoreComplete = false;
+    if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
 
-    state.update((s) => ({
-      ...s,
-      userName: cleanName,
-      roomCode: cleanRoom,
-      isSignedIn: true,
-      userEmail: email || s.userEmail || null,
-      userAvatar: avatarUrl || s.userAvatar || null,
-      invitedRoomCode: null,
-      inviteBannerDismissed: true
-    }));
-
-    // If Convex is available, sync and fetch existing profile
-    if (convex) {
-      try {
-        // @ts-ignore
-        const member = await convex.mutation('crew:signInOrRegister', {
-          roomCode: cleanRoom,
-          name: cleanName,
-          email: email || undefined,
-          avatarUrl: avatarUrl || undefined,
-          authId: authId || undefined
-        });
-
-        if (member && member.doneJson) {
-          try {
-            const restored = JSON.parse(member.doneJson);
-            state.update((s) => ({
-              ...s,
-              done: { ...s.done, ...(restored.done || {}) },
-              dayHours: { ...s.dayHours, ...(restored.dayHours || {}) },
-              dayNotes: { ...s.dayNotes, ...(restored.dayNotes || {}) },
-              cw: member.week || s.cw,
-              cd: member.day || s.cd
-            }));
-          } catch (e) {
-            console.warn('Failed to parse remote progress:', e);
-          }
-        } else if (member) {
-          // New member: upload current state
-          await actions.syncToCloud();
-        }
-      } catch (err) {
-        console.warn('Convex sign-in error:', err);
+    if (!cloudSignIn) {
+      clearCloudAuth();
+      state.update((s) => ({ ...s, userName: cleanName, roomCode: cleanRoom, isSignedIn: false, userEmail: null, userAvatar: null, invitedRoomCode: null, inviteBannerDismissed: true }));
+      cloudStatus.set({ status: 'local', message: 'Saved on this device. Google sign-in is optional.' });
+      return;
+    }
+    if (!convex) throw new Error('Cloud sync is not configured. Local practice is still available.');
+    state.update((s) => ({ ...creditTimer(s), isSignedIn: false }));
+    cloudStatus.set({ status: 'syncing', message: 'Verifying sign-in and loading cloud progress...' });
+    try {
+      const result = await convex.mutation(api.crew.signInOrRegister, { roomCode: cleanRoom, name: cleanName });
+      if (attempt !== authAttempt) return;
+      const local = serializeProgress(get(state));
+      const restored = result.member.doneJson ? parseCloudProgress(JSON.parse(result.member.doneJson), {
+        start: local.start, cw: result.member.week, cd: result.member.day,
+      }) : null;
+      if (restored && JSON.stringify(restored) !== JSON.stringify(local)) {
+        // Save first. If browser storage is full, abort the restore instead of losing device work.
+        if (typeof localStorage !== 'undefined') localStorage.setItem(DEVICE_BACKUP_KEY, JSON.stringify(local));
+        deviceBackup = local;
+        hasDeviceBackup.set(true);
       }
+      cloudVersion = result.member.progressVersion;
+      state.update((s) => {
+        const progress = restored || serializeProgress(s);
+        return {
+          ...s, ...progress, userName: cleanName, roomCode: cleanRoom, isSignedIn: true,
+          invitedRoomCode: null, inviteBannerDismissed: true, userEmail: null,
+          userAvatar: result.member.avatarUrl || null,
+          ...sessionTimer(progress.cw, progress.cd),
+        };
+      });
+      cloudRestoreComplete = true;
+      if (!restored) {
+        if (!await actions.syncToCloud()) throw new Error('Signed in, but the initial cloud save failed. Your progress is still on this device.');
+      } else {
+        cloudStatus.set({ status: 'synced', message: 'Cloud progress restored. Previous device progress is available under Stats & Streak > Restore Device Backup.' });
+      }
+    } catch (error) {
+      if (attempt === authAttempt) {
+        cloudRestoreComplete = false;
+        clearCloudAuth();
+        state.update((s) => ({ ...s, isSignedIn: false }));
+        cloudStatus.set({ status: 'error', message: 'Cloud sign-in or restore failed. Local progress is preserved. Please try again.' });
+      }
+      throw error;
     }
   },
 
+  cloudSessionExpired() {
+    if (!get(state).isSignedIn) return;
+    actions.signOut();
+    cloudStatus.set({ status: 'error', message: 'Your Google session expired. Sign in again to resume cloud sync. Device progress is unchanged.' });
+  },
+
   signOut() {
-    state.update((s) => ({
-      ...s,
-      userName: 'You',
-      userEmail: null,
-      userAvatar: null,
-      isSignedIn: false,
-      authModalOpen: false
-    }));
+    authAttempt++;
+    clearCloudAuth();
+    cloudRestoreComplete = false;
+    if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
+    cloudStatus.set({ status: 'local', message: 'Saved on this device.' });
+    state.update((s) => ({ ...s, userName: 'You', userEmail: null, userAvatar: null, isSignedIn: false, authModalOpen: false }));
   }
 };
 
@@ -619,7 +692,7 @@ export const derivedStats = derived(state, ($s) => {
     }
   }
 
-  // Calculate Streak: count consecutive completed days ending at today or yesterday
+  // Streak follows the selected curriculum day, so navigating days changes the anchor intentionally.
   let streak = 0;
   let currW = $s.cw;
   let currD = $s.cd;
@@ -654,16 +727,11 @@ export const derivedStats = derived(state, ($s) => {
   const coursePct = Math.round((doneDaysCount / 56) * 100);
 
   // Calendar calculations
-  const startDate = new Date($s.start + 'T00:00:00');
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  const liveDayIndex = Math.round((now.getTime() - startDate.getTime()) / 86400000);
+  const liveDayIndex = calendarDayIndex($s.start);
 
-  let liveN = 1, liveD = 1;
-  if (liveDayIndex >= 0 && liveDayIndex < 56) {
-    liveN = Math.floor(liveDayIndex / 7) + 1;
-    liveD = (liveDayIndex % 7) + 1;
-  }
+  const boundedLiveIndex = Math.min(55, Math.max(0, liveDayIndex));
+  const liveN = Math.floor(boundedLiveIndex / 7) + 1;
+  const liveD = (boundedLiveIndex % 7) + 1;
 
   // Missed days
   const missed: Array<{ n: number; d: number }> = [];

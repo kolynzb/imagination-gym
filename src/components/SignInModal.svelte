@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { state, actions, derivedStats } from '../lib/store';
-  import { isConvexEnabled } from '../lib/convex';
-  import { isGoogleAuthAvailable, renderGoogleButton, type GoogleUserPayload } from '../lib/googleAuth';
+  import { state, actions, derivedStats, hasDeviceBackup } from '../lib/store';
+  import { isConvexEnabled, setGoogleCredential } from '../lib/convex';
+  import { isGoogleAuthAvailable, renderGoogleButton, type GoogleCredential } from '../lib/googleAuth';
   import Icon from './Icon.svelte';
 
   let s = $state;
@@ -34,20 +34,23 @@
 
   const convexLive = isConvexEnabled();
 
-  async function handleGoogleLogin(user: GoogleUserPayload) {
+  async function handleGoogleLogin({ credential, profile }: GoogleCredential) {
     isSubmitting = true;
-    syncMessage = `Signing in as ${user.name}...`;
+    syncMessage = `Signing in as ${profile.name}...`;
     isError = false;
     try {
       const cleanRoom = inputRoom.toUpperCase().trim() || 'GYM-CREW';
-      await actions.signIn(user.name, cleanRoom, user.email, user.picture, user.sub);
-      syncMessage = `✓ Welcome, ${user.name}! Synced with ${cleanRoom}.`;
+      setGoogleCredential(credential, authenticated => {
+        if (!authenticated) actions.cloudSessionExpired();
+      });
+      await actions.signIn(profile.name, cleanRoom, true);
+      syncMessage = $hasDeviceBackup ? 'Cloud progress restored. Your previous device progress is available in Stats & Streak.' : `Welcome, ${profile.name}. Cloud sync is active for ${cleanRoom}.`;
       setTimeout(() => {
         actions.closeAuthModal();
       }, 700);
     } catch (err) {
       console.error(err);
-      syncMessage = 'Failed to sign in with Google.';
+      syncMessage = 'Google sign-in could not be verified. Your local practice is unchanged.';
       isError = true;
     } finally {
       isSubmitting = false;
@@ -71,18 +74,18 @@
     }
 
     isSubmitting = true;
-    syncMessage = 'Connecting & syncing progress...';
+    syncMessage = 'Saving your local profile...';
     isError = false;
 
     try {
       await actions.signIn(cleanName, cleanRoom);
-      syncMessage = '✓ Signed in and synced!';
+      syncMessage = 'Local profile saved. Nickname-only mode does not sync to cloud.';
       setTimeout(() => {
         actions.closeAuthModal();
       }, 700);
     } catch (err) {
       console.error(err);
-      syncMessage = 'Sync failed. Storing locally instead.';
+      syncMessage = 'Local profile saved. Sign in with Google to enable cloud sync.';
       isError = true;
     } finally {
       isSubmitting = false;
@@ -96,9 +99,9 @@
     const ok = await actions.syncToCloud();
     isSubmitting = false;
     if (ok) {
-      syncMessage = '✓ Synced with Convex cloud!';
+      syncMessage = 'Cloud progress synced.';
     } else {
-      syncMessage = 'Convex not connected. Progress saved locally.';
+      syncMessage = 'Cloud sync needs a verified Google sign-in. Progress remains local.';
     }
     setTimeout(() => {
       syncMessage = '';
@@ -107,7 +110,7 @@
 
   function handleSignOut() {
     actions.signOut();
-    syncMessage = 'Signed out. Now using local profile.';
+    syncMessage = 'Signed out. Your local practice remains available.';
     setTimeout(() => {
       syncMessage = '';
     }, 2000);
@@ -187,8 +190,8 @@
         <div class="status-dot"></div>
         <div class="status-info">
           {#if convexLive}
-            <span class="status-title">Convex BaaS Connected</span>
-            <span class="status-desc">Real-time sync enabled across devices & crew members.</span>
+            <span class="status-title">Cloud connection ready</span>
+            <span class="status-desc">Sign in with Google to sync across devices and use Crew rooms.</span>
           {:else}
             <span class="status-title">Offline Local Mode</span>
             <span class="status-desc">Progress saved locally in browser. Add VITE_CONVEX_URL for cloud sync.</span>
@@ -264,7 +267,7 @@
             </div>
           {:else}
             <p class="auth-intro">
-              Pick an artist handle and crew room code, or sign in with Google. Your 56-day progress, timer logs, and notes will sync in real time across your devices.
+              Pick an artist handle for local practice, or sign in with Google to sync your progress across devices and join a Crew room.
             </p>
           {/if}
 
@@ -281,7 +284,7 @@
               <div class="google-callout">
                 <div class="google-callout-icon">🔐</div>
                 <div class="google-callout-text">
-                  <strong>Google OAuth Supported:</strong> Add <code>VITE_GOOGLE_CLIENT_ID</code> to enable one-click Google Sign-In.
+                  <strong>Google sign-in is not configured:</strong> add <code>VITE_GOOGLE_CLIENT_ID</code> to enable verified cloud sync. Local practice still works without it.
                 </div>
               </div>
             {/if}
@@ -297,7 +300,7 @@
               bind:value={inputName}
               required
             />
-            <span class="field-hint">Your public identity on the Crew leaderboard.</span>
+            <span class="field-hint">Nickname-only profiles stay on this device. Google users can use this name on Crew leaderboards.</span>
           </div>
 
           <div class="form-group">
@@ -352,7 +355,7 @@
 
           <div class="form-actions">
             <button type="submit" class="btn-primary" disabled={isSubmitting}>
-              {isSubmitting ? 'Connecting...' : (s.invitedRoomCode ? `Join ${inputRoom} & Sync` : 'Sign In & Sync Device')}
+              {isSubmitting ? 'Saving...' : (s.invitedRoomCode ? `Save local profile for ${inputRoom}` : 'Save Local Profile')}
             </button>
           </div>
         </form>

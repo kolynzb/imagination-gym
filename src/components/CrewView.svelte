@@ -1,6 +1,6 @@
 <script lang="ts">
   import { state, actions, derivedStats } from '../lib/store';
-  import { isConvexEnabled, convex, type CrewMember, type CritPost } from '../lib/convex';
+  import { api, getConvexSiteUrl, isConvexEnabled, convex, type CrewMember, type CritPost } from '../lib/convex';
   import { onMount, onDestroy } from 'svelte';
   import Icon from './Icon.svelte';
 
@@ -18,6 +18,8 @@
   let critPosts: CritPost[] = [];
   let unsubscribeMembers: (() => void) | null = null;
   let unsubscribeCrits: (() => void) | null = null;
+  let subscribedRoom = '';
+  let subscriptionError = '';
 
   // New Crit Post Form State
   let critPrompt = '';
@@ -25,6 +27,9 @@
   let critUploading = false;
 
   $: hasConvex = isConvexEnabled();
+  $: cloudCrewReady = hasConvex && s.isSignedIn;
+  $: if (cloudCrewReady && subscribedRoom !== s.roomCode) subscribeConvexRoom();
+  $: if (!cloudCrewReady && subscribedRoom) clearSubscriptions();
 
   // Combine user's own status with crew
   $: myEntry = {
@@ -38,7 +43,7 @@
   };
 
   // If Convex is active, use Convex members; otherwise use localCrew
-  $: displayMembers = hasConvex && convexMembers.length > 0
+  $: displayMembers = cloudCrewReady && convexMembers.length > 0
     ? convexMembers.map((m) => ({
         ...m,
         locked: m.name.toLowerCase() === s.userName.toLowerCase()
@@ -49,49 +54,54 @@
       ].sort((a, b) => b.hours - a.hours);
 
   onMount(() => {
-    if (hasConvex && convex) {
+    if (cloudCrewReady && convex) {
       subscribeConvexRoom();
     }
   });
 
   onDestroy(() => {
-    if (unsubscribeMembers) unsubscribeMembers();
-    if (unsubscribeCrits) unsubscribeCrits();
+    clearSubscriptions();
   });
 
+  function clearSubscriptions() {
+    unsubscribeMembers?.();
+    unsubscribeCrits?.();
+    unsubscribeMembers = null;
+    unsubscribeCrits = null;
+    subscribedRoom = '';
+    convexMembers = [];
+    critPosts = [];
+    subscriptionError = '';
+  }
+
   function subscribeConvexRoom() {
-    if (!convex) return;
+    if (!convex || !cloudCrewReady) return;
+    clearSubscriptions();
+    const roomCode = s.roomCode;
+    subscribedRoom = roomCode;
     try {
-      // @ts-ignore
-      unsubscribeMembers = convex.onUpdate('crew:getMembers', { roomCode: s.roomCode }, (members: CrewMember[]) => {
+      unsubscribeMembers = convex.onUpdate(api.crew.getMembers, { roomCode }, (members: CrewMember[]) => {
+        if (subscribedRoom !== roomCode) return;
         convexMembers = members;
       });
-      // @ts-ignore
-      unsubscribeCrits = convex.onUpdate('crew:getCritPosts', { roomCode: s.roomCode }, (posts: CritPost[]) => {
+      unsubscribeCrits = convex.onUpdate(api.crew.getCritPosts, { roomCode }, (posts: CritPost[]) => {
+        if (subscribedRoom !== roomCode) return;
         critPosts = posts;
       });
     } catch (err) {
       console.warn('Convex subscription error:', err);
+      subscriptionError = 'Could not load this crew room.';
     }
   }
 
   async function handleSyncMyProgress() {
     syncing = true;
-    if (hasConvex && convex) {
+    if (cloudCrewReady && convex) {
       try {
-        // @ts-ignore
-        await convex.mutation('crew:syncProgress', {
-          roomCode: s.roomCode,
-          name: s.userName,
-          week: s.cw,
-          day: s.cd,
-          hours: parseFloat(stats.totalHoursNum) || 0,
-          streak: stats.streak
-        });
-        pasteStatus = '✓ Synced to live room!';
+        pasteStatus = await actions.syncToCloud() ? 'Cloud progress synced to this room.' : 'Cloud sync did not complete. Your local practice is safe.';
       } catch (e) {
         console.error('Failed to sync to Convex:', e);
-        pasteStatus = 'Convex sync failed: using local';
+        pasteStatus = 'Cloud sync failed. Your local practice is safe.';
       }
     } else {
       // Generate code to clipboard
@@ -125,52 +135,50 @@
     if (!critFile) return;
     critUploading = true;
 
-    if (hasConvex && convex) {
+    if (cloudCrewReady && convex) {
       try {
-        // 1. Get Convex upload URL
-        // @ts-ignore
-        const postUrl = await convex.mutation('crew:generateUploadUrl');
-
-        // 2. Upload file
-        const res = await fetch(postUrl, {
+        const siteUrl = getConvexSiteUrl();
+        const auth = convex.getAuth();
+        if (!siteUrl || !auth) throw new Error('Cloud uploads are not configured or signed in');
+        const res = await fetch(`${siteUrl}/crit-upload`, {
           method: 'POST',
-          headers: { 'Content-Type': critFile.type },
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+            'Content-Type': critFile.type,
+            'X-Crit-Room-Code': s.roomCode,
+            'X-Crit-Week': String(s.cw),
+            'X-Crit-Day': String(s.cd),
+            'X-Crit-Size': String(critFile.size),
+            'X-Crit-Prompt': encodeURIComponent(critPrompt || 'Check line convergence and minor axes.')
+          },
           body: critFile
         });
-        const { storageId } = await res.json();
-
-        // 3. Post crit record
-        // @ts-ignore
-        await convex.mutation('crew:postCrit', {
-          roomCode: s.roomCode,
-          authorName: s.userName,
-          week: s.cw,
-          day: s.cd,
-          storageId,
-          prompt: critPrompt || 'Check line convergence and minor axes.'
-        });
+        if (!res.ok) throw new Error('Image upload was rejected');
 
         critPrompt = '';
         critFile = null;
       } catch (err) {
-        console.error('Crit upload error:', err);
+      console.error('Crit upload error:', err);
+      pasteStatus = 'Sketch was not posted. Check the image and Google sign-in, then try again.';
       }
     } else {
-      // Offline fallback: save dataURL locally in memory/critPosts
+      // Temporary local preview only. It is not shared or durable.
       const reader = new FileReader();
       reader.onload = () => {
         critPosts = [
           {
+            _id: `local-${Date.now()}`,
             roomCode: s.roomCode,
             authorName: s.userName,
             week: s.cw,
             day: s.cd,
-            imageUrl: reader.result as string,
+            imageUrl: typeof reader.result === 'string' ? reader.result : '',
             prompt: critPrompt || 'Reviewing linework',
             createdAt: Date.now()
           },
           ...critPosts
         ];
+        pasteStatus = 'Temporary local preview only. Sign in with Google to post this sketch to the Crew.';
         critPrompt = '';
         critFile = null;
       };
@@ -197,7 +205,9 @@
           id="room-code-input"
           type="text"
           value={s.roomCode}
-          onchange={(e) => actions.setRoomCode((e.target as HTMLInputElement).value)}
+          onchange={(e) => {
+            if (e.currentTarget instanceof HTMLInputElement) actions.setRoomCode(e.currentTarget.value);
+          }}
         />
       </div>
       <div class="config-field">
@@ -206,14 +216,16 @@
           id="user-name-input"
           type="text"
           value={s.userName}
-          onchange={(e) => actions.setUserName((e.target as HTMLInputElement).value)}
+          onchange={(e) => {
+            if (e.currentTarget instanceof HTMLInputElement) actions.setUserName(e.currentTarget.value);
+          }}
         />
       </div>
-      <div class="backend-status" class:online={hasConvex}>
-        {#if hasConvex}
+      <div class="backend-status" class:online={cloudCrewReady}>
+        {#if cloudCrewReady}
           <Icon name="flash-on" size={14} /> Convex Real-Time Active
         {:else}
-          <span class="local-dot"></span> Local / Code Sync Mode
+          <span class="local-dot"></span> Local Practice Mode
         {/if}
       </div>
     </div>
@@ -290,11 +302,11 @@
             <span class="pct-text">{pct}%</span>
           </div>
           <div class="col act-col">
-            {#if !member.locked && member.id}
+            {#if !member.locked && 'id' in member && member.id}
               <button
                 type="button"
                 class="remove-mate-btn"
-                onclick={() => actions.removeFriend(member.id!)}
+                onclick={() => actions.removeFriend(member.id)}
                 title="Remove friend"
               >
                 <Icon name="cancel" size={12} />
@@ -316,7 +328,7 @@
     >
       {#if syncing}
         Syncing...
-      {:else if hasConvex}
+      {:else if cloudCrewReady}
         <Icon name="flash-on" size={16} /> Sync My Progress to Room
       {:else}
         <Icon name="copy" size={16} /> Copy My Code · {stats.shareCode}
@@ -340,6 +352,10 @@
     <div class="paste-feedback">{pasteStatus}</div>
   {/if}
 
+  {#if subscriptionError}
+    <div class="paste-feedback">{subscriptionError}</div>
+  {/if}
+
   <!-- Shared Crit Wall -->
   <section class="crit-section">
     <div class="section-heading">
@@ -357,8 +373,7 @@
             type="file"
             accept="image/*"
             onchange={(e) => {
-              const input = e.target as HTMLInputElement;
-              if (input.files) critFile = input.files[0];
+              if (e.currentTarget instanceof HTMLInputElement && e.currentTarget.files) critFile = e.currentTarget.files[0];
             }}
           />
           {#if critFile}
@@ -367,7 +382,7 @@
             <Icon name="opened-folder" size={16} /> Choose Drawing / Sketch Photo
           {/if}
         </label>
-        <span class="posting-as">Posting as <strong>{s.userName}</strong> (W{s.cw} D{s.cd})</span>
+        <span class="posting-as">{cloudCrewReady ? `Posting as ${s.userName}` : 'Temporary local preview'} (W{s.cw} D{s.cd})</span>
       </div>
       <div class="upload-bottom">
         <input

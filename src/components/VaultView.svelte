@@ -21,13 +21,14 @@
   }).filter((group) => group.v.length > 0);
 
   $: totalVideos = filteredVault.reduce((acc, g) => acc + g.v.length, 0);
+  $: totalVaultVideos = VAULT.reduce((acc, group) => acc + group.v.length, 0);
 </script>
 
 <div class="vault-view">
   <header class="vault-header">
     <h1 class="page-title">The Video Vault</h1>
     <p class="subtitle">
-      All 27 curated videos from the 8-week curriculum roadmap, organized by learning phase. Watch directly here without algorithmic distractions.
+      All {totalVaultVideos} curated videos from the 8-week curriculum roadmap, organized by learning phase. Watch directly here without algorithmic distractions.
     </p>
 
     <!-- Search Box -->

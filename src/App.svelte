@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { state, actions } from './lib/store';
+  import { state, actions, cloudStatus, localSaveFailed } from './lib/store';
   import Navigation from './components/Navigation.svelte';
   import TodayView from './components/TodayView.svelte';
   import WeekView from './components/WeekView.svelte';
@@ -47,6 +47,12 @@
   <Navigation />
 
   <main class="main-content">
+    {#if $localSaveFailed}
+      <div class="sync-notice" role="alert">This browser could not save your progress. Export a backup from Stats & Streak before closing this page.</div>
+    {/if}
+    {#if $cloudStatus.status === 'error' || $cloudStatus.status === 'syncing'}
+      <div class="sync-notice" role="status">{$cloudStatus.message}</div>
+    {/if}
     {#key s.view}
       <div class="view-enter">
         {#if s.view === 'today'}
@@ -90,6 +96,13 @@
     display: flex;
     min-height: 100dvh;
     background: var(--canvas);
+  }
+
+  .sync-notice {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    background: var(--card);
   }
 
   .main-content {

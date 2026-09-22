@@ -1,7 +1,8 @@
 <script lang="ts">
   import { state, actions, derivedStats } from '../lib/store';
   import { WEEKS } from '../lib/curriculum';
-  import { formatObsidianDay } from '../lib/obsidian';
+  import { formatSessionNotes } from '../lib/journal';
+  import { sessionDate } from '../lib/dates';
   import Timer from './Timer.svelte';
   import Icon from './Icon.svelte';
 
@@ -18,28 +19,52 @@
   $: completedPartsList = currentDay?.parts.map((_, i) => !!s.done[`w${s.cw}d${s.cd}p${i}`]) || [];
   $: allPartsDone = completedPartsList.length > 0 && completedPartsList.every(Boolean);
 
-  let obsidianCopied = false;
+  let notesCopied = false;
+  let markdownDownloaded = false;
+  let notesError = '';
 
-  function copyToObsidian() {
+  function getSessionMarkdown() {
     if (!currentWeek || !currentDay) return;
-    const dateStr = s.start; // Or formatted date
-    const md = formatObsidianDay({
+    return formatSessionNotes({
       week: currentWeek,
       day: currentDay,
       weekNum: s.cw,
       dayNum: s.cd,
-      dateStr,
+      dateStr: sessionDate(s.start, s.cw, s.cd),
       completedParts: completedPartsList,
       hoursLogged: s.dayHours[`w${s.cw}d${s.cd}`] || '',
       note: s.dayNotes[`w${s.cw}d${s.cd}`] || '',
       totalCoursePct: stats.coursePct,
       streak: stats.streak
     });
+  }
 
-    navigator.clipboard.writeText(md).then(() => {
-      obsidianCopied = true;
-      setTimeout(() => (obsidianCopied = false), 2500);
-    });
+  async function copySessionNotes() {
+    const md = getSessionMarkdown();
+    if (!md) return;
+    try {
+      await navigator.clipboard.writeText(md);
+      notesError = '';
+      notesCopied = true;
+      setTimeout(() => (notesCopied = false), 2500);
+    } catch {
+      notesCopied = false;
+      notesError = 'Clipboard unavailable. Use Download Markdown instead.';
+    }
+  }
+
+  function downloadSessionNotes() {
+    const md = getSessionMarkdown();
+    if (!md) return;
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `imagination-gym-${sessionDate(s.start, s.cw, s.cd)}-w${s.cw}-d${s.cd}.md`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    markdownDownloaded = true;
+    setTimeout(() => (markdownDownloaded = false), 2500);
   }
 
   function extractExerciseRefs(text: string): string[] {
@@ -237,6 +262,7 @@
         </div>
       </div>
 
+      {#if notesError}<p role="alert">{notesError}</p>{/if}
       <!-- Action Buttons -->
       <div class="day-actions-bar">
         <button
@@ -245,14 +271,15 @@
           class:all-done={allPartsDone}
           onclick={() => {
             if (allPartsDone) {
-              actions.stepDay(1);
+              if (s.cw === 8 && s.cd === 7) actions.setView('progress');
+              else actions.stepDay(1);
             } else {
               actions.setAllDayParts(s.cw, s.cd, true);
             }
           }}
         >
           {#if allPartsDone}
-            Go to Next Day →
+            {s.cw === 8 && s.cd === 7 ? 'Review Your Progress →' : 'Go to Next Day →'}
           {:else}
             <Icon name="checkmark" size={15} /> Mark Day Complete
           {/if}
@@ -260,15 +287,28 @@
 
         <button
           type="button"
-          class="obsidian-btn"
-          class:copied={obsidianCopied}
-          onclick={copyToObsidian}
-          title="Copy formatted markdown to Obsidian Journal"
+          class="notes-btn"
+          class:copied={notesCopied}
+          onclick={copySessionNotes}
+          title="Copy formatted session notes"
         >
-          {#if obsidianCopied}
+          {#if notesCopied}
             <Icon name="checkmark" size={16} /> Copied to Clipboard!
           {:else}
-            <Icon name="clipboard" size={16} /> Copy to Obsidian Journal
+            <Icon name="clipboard" size={16} /> Copy Session Notes
+          {/if}
+        </button>
+        <button
+          type="button"
+          class="notes-btn"
+          class:copied={markdownDownloaded}
+          onclick={downloadSessionNotes}
+          title="Download standard Markdown for this session"
+        >
+          {#if markdownDownloaded}
+            <Icon name="checkmark" size={16} /> Markdown Downloaded
+          {:else}
+            <Icon name="download" size={16} /> Download Markdown
           {/if}
         </button>
       </div>
@@ -681,7 +721,7 @@
     color: var(--ink);
   }
 
-  .obsidian-btn {
+  .notes-btn {
     appearance: none;
     border: 1.5px solid var(--line-2);
     background: transparent;
@@ -694,11 +734,11 @@
     transition: all 0.15s ease;
   }
 
-  .obsidian-btn:hover {
+  .notes-btn:hover {
     border-color: var(--ink);
   }
 
-  .obsidian-btn.copied {
+  .notes-btn.copied {
     border-color: var(--accent);
     color: var(--accent-ink);
     font-weight: 700;

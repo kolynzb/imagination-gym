@@ -1,5 +1,6 @@
 <script lang="ts">
   import { state, actions } from '../lib/store';
+  import { WEEKS } from '../lib/curriculum';
   import { playChime } from '../lib/audio';
   import Icon from './Icon.svelte';
 
@@ -7,10 +8,12 @@
 
   let s = $state;
   $: s = $state;
+  $: currentDay = WEEKS[s.cw - 1]?.days[s.cd - 1];
+  $: timerParts = currentDay?.parts || [];
 
   function formatTime(totalSeconds: number): string {
     const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
+    const secs = Math.floor(totalSeconds) % 60;
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   }
 
@@ -22,10 +25,20 @@
   $: progressPct =
     s.timerMode === 'countdown' && s.timerTargetSeconds > 0
       ? Math.min(100, Math.round(((s.timerTargetSeconds - s.timerRemaining) / s.timerTargetSeconds) * 100))
-      : Math.min(100, Math.round((s.timerElapsed / (plannedMins * 60)) * 100));
+      : plannedMins > 0
+        ? Math.min(100, Math.round((s.timerElapsed / (plannedMins * 60)) * 100))
+        : 0;
 
   function setPreset(minutes: number, partIdx: number) {
     actions.selectTimerPart(partIdx, minutes);
+  }
+
+  function setPartTimer(minutes: number, partIdx: number) {
+    if (minutes > 0) {
+      setPreset(minutes, partIdx);
+      return;
+    }
+    actions.startStopwatch(partIdx);
   }
 
   function testChime() {
@@ -48,30 +61,17 @@
 
   <!-- Interval Preset Selectors -->
   <div class="interval-presets">
-    <button
-      type="button"
-      class="preset-btn"
-      class:active={s.timerMode === 'countdown' && s.timerTargetSeconds === 600}
-      onclick={() => setPreset(10, 0)}
-    >
-      Part A (10m)
-    </button>
-    <button
-      type="button"
-      class="preset-btn"
-      class:active={s.timerMode === 'countdown' && s.timerTargetSeconds === 3000}
-      onclick={() => setPreset(50, 1)}
-    >
-      Part B (50m)
-    </button>
-    <button
-      type="button"
-      class="preset-btn"
-      class:active={s.timerMode === 'countdown' && s.timerTargetSeconds === 1800}
-      onclick={() => setPreset(30, 2)}
-    >
-      Part C (30m)
-    </button>
+    {#each timerParts as part, index}
+      <button
+        type="button"
+        class="preset-btn"
+        class:active={s.timerPartIndex === index && (part.m === 0 ? s.timerMode === 'stopwatch' : s.timerMode === 'countdown' && s.timerTargetSeconds === part.m * 60)}
+        onclick={() => setPartTimer(part.m, index)}
+        title={part.m === 0 ? 'Track your play session without a time limit' : `Start the ${part.m} minute ${part.t} interval`}
+      >
+        Part {part.k} ({part.m > 0 ? `${part.m}m` : 'Stopwatch'})
+      </button>
+    {/each}
   </div>
 
   <!-- Big Tabular Clock -->

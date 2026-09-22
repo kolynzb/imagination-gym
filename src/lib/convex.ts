@@ -1,6 +1,20 @@
 import { ConvexClient } from 'convex/browser';
+import { api } from '../../convex/_generated/api';
 
-const CONVEX_URL = (import.meta as unknown as { env: Record<string, string> }).env.VITE_CONVEX_URL || '';
+declare global {
+  interface ImportMetaEnv {
+    readonly VITE_CONVEX_URL?: string;
+    readonly VITE_CONVEX_SITE_URL?: string;
+    readonly VITE_GOOGLE_CLIENT_ID?: string;
+  }
+
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+}
+
+const CONVEX_URL = import.meta.env.VITE_CONVEX_URL || '';
+const CONVEX_SITE_URL = import.meta.env.VITE_CONVEX_SITE_URL || '';
 
 export let convex: ConvexClient | null = null;
 
@@ -16,9 +30,33 @@ export function isConvexEnabled(): boolean {
   return !!convex;
 }
 
+export function getConvexSiteUrl(): string {
+  if (CONVEX_SITE_URL) return CONVEX_SITE_URL.replace(/\/$/, '');
+  try {
+    const url = new URL(CONVEX_URL);
+    if (url.hostname.endsWith('.convex.cloud')) {
+      url.hostname = `${url.hostname.slice(0, -'.convex.cloud'.length)}.convex.site`;
+      return url.toString().replace(/\/$/, '');
+    }
+  } catch {
+    // Cloud upload remains disabled until a valid public Convex site URL is configured.
+  }
+  return '';
+}
+
+export { api };
+
+export function setGoogleCredential(credential: string, onAuthChange: (authenticated: boolean) => void): void {
+  if (!convex) throw new Error('Cloud sync is not configured.');
+  convex.setAuth(async () => credential, onAuthChange);
+}
+
+export function clearCloudAuth(): void {
+  convex?.setAuth(async () => null);
+}
+
 export interface CrewMember {
-  _id?: string;
-  id?: string;
+  _id: string;
   name: string;
   week: number;
   day: number;
@@ -34,7 +72,7 @@ export interface CritPost {
   authorName: string;
   week: number;
   day: number;
-  imageUrl?: string;
+  imageUrl?: string | null;
   storageId?: string;
   prompt: string;
   createdAt: number;
