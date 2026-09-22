@@ -1,0 +1,24 @@
+name: Verify student app
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '12.4.2'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run verify
+      - run: pnpm exec playwright install --with-deps chrome
+      - run: pnpm run test:e2e
+        env:
+          VITE_CONVEX_URL: ''
+          VITE_GOOGLE_CLIENT_ID: ''

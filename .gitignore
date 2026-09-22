@@ -14,6 +14,8 @@ dist/
 # Scratch & test outputs
 scratch/
 test-results/
+playwright-report/
+coverage/
 
 # Editor & OS files
 .DS_Store

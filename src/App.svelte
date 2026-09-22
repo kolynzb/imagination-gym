@@ -18,15 +18,13 @@
   $: s = $state;
 
   function handleKeydown(e: KeyboardEvent) {
-    const target = e.target as HTMLElement;
-    const isTyping = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA');
+    const target = e.target;
+    if (!(target instanceof HTMLElement)) return;
+    const isTyping = target.matches('input, textarea, select') || target.isContentEditable;
 
-    if (s.focus) {
-      // Focus mode handles its own keys
-      return;
-    }
-
-    if (isTyping) return;
+    // Dialogs and focus mode own their keyboard interactions.
+    if (s.focus || s.onboardingOpen || s.authModalOpen || s.activeExerciseDrawer) return;
+    if (isTyping || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
 
     // Spacebar toggles timer
     if (e.code === 'Space' && target.tagName !== 'BUTTON') {
