@@ -491,10 +491,11 @@
     background: transparent;
     padding: 6px;
     border-radius: var(--radius-pill);
-    font-size: 13px;
+    font-size: var(--text-control);
     font-weight: 500;
     color: var(--ink);
     cursor: pointer;
+      min-height: 44px;
   }
 
   .c-buttons button:hover {
@@ -529,8 +530,8 @@
   }
 
   .rubric-err, .rubric-fix {
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
     color: var(--ink-78);
   }
 

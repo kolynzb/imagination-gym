@@ -283,9 +283,9 @@
   }
 
   .video-title {
-    font-size: 15px;
+    font-size: var(--text-body);
     font-weight: 700;
-    line-height: 1.4;
+    line-height: var(--leading-body);
     color: var(--ink);
     margin: 0;
   }
@@ -296,7 +296,7 @@
   }
 
   .yt-link {
-    font-size: 12px;
+    font-size: var(--text-control);
     font-weight: 600;
     color: var(--accent-ink);
     text-decoration: none;

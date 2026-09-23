@@ -242,8 +242,8 @@
   }
 
   .card-p {
-    font-size: 15px;
-    line-height: 1.6;
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
     color: var(--ink-78);
     margin: 0;
   }
@@ -405,10 +405,10 @@
   }
 
   .read-pages {
-    font-size: 14px;
+    font-size: var(--text-body);
     color: var(--ink-78);
     margin: 4px 0 0;
-    line-height: 1.5;
+    line-height: var(--leading-body);
   }
 
   .videos-list {
@@ -435,7 +435,7 @@
     min-height: 44px;
     display: inline-flex;
     align-items: center;
-    font-size: 13px;
+    font-size: var(--text-control);
     color: var(--accent-ink);
     text-decoration: none;
     border-bottom: 1px solid var(--accent-14);

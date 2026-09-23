@@ -17,3 +17,9 @@ Validation: 59 unit tests, type checks and build passed. Live token values and T
 ## Instructional text normalization
 
 Exercise correction text and Method setup/scaffolding explanations now use shared 16px body text and 1.5 line height; compact metadata remains distinct. Exercise search has a stable accessible name and a 44px clear target; drawer actions also have a 44px minimum target. Phone exercise inspection confirmed 16px text, 44px clear control and no horizontal overflow. Six practice UI tests, type checks and build passed. Detector advisories for other existing variations remain; this is not a claim of full normalization.
+
+## Bounded cleanup completion
+
+Weekly explanations/reading notes, video titles and critique rubric text use the shared body size; video links use the control size. Milestone counter controls now have 44px targets. Live phone checks confirmed 16px weekly text, 44px counters and no page overflow. All 59 unit tests, 21 browser regressions, type checks and build passed. Compact metadata and specialized headings remain intentional review exceptions rather than a claim that every detector advisory is eliminated.
+
+Production reachability returned HTTP 200 from Vercel. Its rendered entry still shows the older “Imagination Gym / Sign in with Google to start your drawing practice” dialog, not the current local welcome screen. Production therefore does not demonstrate these local fixes; authenticated production saving is unverified. No deployment was performed.
