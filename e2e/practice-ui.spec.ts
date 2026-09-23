@@ -131,3 +131,23 @@ test('exercise drawer isolates the background and restores keyboard focus', asyn
   await expect(opener).toBeFocused();
   await expect(page.locator('main')).not.toHaveAttribute('inert', '');
 });
+
+test('Day 1 guidance is keyboard-accessible without toggling the timer and stays within mobile width', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await startCourse(page);
+  const warmup = page.locator('summary').filter({ hasText: 'How to practise · Part A' });
+  await warmup.focus();
+  await page.keyboard.press('Space');
+  await expect(warmup.locator('..')).toHaveAttribute('open', '');
+  await expect(page.getByRole('button', { name: 'Start', exact: true })).toBeVisible();
+  const image = page.getByRole('img', { name: /Three stages: place two endpoint dots/ });
+  await expect(image).toBeVisible();
+  expect(await image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.getByRole('button', { name: 'Focus Mode', exact: true }).click();
+  const why = page.locator('.focus-modal summary').filter({ hasText: 'Why rehearse before drawing?' });
+  await why.focus();
+  await page.keyboard.press('Space');
+  await expect(why.locator('..')).toHaveAttribute('open', '');
+  await expect(page.locator('.focus-modal').getByRole('button', { name: 'Start (Space)', exact: true })).toBeVisible();
+});

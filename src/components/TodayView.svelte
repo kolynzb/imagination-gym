@@ -5,6 +5,7 @@
   import { sessionDate } from '../lib/dates';
   import Timer from './Timer.svelte';
   import Icon from './Icon.svelte';
+  import DayOneGuide from './DayOneGuide.svelte';
 
   let s = $state;
   let stats = $derivedStats;
@@ -218,6 +219,9 @@
 
                 <h3 class="part-purpose">{part.p}</h3>
                 <p class="part-desc">{part.d}</p>
+                {#if s.cw === 1 && s.cd === 1}
+                  <DayOneGuide part={part.k} />
+                {/if}
 
                 {#if exRefs.length > 0}
                   <div class="refs-row">

@@ -122,7 +122,7 @@ export const WEEKS: Week[] = [
     milestones: ['50 Silhouettes', '50 Symmetry Shapes'],
     days: [
       { t: 'Shoulder Calibration & Ghosting', parts: [
-        A(10, 'Motor activation', 'Ex 01 (p.7): 8× repetitions of straight lines and C/S curves from the shoulder. Wakes the shoulder joint, locks the wrist.'),
+        A(10, 'Motor activation', 'Ex 01 (p.7): 8× repetitions of straight lines and C/S curves from the shoulder. Practise a comfortable shoulder-led movement without stiffening your wrist.'),
         B(50, 'Stroke trajectory & planning', 'Drawabox Ghosted Lines (2 pages) + Ghosted Planes (2 pages). Prepare the stroke in the air before committing ink.'),
         C(30, 'Workspace & baseline observation', 'Set up your physical workspace. Gather 5 household objects (mug, shoe, scissors, spray bottle, tool) for Project #1.')
       ] },

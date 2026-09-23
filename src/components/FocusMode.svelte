@@ -2,6 +2,7 @@
   import { state, actions, cloudStatus, progressConflicts } from '../lib/store';
   import { WEEKS } from '../lib/curriculum';
   import Icon from './Icon.svelte';
+  import DayOneGuide from './DayOneGuide.svelte';
 
   let s = $state;
   $: s = $state;
@@ -27,7 +28,7 @@
     if (e.code !== 'Space' || e.repeat || e.ctrlKey || e.metaKey || e.altKey || s.activeExerciseDrawer) return;
     if (!(e.target instanceof HTMLElement)) return;
     const target = e.target;
-    if (!target.isContentEditable && !target.closest('button, input, textarea, select, a, [role="checkbox"]')) {
+    if (!target.isContentEditable && !target.closest('button, input, textarea, select, a, summary, [role="checkbox"]')) {
       e.preventDefault();
       actions.toggleTimer();
     }
@@ -217,6 +218,9 @@
                 </div>
                 <div class="part-purpose">{part.p}</div>
                 <div class="part-instructions">{part.d}</div>
+                {#if s.cw === 1 && s.cd === 1}
+                  <DayOneGuide part={part.k} />
+                {/if}
               </div>
             </div>
           {/each}

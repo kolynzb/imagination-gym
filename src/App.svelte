@@ -30,7 +30,7 @@
     if (isTyping || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
 
     // Spacebar toggles timer
-    if (e.code === 'Space' && target.tagName !== 'BUTTON') {
+    if (e.code === 'Space' && !target.closest('button, a, summary, [role="checkbox"]')) {
       e.preventDefault();
       actions.toggleTimer();
       return;
