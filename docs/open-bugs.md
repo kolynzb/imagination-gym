@@ -2,9 +2,9 @@
 
 This is the current open-work list. Earlier QA reports are historical findings; completed fixes and evidence are recorded in qa-fixes-2026-09-23.md.
 
-## AUTH-01 — Refresh requires Google sign-in again
+## AUTH-01 — Refresh requires Google sign-in again (resolved)
 
-- Status: open; reproduced on production after the approved backend deployment.
+- Status: fixed and verified in the production desktop browser (release `3ed74d0`, 2026-09-23). Physical-phone verification remains a separate gap.
 - Priority: P2 usability defect. Saved progress is recoverable; this is not observed data loss.
 - Reproduction: sign in, save a note and pause a timer, reload the page. The welcome/sign-in screen returns. Complete Google sign-in again: the note and paused timer restore.
 - Evidence: production QA room QA-PROD-20260923 restored the exact QA note and 09:53 timer after reauthentication.
@@ -31,3 +31,11 @@ Validation: Svelte/TypeScript check clean, 63 unit tests pass, 21 mocked-provide
 Next implementation needs a supported application-session integration with renewal and revocation, preserving existing Convex `tokenIdentifier` ownership. Test migration/account identity continuity before deployment. This checkpoint is not production release evidence.
 
 Reference: https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out
+
+### AUTH-01 closure — 2026-09-23
+
+Replaced memory-only authentication with verified Google-to-Convex Auth sessions, renewable tokens, server-side revocation, scheduled absolute expiry, and account-scoped pending-draft recovery. See `auth-sessions.md` for the implementation and deployment model.
+
+Production backend deployed to `successful-iguana-581`; frontend commit `3ed74d0` pushed to GitHub and Vercel reported success. Real Google sign-in restored room `QA-PROD-20260923`, the exact existing production QA note, and paused timer `09:53`. Full reload and a fresh second tab both restored the authenticated course without another Google click. Explicit sign-out cleared both tabs; reloading remained signed out.
+
+Validation: 78 unit/backend tests, 21 browser regressions, clean Svelte/TypeScript checks and production build. Short-lived (30-second) development tokens exercised renewal; that temporary setting was removed. Account isolation, expiry, revocation and unsaved-draft conflict recovery have automated coverage. Separate physical-device coverage and the full video catalog remain open; opening illustrations remain deferred.
