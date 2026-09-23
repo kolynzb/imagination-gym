@@ -28,3 +28,40 @@ Physical-device playback remains unverified. Third-party availability can change
 ## Deployed verification
 
 Vercel reported success for `f27cc02`. Reloaded production, restored the authenticated QA room, and opened each replacement through Vault search. Peter Han displayed playing controls, captions and elapsed 0:01 of 28:09. Drawabox displayed playing controls and elapsed 0:03 of 10:32. Both have actual playback-start evidence in the app, beyond a loaded thumbnail.
+
+## Complete playback-start pass — 2026-09-23
+
+All 30 deployed Vault entries were started through their embedded Play controls in the authenticated production desktop browser. Each showed elapsed playback greater than zero; no unavailable/error state was observed. Players were tested in learning-phase groups, then unloaded by changing the Vault filter. This closes the catalog playback-start check, not a full-duration editorial review or physical-phone test.
+
+| Video ID | Observed elapsed seconds |
+| --- | ---: |
+| zYzgxUVSpUc | 17 |
+| A9YhcZIwH3c | 13 |
+| tYanSuLS2i4 | 16 |
+| BKiopm83L8c | 17 |
+| 6-8ED4DW6A0 | 7 |
+| LkJG6pKTuRc | 8 |
+| oK-4wUbBmJI | 7 |
+| VBAJDepILYc | 7 |
+| Jwti08d0jYk | 15 |
+| BHvXszH1fdI | 7 |
+| AabFcueorqg | 7 |
+| NijDzUGNVfQ | 7 |
+| 6xUqTKQrMr0 | 6 |
+| w3ROXZLZZ_k | 6 |
+| f5Bq-ugRv3E | 6 |
+| YY5jVOwz4Pg | 6 |
+| RDPVo6TPPbk | 3 |
+| WkmZLi8bNBM | 3 |
+| EL5kn_GLq40 | 3 |
+| J9MYR-BLzNg | 3 |
+| KjgSYqr77C0 | 2 |
+| gvro2NslMfA | 2 |
+| 1qIy7LyYLnI | 3 |
+| d07NanfYT8U | 2 |
+| FBXb8woYQn0 | 2 |
+| 4Y0XVPprbYY | 2 |
+| -2xhmKLsPO8 | 2 |
+| fSCz8akhJzw | 3 |
+| _YuSTSfl-7s | 3 |
+| dWrT-MakDIc | 2 |

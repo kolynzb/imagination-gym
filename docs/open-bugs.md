@@ -15,7 +15,7 @@ This is the current open-work list. Earlier QA reports are historical findings; 
 ## Verification gaps (not confirmed defects)
 
 - Separate physical-device sign-in and progress recovery.
-- Full-duration playback of every lesson and physical-device playback are not verified. All 30 catalog players now load; two unavailable videos were replaced and both replacements played in production. See video-catalog-qa-2026-09-23.md.
+- Physical-device video playback. The desktop catalog check is complete: all 30 videos started and advanced beyond zero seconds in production. See video-catalog-qa-2026-09-23.md for per-video evidence. Full-duration viewing was not part of this smoke test.
 
 ## Deferred work
 
