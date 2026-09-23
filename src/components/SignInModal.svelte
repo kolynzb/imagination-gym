@@ -53,26 +53,52 @@
 </script>
 
 {#if !s.isSignedIn || s.authModalOpen}
-  <div class="auth-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-heading">
+  <div class="auth-overlay" class:welcome={!s.isSignedIn} role={s.isSignedIn ? 'dialog' : 'region'} aria-modal={s.isSignedIn ? 'true' : undefined} aria-labelledby="auth-heading">
+    {#if !s.isSignedIn}
+      <div class="welcome-story">
+        <div class="welcome-brand"><img src="/android-chrome-192x192.png" alt="" /><span>Imagination Gym</span></div>
+        <p class="eyebrow">An eight-week drawing practice</p>
+        <h1 id="auth-heading">Make room<br />for drawing.</h1>
+        <p class="welcome-intro">Build the skills to draw from imagination, one focused session at a time. Bring a sketchbook or an iPad. We’ll bring the plan.</p>
+        <svg class="practice-sketch" viewBox="0 0 560 170" fill="none" aria-hidden="true">
+          <path d="M16 133C72 30 117 22 158 116M30 139C83 40 119 41 147 121M13 146L173 146" stroke="currentColor" stroke-width="1.5" />
+          <path d="M235 59L289 31L343 59L289 90L235 59ZM235 59V119L289 151L343 120V59M289 90V151" stroke="currentColor" stroke-width="1.8" />
+          <path d="M235 119L289 89L343 120M289 31V89" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="4 5" />
+          <ellipse cx="455" cy="55" rx="49" ry="21" stroke="currentColor" stroke-width="1.5" />
+          <path d="M406 55V123C406 151 504 151 504 123V55" stroke="currentColor" stroke-width="1.5" />
+          <path d="M405 120C411 95 499 95 505 120" stroke="currentColor" stroke-opacity=".3" stroke-dasharray="4 5" />
+          <path d="M194 23L218 11M354 146L377 154M448 15L457 5" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" />
+        </svg>
+        <ol class="practice-path">
+          <li><span>01</span><strong>Warm up</strong><p>Loosen your shoulder and find your line.</p></li>
+          <li><span>02</span><strong>Practise one skill</strong><p>Work through a focused drawing drill.</p></li>
+          <li><span>03</span><strong>Make something</strong><p>Put the skill to work in your own project.</p></li>
+        </ol>
+        <p class="practice-commitment">Plan around 90 minutes for a typical practice day. Every seventh day is for free drawing.</p>
+      </div>
+    {/if}
     {#if s.isSignedIn}
       <button type="button" class="backdrop-btn" onclick={() => actions.closeAuthModal()} aria-label="Close account"></button>
     {/if}
     <div class="auth-card">
-      <img src="/android-chrome-192x192.png" alt="" class="auth-modal-logo" />
-      <h1 id="auth-heading">{s.isSignedIn ? 'Your account' : 'Imagination Gym'}</h1>
       {#if s.isSignedIn}
+        <img src="/android-chrome-192x192.png" alt="" class="auth-modal-logo" />
+        <h1 id="auth-heading">Your account</h1>
         <p class="account-name">{s.userName}</p>
         <div class="action-buttons">
           <button type="button" onclick={handleSignOut}>Sign out</button>
           <button type="button" onclick={() => actions.closeAuthModal()}>Close</button>
         </div>
       {:else}
-        <p>Sign in with Google to start your drawing practice.</p>
+        <h2>Your practice starts here</h2>
+        <p>Sign in to open your course, follow today’s session and keep your notes together.</p>
         {#if signInAvailable}
           <div class="google-slot-wrap" aria-busy={isSubmitting} use:mountGoogleButton></div>
         {:else}
           <p class="error" role="alert">Sign-in is unavailable. Please try again later.</p>
         {/if}
+        <p class="saving-explainer">Your progress saves to your account. Use the same Google account when you return, on this device or another.</p>
+        <p class="connection-note">A Google account and internet connection are required.</p>
       {/if}
       {#if !message && $cloudStatus.status === 'error'}
         <p class="error" role="alert">{$cloudStatus.message}</p>
@@ -156,4 +182,53 @@
     cursor: pointer;
   }
   .action-buttons button:hover { background: var(--line); }
+
+  .welcome {
+    position: relative;
+    z-index: auto;
+    min-height: 100dvh;
+    width: 100%;
+    background: var(--canvas);
+    display: grid;
+    grid-template-columns: minmax(0, 680px) minmax(300px, 380px);
+    gap: clamp(32px, 6vw, 96px);
+    padding: clamp(24px, 5vw, 72px);
+    align-content: center;
+  }
+  .welcome-story { min-width: 0; }
+  .welcome-brand { display: flex; align-items: center; gap: 12px; font-weight: 700; }
+  .welcome-brand img { width: 34px; height: 34px; }
+  .welcome .eyebrow { margin: 44px 0 12px; font-size: 14px; color: var(--ink-72); }
+  .welcome h1 { font-size: clamp(60px, 7vw, 96px); line-height: .96; margin: 0 0 24px; }
+  .welcome-intro { max-width: 540px; font-size: 18px; line-height: 1.6; }
+  .practice-sketch { width: min(100%, 560px); height: auto; margin: 12px 0 24px; color: var(--ink-72); }
+  .practice-path { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; padding: 0; margin: 0; list-style: none; }
+  .practice-path li { border-top: 1px solid var(--line-2); padding-top: 14px; }
+  .practice-path span { display: block; font-size: 12px; color: var(--accent-ink); margin-bottom: 8px; }
+  .practice-path strong { font-size: 15px; }
+  .practice-path p { font-size: 14px; margin: 8px 0 0; line-height: 1.5; }
+  .welcome .practice-commitment { max-width: 520px; font-size: 13px; color: var(--ink-72); margin: 24px 0 0; }
+  .welcome .auth-card { text-align: left; max-height: none; overflow: visible; border: 0; border-radius: 18px; padding: 32px; background: var(--card); }
+  .welcome h2 { font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 700; line-height: 1.2; margin: 0 0 16px; }
+  .welcome .auth-card p { font-size: 15px; }
+  .welcome .google-slot-wrap { justify-content: flex-start; width: 100%; margin: 24px 0; }
+  .welcome .auth-card .saving-explainer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 14px; }
+  .welcome .auth-card .connection-note { font-size: 12px; color: var(--ink-72); margin-bottom: 0; }
+  @media(max-width: 860px) {
+    .welcome { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 28px 24px 40px; }
+    .welcome-story { display: contents; }
+    .welcome-brand { grid-row: 1; }
+    .welcome .eyebrow { grid-row: 2; margin: 8px 0 -18px; }
+    .welcome h1 { grid-row: 3; margin-bottom: 0; }
+    .welcome-intro { grid-row: 4; margin: 0; }
+    .welcome .auth-card { grid-row: 5; max-width: none; padding: 24px; }
+    .practice-sketch { grid-row: 6; margin: 0 auto; }
+    .practice-path { grid-row: 7; gap: 16px; }
+    .welcome .practice-commitment { grid-row: 8; margin: 0; }
+  }
+  @media(max-width: 420px) {
+    .practice-path { grid-template-columns: 1fr; gap: 20px; }
+    .practice-path span { float: left; margin: 3px 12px 0 0; }
+    .practice-path p { margin-left: 28px; }
+  }
 </style>

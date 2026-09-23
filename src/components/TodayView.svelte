@@ -511,32 +511,50 @@
   .parts-container {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    background: var(--card);
   }
 
   .part-card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 0 24px 24px 0;
-    padding: 24px 26px;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    padding: 20px 24px;
     display: flex;
-    gap: 18px;
+    gap: 14px;
     align-items: flex-start;
-    transition: opacity 200ms var(--ease-out), border-color 160ms var(--ease-out);
+    transition: opacity 200ms var(--ease-out), background-color 160ms var(--ease-out);
+  }
+
+  .part-card:last-child {
+    border-bottom: 0;
   }
 
   @media (hover: hover) and (pointer: fine) {
     .part-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(7, 6, 7, 0.06);
-      border-color: var(--line-3);
+      background: var(--canvas);
     }
   }
 
-  .part-card.part-a { border-left: 8px solid var(--sulfur); }
-  .part-card.part-b { border-left: 8px solid var(--accent); }
-  .part-card.part-c { border-left: 8px solid var(--ink); }
-  .part-card.part-d { border-left: 8px solid var(--line-3); }
+  .part-tag::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 8px;
+    border-radius: 50%;
+    vertical-align: 1px;
+    background: var(--line-3);
+  }
+
+  .part-card.part-a .part-tag::before { background: var(--sulfur); }
+  .part-card.part-b .part-tag::before { background: var(--accent); }
+  .part-card.part-c .part-tag::before { background: var(--ink); }
+  .part-card.part-d .part-tag::before { background: var(--line-3); }
 
   .part-card.completed {
     opacity: 0.72;
@@ -583,10 +601,8 @@
   }
 
   .part-tag {
-    font-size: 11px;
+    font-size: 14px;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
     color: var(--ink-78);
   }
 
@@ -605,10 +621,12 @@
   }
 
   .part-purpose {
-    font-size: 17px;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    font-size: 16px;
     font-weight: 700;
     color: var(--ink);
-    margin: 8px 0 6px;
+    line-height: 1.35;
+    margin: 5px 0 6px;
   }
 
   .part-desc {
@@ -664,13 +682,11 @@
   }
 
   .input-group label {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
-    color: var(--ink-62);
+    color: var(--ink);
     display: block;
     margin-bottom: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
   }
 
   .hours-group input {
@@ -762,12 +778,10 @@
   }
 
   .context-label {
-    font-size: 12px;
+    font-size: 14px;
     font-weight: 700;
-    color: var(--ink-55);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    color: var(--ink);
+    margin-bottom: 6px;
   }
 
   .project-title {
@@ -915,6 +929,33 @@
   }
 
   @media (max-width: 600px) {
+    .schedule-alert {
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      border-radius: 18px;
+      gap: 10px;
+    }
+    .alert-title {
+      font-size: 14px;
+      line-height: 1.25;
+    }
+    .alert-desc {
+      font-size: 12px;
+      line-height: 1.35;
+      margin-top: 3px;
+    }
+    .alert-actions {
+      width: 100%;
+      gap: 8px;
+    }
+    .alert-btn {
+      min-width: 0;
+      min-height: 44px;
+      flex: 1;
+      padding: 6px 10px;
+      font-size: 12px;
+      line-height: 1.25;
+    }
     .today-view {
       padding: 24px 18px 80px;
     }

@@ -472,11 +472,9 @@
 
   .interval-controls label {
     grid-column: 1 / -1;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
-    color: var(--ink-55);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    color: var(--ink);
   }
 
   .interval-controls select {
@@ -539,10 +537,10 @@
   }
 
   .parts-list {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    padding: 20px;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 2px 4px;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -550,22 +548,25 @@
   }
 
   .list-title {
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--ink-55);
-    margin-bottom: 4px;
+    color: var(--ink);
+    margin-bottom: 2px;
   }
 
   .part-item {
     display: flex;
-    gap: 12px;
-    padding: 10px 12px;
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    background: var(--canvas);
+    gap: 14px;
+    padding: 13px 2px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    border-radius: 0;
+    background: transparent;
     align-items: flex-start;
+  }
+
+  .part-item:last-of-type {
+    border-bottom: 0;
   }
 
   .part-item.done {
@@ -595,20 +596,20 @@
   }
 
   .part-name {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--ink);
   }
 
   .part-purpose {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--ink-72);
     margin-top: 2px;
   }
 
   .part-instructions {
-    font-size: 12px;
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: 1.55;
     color: var(--ink-72);
     margin-top: 5px;
   }

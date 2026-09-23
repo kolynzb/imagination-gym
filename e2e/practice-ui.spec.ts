@@ -90,11 +90,26 @@ test('Focus keeps an unsaved checkpoint retry visible without a conflict dialog'
   await expect(focusAlert).toHaveCount(0);
 });
 
-test('captures rendered desktop and phone Focus screens', async ({ page }) => {
+test('captures rendered desktop and phone Today and Focus screens', async ({ page }) => {
   const screenshotDir = resolve(process.cwd(), 'scratch/screenshots');
   await mkdir(screenshotDir, { recursive: true });
+  await page.clock.setFixedTime(new Date('2026-09-23T09:00:00.000Z'));
+  await page.setViewportSize({ width: 1440, height: 960 });
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Sign in with Google', exact: true })).toBeVisible();
+  await page.screenshot({ path: resolve(screenshotDir, 'practice-welcome-desktop.png') });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: resolve(screenshotDir, 'practice-welcome-phone.png') });
+
   await page.setViewportSize({ width: 1440, height: 960 });
   await startCourse(page);
+  await page.screenshot({ path: resolve(screenshotDir, 'practice-today-desktop.png') });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.screenshot({ path: resolve(screenshotDir, 'practice-today-phone.png') });
+  const phoneStart = await page.getByRole('button', { name: 'Start', exact: true }).boundingBox();
+  expect(phoneStart).not.toBeNull();
+  expect(phoneStart!.y + phoneStart!.height).toBeLessThanOrEqual(780);
+  await page.setViewportSize({ width: 1440, height: 960 });
   await page.getByRole('button', { name: 'Focus Mode', exact: true }).click();
   await expect(page.locator('.focus-modal')).toBeVisible();
   await page.screenshot({ path: resolve(screenshotDir, 'practice-focus-desktop.png') });
