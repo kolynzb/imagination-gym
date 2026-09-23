@@ -258,7 +258,7 @@
           <img src="/android-chrome-192x192.png" alt="Imagination Gym" class="brand-logo-img-sm" />
           <span class="sheet-title">Imagination Gym</span>
         </div>
-        <button type="button" class="close-btn" onclick={() => (mobileMenuOpen = false)}><Icon name="cancel" size={14} /></button>
+        <button type="button" class="close-btn" aria-label="Dismiss menu" onclick={() => (mobileMenuOpen = false)}><Icon name="cancel" size={14} /></button>
       </div>
       <div class="sheet-links">
         <button class="sheet-btn start-mobile-btn" onclick={() => { mobileMenuOpen = false; actions.openOnboarding(); }}>
@@ -716,6 +716,8 @@
     }
 
     .close-btn {
+      min-width: 44px;
+      min-height: 44px;
       background: transparent;
       border: 0;
       font-size: 20px;

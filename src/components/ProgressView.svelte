@@ -101,6 +101,8 @@
                   class:rest={dayNum === 7}
                   onclick={() => actions.jumpToDay(week.n, dayNum)}
                   title="W{week.n} D{dayNum}"
+                  aria-label="Week {week.n}, Day {dayNum}: {week.days[dayNum - 1]?.t || ''}{isDone ? ', complete' : ', incomplete'}"
+                  aria-current={isToday ? 'date' : undefined}
                 >
                   <span class="cell-num">{dayNum}</span>
                   {#if isDone}
@@ -146,9 +148,9 @@
           </div>
           <div class="c-bar"><div class="c-bar-fill" style="width: {pct}%"></div></div>
           <div class="c-buttons">
-            <button type="button" onclick={() => actions.bumpCounter(item.k, -1)}>−1</button>
-            <button type="button" onclick={() => actions.bumpCounter(item.k, 1)}>+1</button>
-            <button type="button" onclick={() => actions.bumpCounter(item.k, 5)}>+5</button>
+            <button type="button" aria-label="Subtract 1: {item.t}" onclick={() => actions.bumpCounter(item.k, -1)}>−1</button>
+            <button type="button" aria-label="Add 1: {item.t}" onclick={() => actions.bumpCounter(item.k, 1)}>+1</button>
+            <button type="button" aria-label="Add 5: {item.t}" onclick={() => actions.bumpCounter(item.k, 5)}>+5</button>
           </div>
         </div>
       {/each}

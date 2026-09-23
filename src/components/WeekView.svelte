@@ -99,7 +99,7 @@
               {#each day.parts as p}
                 <span class="part-chip part-{p.k.toLowerCase()}">{p.k}</span>
               {/each}
-              <span class="parts-count">{day.parts.length} parts</span>
+              <span class="parts-count">{day.parts.length} part{day.parts.length === 1 ? '' : 's'}</span>
             </div>
           </div>
 
@@ -432,6 +432,9 @@
   }
 
   .vid-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
     font-size: 13px;
     color: var(--accent-ink);
     text-decoration: none;
