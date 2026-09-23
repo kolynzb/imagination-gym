@@ -15,7 +15,7 @@ This is the current open-work list. Earlier QA reports are historical findings; 
 ## Verification gaps (not confirmed defects)
 
 - Separate physical-device sign-in and progress recovery.
-- Full video catalog availability: sampled embedded roadmap playback is proven, not all 30 videos.
+- Full-duration playback of every lesson and physical-device playback are not verified. All 30 catalog players now load; two unavailable videos were replaced and both replacements played in production. See video-catalog-qa-2026-09-23.md.
 
 ## Deferred work
 
@@ -39,3 +39,7 @@ Replaced memory-only authentication with verified Google-to-Convex Auth sessions
 Production backend deployed to `successful-iguana-581`; frontend commit `3ed74d0` pushed to GitHub and Vercel reported success. Real Google sign-in restored room `QA-PROD-20260923`, the exact existing production QA note, and paused timer `09:53`. Full reload and a fresh second tab both restored the authenticated course without another Google click. Explicit sign-out cleared both tabs; reloading remained signed out.
 
 Validation: 78 unit/backend tests, 21 browser regressions, clean Svelte/TypeScript checks and production build. Short-lived (30-second) development tokens exercised renewal; that temporary setting was removed. Account isolation, expiry, revocation and unsaved-draft conflict recovery have automated coverage. Separate physical-device coverage and the full video catalog remain open; opening illustrations remain deferred.
+
+### Video catalog closure — 2026-09-23
+
+Release `f27cc02` replaced two unavailable embeds and corrected Marco Bucci attribution in the Vault and curriculum. Vercel reported success. Both replacement videos started playback in the production app (Peter Han elapsed 0:01; Drawabox elapsed 0:03). All 30 catalog entries have player-load availability evidence; this does not claim every lesson was watched in full.
