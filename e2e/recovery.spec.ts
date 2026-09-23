@@ -64,4 +64,9 @@ test('new student completes onboarding and restores the chosen date', async ({ p
   await page.reload();
   await signIn(page);
   await expect(onboarding).toHaveCount(0);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: '⋯ Menu', exact: true }).click();
+  await page.getByRole('button', { name: 'Start Here (Course Orientation)', exact: true }).click();
+  await expect(onboarding).toBeVisible();
+  await expect(onboarding.getByRole('link', { name: 'Watch on YouTube ↗' })).toHaveAttribute('href', 'https://www.youtube.com/watch?v=zYzgxUVSpUc');
 });

@@ -76,6 +76,7 @@
             <div class="embed-info">
               <div class="embed-title">Giving away my entire drawing class</div>
               <div class="embed-desc">brokendraw · 43 min · The master roadmap video this entire curriculum is built from.</div>
+              <a class="video-fallback" href="https://www.youtube.com/watch?v=zYzgxUVSpUc" target="_blank" rel="noreferrer">Watch on YouTube ↗</a>
             </div>
           </div>
 
@@ -382,6 +383,16 @@
     font-size: 14px;
     color: var(--ink-62);
     margin-top: 4px;
+  }
+
+  .video-fallback {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: 8px;
+    color: var(--accent-ink);
+    font-weight: 600;
+    text-underline-offset: 3px;
   }
 
   .cards-triad {

@@ -677,6 +677,7 @@
     }
 
     .mobile-sheet {
+      position: relative;
       width: 100%;
       background: var(--canvas);
       border-radius: 24px 24px 0 0;
