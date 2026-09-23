@@ -63,7 +63,7 @@ Dark mode retains the same roles: canvas `#121211`, card `#1d1d1b`, ink `#eceae4
 
 Use `--font-display` for page and major section headings; `--font-body` for reading, controls and small instructional headings. Existing page titles commonly use 64px desktop and 44px phone; section titles use 28–36px. These are observed roles, not permission to invent intermediate sizes.
 
-Body copy should remain readable at 16px with approximately 1.5 line height. Compact metadata and controls currently vary between 11–15px. That variation is an audit backlog, not a newly approved universal scale. Do not turn essential instructions into tiny metadata. Timers retain their distinct large numerals.
+Body copy uses `--text-body` (16px) and `--leading-body` (1.5). Standard control text uses `--text-control` (14px). Compact metadata and controls currently vary between 11–15px. That variation is an audit backlog, not a newly approved universal scale. Do not turn essential instructions into tiny metadata. Timers retain their distinct large numerals.
 
 ## Layout
 

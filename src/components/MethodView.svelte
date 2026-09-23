@@ -283,9 +283,10 @@
   }
 
   .card-desc {
-    font-size: 13px;
+    font-size: var(--text-body);
     color: var(--ink-72);
     margin: 0;
+      line-height: var(--leading-body);
   }
 
   .date-input {
@@ -393,8 +394,8 @@
   }
 
   .kit-why {
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
     color: var(--ink-78);
     margin: 4px 0 0;
   }
@@ -427,13 +428,14 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    font-size: 13px;
+    font-size: var(--text-body);
     color: var(--ink-78);
+      line-height: var(--leading-body);
   }
 
   .scaffold-fix {
-    font-size: 12px;
-    line-height: 1.5;
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
     color: var(--accent-ink);
     border-top: 1px solid var(--line);
     padding-top: 8px;

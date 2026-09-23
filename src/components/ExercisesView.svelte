@@ -45,6 +45,7 @@
         <input
           type="text"
           class="search-input"
+          aria-label="Search exercises"
           placeholder="Search by drill, topic, or pitfall (e.g. cylinder, ghosting, box)..."
           bind:value={searchQuery}
         />
@@ -178,7 +179,8 @@
 
   .search-input {
     width: 100%;
-    padding: 12px 38px 12px 42px;
+    padding: 12px 48px 12px 42px;
+    min-height: 44px;
     border-radius: var(--radius-pill);
     background: var(--card);
     border: 1px solid var(--line);
@@ -196,7 +198,10 @@
 
   .clear-search-btn {
     position: absolute;
-    right: 12px;
+    right: 2px;
+    width: 44px;
+    height: 44px;
+    color: var(--ink);
     background: transparent;
     border: 0;
     cursor: pointer;
@@ -331,8 +336,8 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    font-size: 13px;
-    line-height: 1.45;
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
   }
 
   .item-line {
@@ -345,12 +350,13 @@
   }
 
   .open-drawer-btn {
+    min-height: 44px;
     appearance: none;
     background: transparent;
     border: 0;
     color: var(--accent-ink);
     border-bottom: 1px solid var(--accent-14);
-    font-size: 13px;
+    font-size: var(--text-control);
     font-weight: 600;
     cursor: pointer;
     align-self: flex-start;
