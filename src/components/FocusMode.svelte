@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { state, actions } from '../lib/store';
+  import { state, actions, cloudStatus, progressConflicts } from '../lib/store';
   import { WEEKS } from '../lib/curriculum';
   import Icon from './Icon.svelte';
 
@@ -8,6 +8,7 @@
 
   $: currentWeek = WEEKS[s.cw - 1];
   $: currentDay = currentWeek?.days[s.cd - 1];
+  $: allPartsDone = !!currentDay?.parts.length && currentDay.parts.every((_, i) => !!s.done[`w${s.cw}d${s.cd}p${i}`]);
 
   let refImage: string | null = null;
   let referenceError = '';
@@ -19,10 +20,37 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Escape') close();
-    if (e.code === 'Space' && (e.target as HTMLElement)?.tagName !== 'INPUT' && (e.target as HTMLElement)?.tagName !== 'TEXTAREA') {
+    if (e.key === 'Escape' && !s.activeExerciseDrawer) {
+      close();
+      return;
+    }
+    if (e.code !== 'Space' || e.repeat || e.ctrlKey || e.metaKey || e.altKey || s.activeExerciseDrawer) return;
+    if (!(e.target instanceof HTMLElement)) return;
+    const target = e.target;
+    if (!target.isContentEditable && !target.closest('button, input, textarea, select, a, [role="checkbox"]')) {
       e.preventDefault();
       actions.toggleTimer();
+    }
+  }
+
+  function selectPartInterval(index: number) {
+    const part = currentDay?.parts[index];
+    if (!part) return;
+    actions.selectTimerPart(index, part.m);
+  }
+
+  function selectNextInterval() {
+    if (!currentDay?.parts.length) return;
+    selectPartInterval(Math.min(s.timerPartIndex + 1, currentDay.parts.length - 1));
+  }
+
+  function completeSession() {
+    if (!currentDay) return;
+    if (allPartsDone) {
+      if (s.cw === 8 && s.cd === 7) actions.setView('progress');
+      else actions.stepDay(1);
+    } else {
+      actions.setAllDayParts(s.cw, s.cd, true);
     }
   }
 
@@ -82,9 +110,9 @@
     </button>
   </header>
 
-  <div class="focus-body">
+  <div class="focus-body" class:no-reference={!refImage}>
     <!-- Reference Drop Canvas -->
-    <div class="reference-slot">
+    <div class="reference-slot" class:empty={!refImage}>
       {#if refImage}
         <div class="img-wrapper">
           <img src={refImage} alt="Session Reference" />
@@ -109,6 +137,12 @@
 
     <!-- Timer & Checklist Rail -->
     <div class="focus-rail">
+      {#if $cloudStatus.status === 'error' && !$progressConflicts.length}
+        <div class="focus-sync-error" role="alert">
+          <span>{$cloudStatus.message}</span>
+          <button type="button" onclick={() => actions.syncToCloud()}>Retry save</button>
+        </div>
+      {/if}
       <div class="timer-card">
         <div class="timer-clock" class:running={s.timerRunning}>
           {displayTime}
@@ -141,6 +175,19 @@
             Reset
           </button>
         </div>
+        {#if currentDay?.parts.length}
+          <div class="interval-controls">
+            <label for="focus-interval">Timer interval</label>
+            <select id="focus-interval" value={s.timerPartIndex} onchange={(e) => selectPartInterval(Number((e.target as HTMLSelectElement).value))}>
+              {#each currentDay.parts as part, i}
+                <option value={i}>Part {part.k} · {part.t} {part.m > 0 ? `(${part.m}m)` : '(Stopwatch)'}</option>
+              {/each}
+            </select>
+            <button type="button" class="next-interval-btn" onclick={selectNextInterval} disabled={s.timerPartIndex >= currentDay.parts.length - 1}>
+              Next part interval →
+            </button>
+          </div>
+        {/if}
       </div>
 
       <!-- Quick Part Ticker -->
@@ -156,6 +203,9 @@
                 class="tick-box"
                 class:checked={isDone}
                 onclick={() => actions.togglePart(s.cw, s.cd, i)}
+                role="checkbox"
+                aria-checked={isDone}
+                aria-label={`Part ${part.k}: ${part.t} complete`}
               >
                 {#if isDone}
                   <Icon name="checkmark" size={13} />
@@ -166,9 +216,19 @@
                   Part {part.k} · {part.t} {part.m > 0 ? `(${part.m}m)` : ''}
                 </div>
                 <div class="part-purpose">{part.p}</div>
+                <div class="part-instructions">{part.d}</div>
               </div>
             </div>
           {/each}
+        {/if}
+        {#if currentDay}
+          <button type="button" class="complete-session-btn" class:all-done={allPartsDone} onclick={completeSession}>
+            {#if allPartsDone}
+              {s.cw === 8 && s.cd === 7 ? 'Review Your Progress →' : 'Go to Next Day →'}
+            {:else}
+              <Icon name="checkmark" size={14} /> Mark Session Complete
+            {/if}
+          </button>
         {/if}
       </div>
     </div>
@@ -235,6 +295,19 @@
     gap: 20px;
     padding: 20px 28px 28px;
     min-height: 0;
+  }
+
+  .focus-body.no-reference .reference-slot {
+    flex: 0 0 240px;
+    height: 260px;
+    align-self: center;
+    order: 2;
+  }
+
+  .focus-body.no-reference .focus-rail {
+    width: auto;
+    flex: 1;
+    order: 1;
   }
 
   .reference-slot {
@@ -337,6 +410,32 @@
     padding: 22px;
   }
 
+  .focus-sync-error {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--line-2);
+    border-radius: 14px;
+    background: var(--sulfur-band);
+    color: var(--ink);
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .focus-sync-error button {
+    flex: 0 0 auto;
+    border: 1px solid var(--ink);
+    border-radius: 800px;
+    background: transparent;
+    color: var(--ink);
+    padding: 6px 12px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
   .timer-clock {
     font-family: 'Bebas Neue', Impact, sans-serif;
     font-size: 76px;
@@ -361,6 +460,49 @@
     display: flex;
     gap: 8px;
     margin-top: 18px;
+  }
+
+  .interval-controls {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 7px 10px;
+    align-items: center;
+    margin-top: 16px;
+  }
+
+  .interval-controls label {
+    grid-column: 1 / -1;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-55);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .interval-controls select {
+    min-width: 0;
+    padding: 7px 9px;
+    border: 1px solid var(--line-2);
+    border-radius: 10px;
+    background: var(--canvas);
+    color: var(--ink);
+    font: inherit;
+    font-size: 12px;
+  }
+
+  .next-interval-btn {
+    border: 0;
+    background: transparent;
+    color: var(--ink-72);
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .next-interval-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 
   .control-btn {
@@ -464,16 +606,62 @@
     margin-top: 2px;
   }
 
+  .part-instructions {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--ink-72);
+    margin-top: 5px;
+  }
+
+  .complete-session-btn {
+    appearance: none;
+    width: 100%;
+    margin-top: auto;
+    border: 1.5px solid var(--accent);
+    border-radius: 800px;
+    background: var(--accent);
+    color: var(--on-accent);
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .complete-session-btn.all-done {
+    border-color: var(--ink);
+    background: transparent;
+    color: var(--ink);
+  }
+
   @media (max-width: 860px) {
     .focus-body {
       flex-direction: column;
+      overflow-y: auto;
     }
     .focus-rail {
       width: 100%;
       flex: none;
+      order: 1;
+      overflow-y: visible;
+    }
+    .focus-body.no-reference .focus-rail {
+      width: 100%;
+      flex: none;
+      order: 1;
     }
     .reference-slot {
       min-height: 260px;
+      order: 2;
+    }
+    .reference-slot.empty {
+      height: 112px;
+      min-height: 112px;
+      flex: 0 0 112px;
+    }
+    .focus-body.no-reference .reference-slot.empty {
+      height: 112px;
+      align-self: stretch;
+      order: 2;
     }
   }
 </style>

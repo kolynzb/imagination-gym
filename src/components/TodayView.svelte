@@ -198,7 +198,9 @@
                 class="part-checkbox"
                 class:checked={isDone}
                 onclick={() => actions.togglePart(s.cw, s.cd, i)}
-                aria-label="Toggle part completion"
+                role="checkbox"
+                aria-checked={isDone}
+                aria-label={`Part ${part.k}: ${part.t} complete`}
               >
                 {#if isDone}
                   <Icon name="checkmark" size={13} />
@@ -262,7 +264,7 @@
         </div>
       </div>
 
-      {#if notesError}<p role="alert">{notesError}</p>{/if}
+      {#if notesError}<p class="notes-error" role="alert">{notesError}</p>{/if}
       <!-- Action Buttons -->
       <div class="day-actions-bar">
         <button
@@ -892,6 +894,24 @@
       width: 100%;
       flex: none;
     }
+  }
+
+  @media (max-width: 860px) {
+    .day-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      align-items: stretch;
+    }
+    .day-main,
+    .day-sidebar {
+      display: contents;
+    }
+    :global(.timer-box) { order: 1; }
+    .parts-container { order: 2; }
+    .session-log-card { order: 3; }
+    .notes-error { order: 4; }
+    .day-actions-bar { order: 5; }
+    .week-context-card { order: 6; }
   }
 
   @media (max-width: 600px) {
