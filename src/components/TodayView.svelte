@@ -830,8 +830,8 @@
     gap: 16px;
     padding: 16px 20px;
     border-radius: 20px;
-    background: rgba(235, 94, 40, 0.08);
-    border: 1px solid rgba(235, 94, 40, 0.35);
+    background: var(--accent-14);
+    border: 1px solid var(--line-2);
     margin-bottom: 24px;
     animation: fadeIn 200ms var(--ease-out);
   }
@@ -862,7 +862,7 @@
   .join-crew-btn {
     appearance: none;
     background: var(--accent);
-    color: #fff;
+    color: var(--on-accent);
     border: 0;
     border-radius: 800px;
     font-size: 13px;

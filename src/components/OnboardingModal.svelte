@@ -275,7 +275,7 @@
     border-radius: 8px;
     object-fit: cover;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(252, 80, 0, 0.25);
+    border: 1px solid var(--line-2);
   }
 
   .ob-title {

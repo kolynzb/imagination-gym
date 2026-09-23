@@ -521,7 +521,7 @@
   .replay-guide-btn {
     appearance: none;
     background: var(--accent);
-    color: #fff;
+    color: var(--on-accent);
     border: 0;
     border-radius: 14px;
     padding: 12px 20px;

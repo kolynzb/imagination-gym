@@ -363,7 +363,7 @@
   }
 
   .drop-error {
-    color: var(--danger, #9d2b2b);
+    color: var(--danger);
     font-size: 13px;
     margin-top: 12px;
   }

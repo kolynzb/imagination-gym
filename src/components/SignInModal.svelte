@@ -167,7 +167,7 @@
   }
 
   .account-name { font-weight: 700; overflow-wrap: anywhere; }
-  .error { color: var(--danger, #9d2b2b); }
+  .error { color: var(--danger); }
   .google-slot-wrap { display: flex; justify-content: center; min-height: 42px; }
   .action-buttons { display: flex; gap: 12px; }
   .action-buttons button {

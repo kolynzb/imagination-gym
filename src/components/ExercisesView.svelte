@@ -191,7 +191,7 @@
 
   .search-input:focus {
     border-color: var(--ink);
-    box-shadow: 0 0 0 2px var(--line-active);
+    box-shadow: 0 0 0 2px var(--accent);
   }
 
   .clear-search-btn {
@@ -234,7 +234,7 @@
 
   .filter-btn:hover {
     color: var(--ink);
-    border-color: var(--ink-22);
+    border-color: var(--line-2);
   }
 
   .filter-btn.active {
@@ -264,7 +264,7 @@
   @media (hover: hover) and (pointer: fine) {
     .exercise-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px var(--shadow-sm);
+      box-shadow: 0 8px 24px var(--track);
     }
   }
 

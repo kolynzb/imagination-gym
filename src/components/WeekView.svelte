@@ -384,7 +384,7 @@
   }
 
   .day-row.is-complete .status-marker {
-    color: #107c41;
+    color: var(--success);
     font-weight: 700;
   }
 

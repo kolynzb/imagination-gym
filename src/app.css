@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light;
   --canvas: #e2e2df;
   --card: #f7f6f2;
   --ink: #070607;
@@ -16,6 +17,9 @@
   --ink-72: rgba(7, 6, 7, 0.72);
   --ink-68: rgba(7, 6, 7, 0.68);
   --ink-62: rgba(7, 6, 7, 0.66);
+  --ink-55: rgba(7, 6, 7, 0.64);
+  --danger: #9d2b2b;
+  --success: #107c41;
   --ink-42: rgba(7, 6, 7, 0.62);
   --ink-35: rgba(7, 6, 7, 0.62);
 
@@ -26,6 +30,7 @@
 }
 
 html[data-theme="dark"] {
+  color-scheme: dark;
   --canvas: #121211;
   --card: #1d1d1b;
   --ink: #eceae4;
@@ -43,6 +48,8 @@ html[data-theme="dark"] {
   --ink-72: rgba(236, 234, 228, 0.74);
   --ink-68: rgba(236, 234, 228, 0.70);
   --ink-62: rgba(236, 234, 228, 0.70);
+  --danger: #ffb4a9;
+  --success: #91d7ad;
   --ink-55: rgba(236, 234, 228, 0.68);
   --ink-42: rgba(236, 234, 228, 0.62);
   --ink-35: rgba(236, 234, 228, 0.60);
@@ -157,4 +164,3 @@ button:not(:disabled):active {
     scroll-behavior: auto !important;
   }
 }
-

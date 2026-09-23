@@ -197,8 +197,8 @@
   }
 
   .pitfall-box {
-    background: rgba(252, 80, 0, 0.06);
-    border: 1px solid rgba(252, 80, 0, 0.2);
+    background: var(--accent-14);
+    border: 1px solid var(--line-2);
     padding: 14px 16px;
   }
 

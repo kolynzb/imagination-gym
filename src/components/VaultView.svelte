@@ -178,7 +178,7 @@
 
   .search-input:focus {
     border-color: var(--ink);
-    box-shadow: 0 0 0 2px var(--line-active);
+    box-shadow: 0 0 0 2px var(--accent);
   }
 
   .clear-search-btn {
@@ -228,7 +228,7 @@
     font-family: 'DM Sans', sans-serif;
     font-size: 14px;
     font-weight: 500;
-    color: var(--ink-44);
+    color: var(--ink-42);
   }
 
   .videos-grid {
@@ -250,7 +250,7 @@
   @media (hover: hover) and (pointer: fine) {
     .video-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 24px var(--shadow-sm);
+      box-shadow: 0 8px 24px var(--track);
     }
   }
 
