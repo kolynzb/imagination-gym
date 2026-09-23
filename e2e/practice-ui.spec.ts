@@ -117,3 +117,17 @@ test('captures rendered desktop and phone Today and Focus screens', async ({ pag
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: resolve(screenshotDir, 'practice-focus-phone.png') });
 });
+
+test('exercise drawer isolates the background and restores keyboard focus', async ({ page }) => {
+  await startCourse(page);
+  const opener = page.getByRole('button', { name: 'Ex 01 Drawer ↗', exact: true });
+  await opener.click();
+  const drawer = page.getByRole('dialog', { name: 'Exercise details' });
+  await expect(drawer.locator('.close-btn')).toBeFocused();
+  await expect(page.locator('main')).toHaveAttribute('inert', '');
+  await expect(page.locator('.navigation-wrapper')).toHaveAttribute('inert', '');
+  await page.keyboard.press('Escape');
+  await expect(drawer).toHaveCount(0);
+  await expect(opener).toBeFocused();
+  await expect(page.locator('main')).not.toHaveAttribute('inert', '');
+});

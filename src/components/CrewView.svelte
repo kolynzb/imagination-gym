@@ -311,6 +311,57 @@
 </div>
 
 <style>
+  .crew-share-bar, .share-actions-group, .room-summary-chip {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .crew-share-bar {
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .room-tag-label {
+    color: var(--ink-62);
+    font-size: 13px;
+  }
+
+  .room-tag-value {
+    color: var(--ink);
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .action-chip-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 1px solid var(--line-2);
+    border-radius: 14px;
+    background: var(--card);
+    color: var(--ink);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .action-chip-btn.highlight {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .action-chip-btn:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+
   .crew-view {
     padding: 36px 44px 80px;
     max-width: 1100px;

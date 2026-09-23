@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { state, actions } from '../lib/store';
   import { EXERCISES, type Exercise } from '../lib/curriculum';
   import Icon from './Icon.svelte';
@@ -11,6 +12,18 @@
 
   function close() {
     actions.closeExerciseDrawer();
+  }
+
+  function focusDrawer(node: HTMLElement) {
+    const previous = document.activeElement;
+    void tick().then(() => node.focus());
+    return {
+      destroy() {
+        void tick().then(() => {
+          if (previous instanceof HTMLElement && previous.isConnected) previous.focus();
+        });
+      },
+    };
   }
 
   function handleKeydown(e: KeyboardEvent) {
@@ -30,7 +43,7 @@
           <span class="ex-page">Companion Book p.{exercise.p}</span>
           <span class="ex-level">Level {exercise.lvl}</span>
         </div>
-        <button type="button" class="close-btn" onclick={close} aria-label="Close drawer"><Icon name="cancel" size={16} /></button>
+        <button type="button" class="close-btn" use:focusDrawer onclick={close} aria-label="Close drawer"><Icon name="cancel" size={16} /></button>
       </div>
 
       <h2 class="ex-title">{exercise.name}</h2>
@@ -93,6 +106,7 @@
   }
 
   .drawer-content {
+    position: relative;
     width: 100%;
     max-width: 440px;
     height: 100%;
@@ -140,6 +154,9 @@
   }
 
   .close-btn {
+    min-width: 44px;
+    min-height: 44px;
+    flex-shrink: 0;
     background: transparent;
     border: 0;
     font-size: 20px;

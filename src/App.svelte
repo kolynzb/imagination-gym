@@ -51,9 +51,9 @@
 
 <div class="app-layout" inert={s.isSignedIn && $progressConflicts.length > 0}>
   {#if s.isSignedIn}
-  <div class="navigation-wrapper" inert={s.focus || s.onboardingOpen || s.authModalOpen}><Navigation /></div>
+  <div class="navigation-wrapper" inert={s.focus || s.onboardingOpen || s.authModalOpen || !!s.activeExerciseDrawer}><Navigation /></div>
 
-  <main class="main-content" inert={s.focus || s.onboardingOpen || s.authModalOpen}>
+  <main class="main-content" inert={s.focus || s.onboardingOpen || s.authModalOpen || !!s.activeExerciseDrawer}>
     {#if $cloudStatus.status === 'error'}
       <div class="sync-notice" role="alert">
         {$cloudStatus.message}
