@@ -2,10 +2,12 @@ import { writable, derived, get } from 'svelte/store';
 import { WEEKS, type Week, type Day, type DayPart } from './curriculum';
 import { playChime, playBlip } from './audio';
 import { api, clearCloudAuth, convex } from './convex';
+import { mergeProgress, resolveProgressConflict, conflictValue, type ProgressConflict } from './mergeProgress';
 import { calendarDayIndex, formatLocalDate, getMondayOf as localMondayOf, shiftLocalDate, parseLocalDate } from './dates';
-import { parseCloudProgress, serializeProgress } from './progress';
+import { parseCloudProgress, serializeProgress, type TimerProgress, type Progress } from './progress';
 
 export interface AppState {
+  timer?: TimerProgress;
   view: 'today' | 'week' | 'roadmap' | 'exercises' | 'vault' | 'progress' | 'crew' | 'method';
   cw: number; // Current week 1..8
   cd: number; // Current day 1..7
@@ -71,8 +73,78 @@ export function getMondayOf(d: Date): Date {
 }
 
 export const state = writable<AppState>(getInitialState());
+function timerCheckpoint(s: AppState): TimerProgress | undefined {
+  const initial = sessionTimer(s.cw, s.cd);
+  if (!s.timerRunning && s.timerElapsed === 0 && s.timerPartIndex === 0 && s.timerRemaining === initial.timerRemaining && s.timerMode === initial.timerMode) return undefined;
+  return { timerMode: s.timerMode, timerPartIndex: s.timerPartIndex, timerTargetSeconds: s.timerTargetSeconds,
+    timerRemaining: s.timerRemaining, timerRunning: s.timerRunning, timerElapsed: s.timerElapsed, timerStartedAt: s.timerStartedAt };
+}
+
+function updateState(change: (s: AppState) => AppState) {
+  state.update(s => {
+    const next = change(s);
+    return { ...next, timer: timerCheckpoint(next) };
+  });
+}
+
+function restoredTimer(progress: { cw: number; cd: number; timer?: TimerProgress }): TimerProgress {
+  if (!progress.timer) return sessionTimer(progress.cw, progress.cd);
+  const restored = settleTimer({ ...getInitialState(), ...progress, ...progress.timer });
+  // Resume explicitly after recovery, so an unattended stopwatch cannot run forever.
+  return { ...progress.timer, timerElapsed: restored.timerElapsed, timerRemaining: restored.timerRemaining,
+    timerRunning: false, timerStartedAt: null };
+}
+
 export const cloudStatus = writable<{ status: 'idle' | 'syncing' | 'synced' | 'error'; message: string }>({ status: 'idle', message: '' });
 export const savePending = writable(false);
+export const progressConflicts = writable<ProgressConflict[]>([]);
+let conflictProgress: Progress | null = null;
+
+function conflictPayload(error: unknown): { progressVersion: number; doneJson: string } | null {
+  if (!error || typeof error !== 'object' || !('data' in error)) return null;
+  const data = error.data;
+  if (!data || typeof data !== 'object' || !('code' in data) || data.code !== 'PROGRESS_CONFLICT' ||
+    !('progressVersion' in data) || typeof data.progressVersion !== 'number' ||
+    !Number.isInteger(data.progressVersion) || data.progressVersion < 0 ||
+    !('doneJson' in data) || typeof data.doneJson !== 'string') return null;
+  return { progressVersion: data.progressVersion, doneJson: data.doneJson };
+}
+
+function applyProgress(progress: Progress) {
+  updateState(s => ({ ...s, ...progress, timer: progress.timer, ...restoredTimer(progress) }));
+}
+
+function reconcileProgress(remoteJson: string, version: number, draft?: Progress, unresolved: ProgressConflict[] = []): boolean {
+  const current = get(state);
+  const remote = parseCloudProgress(JSON.parse(remoteJson), current);
+  const base = lastSavedJson ? parseCloudProgress(JSON.parse(lastSavedJson), current) : serializeProgress(getInitialState());
+  // Freeze the local timer before showing choices; no edits can race the dialog.
+  updateState(s => ({ ...settleTimer(s), timerRunning: false, timerStartedAt: null }));
+  const local = draft || serializeProgress(get(state));
+  const merged = mergeProgress(base, local, remote);
+  for (const previous of unresolved) {
+    if (merged.conflicts.some(item => item.path === previous.path)) continue;
+    const localValue = conflictValue(local, previous.path);
+    const remoteValue = conflictValue(remote, previous.path);
+    if (JSON.stringify(localValue) !== JSON.stringify(remoteValue)) {
+      merged.conflicts.push({ path: previous.path, local: localValue, remote: remoteValue });
+    }
+  }
+  cloudVersion = version;
+  lastSavedJson = JSON.stringify(remote);
+  if (merged.conflicts.length) {
+    conflictProgress = merged.progress;
+    progressConflicts.set(merged.conflicts);
+    cloudStatus.set({ status: 'error', message: 'Another device changed the same progress. Choose which version to keep.' });
+    savePending.set(true);
+    return false;
+  }
+  conflictProgress = null;
+  progressConflicts.set([]);
+  applyProgress(merged.progress);
+  return true;
+}
+
 let authAttempt = 0;
 let cloudVersion = 0;
 let activeMemberId: string | null = null;
@@ -84,7 +156,7 @@ let cloudRestoreComplete = false;
 
 state.subscribe((s) => {
   if (typeof document !== 'undefined') document.documentElement.setAttribute('data-theme', s.theme);
-  if (!s.isSignedIn || !cloudRestoreComplete) return;
+  if (!s.isSignedIn || !cloudRestoreComplete || get(progressConflicts).length) return;
   const json = JSON.stringify(serializeProgress(s));
   savePending.set(json !== lastSavedJson);
   if (json === lastObservedJson) return;
@@ -104,7 +176,7 @@ function settleTimer(s: AppState, now = Date.now()): AppState {
   if (finished) playChime(528, 3.5);
   return {
     ...s,
-    timerElapsed: s.timerElapsed + counted,
+    timerElapsed: Math.min(86400, s.timerElapsed + counted),
     timerRemaining: remaining,
     timerRunning: !finished,
     timerStartedAt: finished ? null : now,
@@ -137,34 +209,37 @@ let timerInterval: ReturnType<typeof setInterval> | null = null;
 
 if (typeof window !== 'undefined') {
   timerInterval = setInterval(() => {
-    if (get(state).timerRunning) state.update((s) => settleTimer(s));
+    if (get(state).timerRunning) state.update(s => {
+      const next = settleTimer(s);
+      return next.timerRunning ? next : { ...next, timer: timerCheckpoint(next) };
+    });
   }, 1000);
 }
 
 // State Action Methods
 export const actions = {
   setView(view: AppState['view']) {
-    state.update((s) => ({ ...s, view, focus: false }));
+    updateState((s) => ({ ...s, view, focus: false }));
   },
 
   setTheme(theme: 'light' | 'dark') {
-    state.update((s) => ({ ...s, theme }));
+    updateState((s) => ({ ...s, theme }));
   },
 
   setStartDate(start: string) {
     if (!start) return;
     parseLocalDate(start);
-    state.update((s) => ({ ...s, start }));
+    updateState((s) => ({ ...s, start }));
   },
 
   setPaceFlex(paceFlex: boolean) {
-    state.update((s) => ({ ...s, paceFlex }));
+    updateState((s) => ({ ...s, paceFlex }));
   },
 
   async setRoomCode(roomCode: string) {
     const s = get(state);
     if (!s.isSignedIn) return;
-    state.update(current => creditTimer(current));
+    updateState(current => creditTimer(current));
     if (get(savePending) && !await actions.syncToCloud()) return;
     if (get(savePending)) return;
     try { await actions.signIn(s.userName, roomCode); }
@@ -176,34 +251,34 @@ export const actions = {
     if (!s.isSignedIn || !convex || !userName.trim()) return;
     try {
       const result = await convex.mutation(api.crew.signInOrRegister, { roomCode: s.roomCode, name: userName.trim() });
-      state.update((current) => ({ ...current, userName: result.member.name }));
+      updateState((current) => ({ ...current, userName: result.member.name }));
     } catch {
       cloudStatus.set({ status: 'error', message: 'Your name could not be updated. Try again.' });
     }
   },
 
   openExerciseDrawer(exerciseNum: string) {
-    state.update((s) => ({ ...s, activeExerciseDrawer: exerciseNum }));
+    updateState((s) => ({ ...s, activeExerciseDrawer: exerciseNum }));
   },
 
   closeExerciseDrawer() {
-    state.update((s) => ({ ...s, activeExerciseDrawer: null }));
+    updateState((s) => ({ ...s, activeExerciseDrawer: null }));
   },
 
   setFocus(focus: boolean) {
-    state.update((s) => ({ ...s, focus }));
+    updateState((s) => ({ ...s, focus }));
   },
 
   jumpToDay(cw: number, cd: number) {
     if (!Number.isFinite(cw) || !Number.isFinite(cd)) return;
     const week = Math.min(8, Math.max(1, Math.trunc(cw)));
     const day = Math.min(7, Math.max(1, Math.trunc(cd)));
-    state.update((s) => ({ ...navigateDay(s, week, day), view: 'today' }));
+    updateState((s) => ({ ...navigateDay(s, week, day), view: 'today' }));
   },
 
   stepDay(delta: number) {
     if (!Number.isFinite(delta)) return;
-    state.update((s) => {
+    updateState((s) => {
       const index = Math.min(55, Math.max(0, (s.cw - 1) * 7 + s.cd - 1 + Math.trunc(delta)));
       return navigateDay(s, Math.floor(index / 7) + 1, index % 7 + 1);
     });
@@ -211,7 +286,7 @@ export const actions = {
 
   togglePart(cw: number, cd: number, partIndex: number) {
     if (!WEEKS[cw - 1]?.days[cd - 1]?.parts[partIndex]) return;
-    state.update((s) => {
+    updateState((s) => {
       const key = `w${cw}d${cd}p${partIndex}`;
       const done = { ...s.done, [key]: !s.done[key] };
       return { ...s, done };
@@ -220,7 +295,7 @@ export const actions = {
 
   setPartDone(cw: number, cd: number, partIndex: number, isDone: boolean) {
     if (!WEEKS[cw - 1]?.days[cd - 1]?.parts[partIndex]) return;
-    state.update((s) => {
+    updateState((s) => {
       const key = `w${cw}d${cd}p${partIndex}`;
       const done = { ...s.done, [key]: isDone };
       return { ...s, done };
@@ -228,7 +303,7 @@ export const actions = {
   },
 
   setAllDayParts(cw: number, cd: number, isDone: boolean) {
-    state.update((s) => {
+    updateState((s) => {
       const week = WEEKS[cw - 1];
       if (!week) return s;
       const day = week.days[cd - 1];
@@ -247,35 +322,35 @@ export const actions = {
   setDayHours(cw: number, cd: number, hours: string) {
     if (hours !== '' && (!Number.isFinite(Number(hours)) || Number(hours) < 0 || Number(hours) > 24)) return;
     hours = hours.trim() === '' ? '' : String(Number(hours));
-    state.update((s) => {
+    updateState((s) => {
       const dayHours = { ...s.dayHours, [`w${cw}d${cd}`]: hours };
       return { ...s, dayHours };
     });
   },
 
   setDayNote(cw: number, cd: number, note: string) {
-    state.update((s) => {
+    updateState((s) => {
       const dayNotes = { ...s.dayNotes, [`w${cw}d${cd}`]: note };
       return { ...s, dayNotes };
     });
   },
 
   setWeekNote(weekNum: number, note: string) {
-    state.update((s) => {
+    updateState((s) => {
       const weekNotes = { ...s.weekNotes, [weekNum]: note };
       return { ...s, weekNotes };
     });
   },
 
   toggleMilestone(key: string) {
-    state.update((s) => {
+    updateState((s) => {
       const ms = { ...s.ms, [key]: !s.ms[key] };
       return { ...s, ms };
     });
   },
 
   bumpCounter(key: string, delta: number) {
-    state.update((s) => {
+    updateState((s) => {
       const counters = {
         ...s.counters,
         [key]: Math.max(0, (s.counters[key] || 0) + delta)
@@ -287,7 +362,7 @@ export const actions = {
   // Each interval has its own remaining time; elapsed time is unlogged session time.
   selectTimerPart(partIndex: number, minutes: number) {
     if (!Number.isInteger(partIndex) || partIndex < 0 || !Number.isFinite(minutes) || minutes < 0) return;
-    state.update((s) => ({
+    updateState((s) => ({
       ...settleTimer(s),
       timerMode: minutes > 0 ? 'countdown' : 'stopwatch',
       timerPartIndex: partIndex,
@@ -303,7 +378,7 @@ export const actions = {
   },
 
   toggleTimer() {
-    state.update((s) => {
+    updateState((s) => {
       const settled = settleTimer(s);
       const nextRun = !settled.timerRunning;
       playBlip(nextRun ? 660 : 440);
@@ -318,30 +393,30 @@ export const actions = {
   },
 
   resetTimer() {
-    state.update((s) => ({
+    updateState((s) => ({
       ...s, timerRunning: false, timerElapsed: 0,
       timerRemaining: s.timerTargetSeconds, timerStartedAt: null,
     }));
   },
 
   logTimerElapsed(cw: number, cd: number) {
-    state.update((s) => cw === s.cw && cd === s.cd ? creditTimer(s) : s);
+    updateState((s) => cw === s.cw && cd === s.cd ? creditTimer(s) : s);
   },
 
   // Schedule Shift (move start date by N missed days)
   shiftSchedule(daysToShift: number) {
-    state.update((s) => {
+    updateState((s) => {
       return { ...s, start: shiftLocalDate(s.start, daysToShift) };
     });
   },
 
   // Onboarding Actions
   openOnboarding() {
-    state.update((s) => ({ ...s, onboardingOpen: true, onboardingStep: 1 }));
+    updateState((s) => ({ ...s, onboardingOpen: true, onboardingStep: 1 }));
   },
 
   closeOnboarding() {
-    state.update((s) => ({
+    updateState((s) => ({
       ...s,
       onboardingOpen: false,
       onboarded: true,
@@ -350,11 +425,11 @@ export const actions = {
   },
 
   setOnboardingStep(step: 1 | 2 | 3) {
-    state.update((s) => ({ ...s, onboardingStep: step }));
+    updateState((s) => ({ ...s, onboardingStep: step }));
   },
 
   toggleKitItem(itemId: string) {
-    state.update((s) => ({
+    updateState((s) => ({
       ...s,
       kitChecked: { ...s.kitChecked, [itemId]: !s.kitChecked[itemId] }
     }));
@@ -362,43 +437,84 @@ export const actions = {
 
   // Auth / Sign In Actions
   openAuthModal() {
-    state.update((s) => ({ ...s, authModalOpen: true }));
+    updateState((s) => ({ ...s, authModalOpen: true }));
   },
 
   closeAuthModal() {
-    state.update((s) => ({ ...s, authModalOpen: false }));
+    updateState((s) => ({ ...s, authModalOpen: false }));
   },
 
   async syncToCloud() {
-    const s = get(state);
     const client = convex;
-    if (!s.isSignedIn || !client || !cloudRestoreComplete) return false;
+    if (!get(state).isSignedIn || !client || !cloudRestoreComplete || get(progressConflicts).length) return false;
     const attempt = authAttempt;
-    const stats = get(derivedStats);
-    const payload = {
-      roomCode: s.roomCode, week: s.cw, day: s.cd,
-      hours: Number(stats.totalHoursNum), streak: stats.streak,
-      doneJson: JSON.stringify(serializeProgress(s)),
-    };
     cloudSyncQueue = cloudSyncQueue.then(async () => {
-      if (attempt !== authAttempt || !cloudRestoreComplete) return false;
-      if (payload.doneJson === lastSavedJson) return true;
-      cloudStatus.set({ status: 'syncing', message: 'Saving...' });
-      try {
-        const version = await client.mutation(api.crew.syncProgress, { ...payload, expectedVersion: cloudVersion });
-        if (attempt === authAttempt) {
+      for (let retry = 0; retry < 2; retry++) {
+        if (attempt !== authAttempt || !cloudRestoreComplete || get(progressConflicts).length) return false;
+        const s = get(state);
+        const stats = get(derivedStats);
+        const doneJson = JSON.stringify(serializeProgress(s));
+        if (doneJson === lastSavedJson) {
+          savePending.set(false);
+          cloudStatus.set({ status: 'synced', message: 'Saved' });
+          return true;
+        }
+        cloudStatus.set({ status: 'syncing', message: 'Saving...' });
+        try {
+          const version = await client.mutation(api.crew.syncProgress, {
+            roomCode: s.roomCode, week: s.cw, day: s.cd,
+            hours: Number(stats.totalHoursNum), streak: stats.streak, doneJson, expectedVersion: cloudVersion,
+          });
+          if (attempt !== authAttempt) return false;
           cloudVersion = version;
-          lastSavedJson = payload.doneJson;
+          lastSavedJson = doneJson;
           savePending.set(JSON.stringify(serializeProgress(get(state))) !== lastSavedJson);
           cloudStatus.set({ status: 'synced', message: 'Saved' });
+          return true;
+        } catch (error) {
+          if (attempt !== authAttempt) return false;
+          const conflict = conflictPayload(error);
+          if (conflict) {
+            try {
+              if (!reconcileProgress(conflict.doneJson, conflict.progressVersion)) return false;
+              continue;
+            } catch {
+              cloudStatus.set({ status: 'error', message: 'The saved course could not be read. Your edits are still here. Keep this tab open and retry.' });
+              return false;
+            }
+          }
+          cloudStatus.set({ status: 'error', message: 'Your changes have not saved. Keep this tab open and retry.' });
+          return false;
         }
-        return true;
-      } catch {
-        if (attempt === authAttempt) cloudStatus.set({ status: 'error', message: 'Your changes have not saved. Keep this tab open and retry.' });
-        return false;
       }
+      cloudStatus.set({ status: 'error', message: 'Another device is still saving. Your edits are safe in this tab. Retry when it finishes.' });
+      return false;
     });
     return cloudSyncQueue;
+  },
+
+  conflictDrafts() {
+    return { local: serializeProgress(get(state)), merged: conflictProgress,
+      remote: lastSavedJson ? JSON.parse(lastSavedJson) as Progress : null, conflicts: get(progressConflicts) };
+  },
+
+  async resolveConflict(path: string, choice: 'local' | 'remote') {
+    const conflicts = get(progressConflicts);
+    const conflict = conflicts.find(item => item.path === path);
+    if (!conflict || !conflictProgress || !get(state).isSignedIn) return;
+    conflictProgress = resolveProgressConflict(conflictProgress, conflict, choice);
+    const remaining = conflicts.filter(item => item.path !== path);
+    if (remaining.length) {
+      progressConflicts.set(remaining);
+      return;
+    }
+    const progress = conflictProgress;
+    conflictProgress = null;
+    // Apply before clearing the dialog, so subscriptions cannot enqueue an old draft.
+    applyProgress(progress);
+    progressConflicts.set([]);
+    savePending.set(JSON.stringify(serializeProgress(get(state))) !== lastSavedJson);
+    await actions.syncToCloud();
   },
 
   async copyInviteLink(roomCode?: string): Promise<string> {
@@ -419,7 +535,7 @@ export const actions = {
   },
 
   dismissInviteBanner() {
-    state.update((s) => ({ ...s, inviteBannerDismissed: true }));
+    updateState((s) => ({ ...s, inviteBannerDismissed: true }));
   },
 
   acceptInvite(roomCode: string) {
@@ -429,7 +545,7 @@ export const actions = {
       void actions.setRoomCode(cleanRoom);
       return;
     }
-    state.update((s) => ({
+    updateState((s) => ({
       ...s,
       roomCode: cleanRoom,
       invitedRoomCode: null,
@@ -446,31 +562,37 @@ export const actions = {
     const attempt = ++authAttempt;
     cloudRestoreComplete = false;
     if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
-    state.update((s) => ({ ...creditTimer(s), timerRunning: false, timerStartedAt: null, isSignedIn: false }));
+    updateState((s) => ({ ...creditTimer(s), timerRunning: false, timerStartedAt: null, isSignedIn: false }));
     cloudStatus.set({ status: 'syncing', message: 'Opening your course...' });
     try {
       const result = await convex.mutation(api.crew.signInOrRegister, { name: cleanName, ...(cleanRoom ? { roomCode: cleanRoom } : {}) });
       if (attempt !== authAttempt) return;
       if (activeMemberId && activeMemberId !== result.member._id && get(savePending)) throw new Error('Sign back into your previous account to save your changes before switching accounts.');
       const pending = activeMemberId === result.member._id && get(savePending);
-      if (pending && result.member.progressVersion !== cloudVersion) throw new Error('Your course changed on another device. Keep this tab open so your unsaved changes are not lost.');
+      const changedRemotely = pending && result.member.progressVersion !== cloudVersion;
       const initial = getInitialState();
       const restored = result.member.doneJson ? parseCloudProgress(JSON.parse(result.member.doneJson), {
         start: initial.start, cw: result.member.week, cd: result.member.day,
       }) : null;
-      const progress = pending ? serializeProgress(get(state)) : restored || serializeProgress(initial);
+      const progress = pending ? conflictProgress || serializeProgress(get(state)) : restored || serializeProgress(initial);
       activeMemberId = result.member._id;
-      cloudVersion = result.member.progressVersion;
-      lastSavedJson = restored ? JSON.stringify(restored) : '';
+      if (!changedRemotely) {
+        cloudVersion = result.member.progressVersion;
+        lastSavedJson = restored ? JSON.stringify(restored) : '';
+      }
       lastObservedJson = JSON.stringify(progress);
-      state.update((s) => ({
+      updateState((s) => ({
         ...s, ...progress, userName: result.member.name, roomCode: result.member.roomCode,
         isSignedIn: true, authModalOpen: false,
         onboardingOpen: !progress.onboarded,
         invitedRoomCode: null, inviteBannerDismissed: true, userEmail: null,
-        userAvatar: result.member.avatarUrl || null, ...sessionTimer(progress.cw, progress.cd),
+        userAvatar: result.member.avatarUrl || null, ...restoredTimer(progress),
       }));
       cloudRestoreComplete = true;
+      const unresolved = get(progressConflicts);
+      if (pending && (changedRemotely || unresolved.length) &&
+        !reconcileProgress(result.member.doneJson || '', result.member.progressVersion, progress, unresolved)) return;
+      lastObservedJson = JSON.stringify(serializeProgress(get(state)));
       savePending.set(lastObservedJson !== lastSavedJson);
       if (get(savePending)) {
         if (!await actions.syncToCloud()) throw new Error('Your course could not be saved. Please retry.');
@@ -479,7 +601,7 @@ export const actions = {
       if (attempt === authAttempt) {
         cloudRestoreComplete = false;
         clearCloudAuth();
-        state.update((s) => ({ ...s, isSignedIn: false, authModalOpen: true }));
+        updateState((s) => ({ ...s, isSignedIn: false, authModalOpen: true }));
         cloudStatus.set({ status: 'error', message: error instanceof Error ? error.message : 'Sign-in failed. Please try again.' });
       }
       throw error;
@@ -491,20 +613,22 @@ export const actions = {
     authAttempt++;
     cloudRestoreComplete = false;
     if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
-    state.update((s) => ({ ...creditTimer(s), timerRunning: false, timerStartedAt: null, isSignedIn: false, authModalOpen: true }));
+    updateState((s) => ({ ...creditTimer(s), timerRunning: false, timerStartedAt: null, isSignedIn: false, authModalOpen: true }));
     savePending.set(JSON.stringify(serializeProgress(get(state))) !== lastSavedJson);
     clearCloudAuth();
     cloudStatus.set({ status: 'error', message: 'Sign in again to continue.' });
   },
 
   async signOut() {
-    if (get(state).isSignedIn) state.update(s => creditTimer(s));
+    if (get(state).isSignedIn) updateState(s => creditTimer(s));
     if (get(savePending) && !await actions.syncToCloud()) return false;
     if (get(savePending)) return false;
     authAttempt++;
     cloudRestoreComplete = false;
     if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
     activeMemberId = null;
+    progressConflicts.set([]);
+    conflictProgress = null;
     lastSavedJson = '';
     lastObservedJson = '';
     state.set(getInitialState());

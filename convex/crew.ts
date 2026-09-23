@@ -1,7 +1,7 @@
 import { internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import type { Doc } from "./_generated/dataModel";
-import { v } from "convex/values";
+import { v, ConvexError } from "convex/values";
 import { parseProgress } from "../src/lib/progress";
 
 export const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -155,7 +155,7 @@ export const syncProgress = mutation({
     const code = roomCode(args.roomCode);
     const { member } = await requireMember(ctx, code);
     if (!Number.isInteger(args.week) || args.week < 1 || args.week > 8 || !Number.isInteger(args.day) || args.day < 1 || args.day > 7 || !Number.isFinite(args.hours) || args.hours < 0 || !Number.isFinite(args.streak) || args.streak < 0) throw new Error("Invalid progress values");
-    if (!Number.isInteger(args.expectedVersion) || args.expectedVersion !== (member.progressVersion ?? 0)) throw new Error("Cloud progress changed on another device. Sign in again before saving.");
+    if (!Number.isInteger(args.expectedVersion) || args.expectedVersion !== (member.progressVersion ?? 0)) throw new ConvexError({ code: "PROGRESS_CONFLICT", progressVersion: member.progressVersion ?? 0, doneJson: member.doneJson ?? "" });
     if (args.doneJson.length > 900_000) throw new Error("Progress is too large to sync");
     let serializedProgress: unknown;
     try {

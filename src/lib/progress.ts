@@ -1,7 +1,18 @@
 import { WEEKS } from './curriculum';
 import { parseLocalDate } from './dates';
 
+export interface TimerProgress {
+  timerMode: 'countdown' | 'stopwatch';
+  timerPartIndex: number;
+  timerTargetSeconds: number;
+  timerRemaining: number;
+  timerRunning: boolean;
+  timerElapsed: number;
+  timerStartedAt: number | null;
+}
+
 export interface Progress {
+  timer?: TimerProgress;
   done: Record<string, boolean>;
   dayHours: Record<string, string>;
   dayNotes: Record<string, string>;
@@ -50,6 +61,7 @@ function optional<T>(source: Record<string, unknown>, key: string, fallback: T, 
 
 export function serializeProgress(state: Progress): Progress {
   return {
+    ...(state.timer ? { timer: { ...state.timer } } : {}),
     done: { ...state.done },
     dayHours: { ...state.dayHours },
     dayNotes: { ...state.dayNotes },
@@ -96,7 +108,29 @@ export function parseProgress(data: unknown): Progress {
   const theme = optional(source, 'theme', 'light', (value): value is 'light' | 'dark' => value === 'light' || value === 'dark');
   const onboarded = optional(source, 'onboarded', true, booleanValue);
   parseLocalDate(start);
-  return { done, dayHours, dayNotes, weekNotes, ms, counters, start, cw, cd, paceFlex, kitChecked, theme, onboarded };
+  let timer: TimerProgress | undefined;
+  if (source.timer !== undefined) {
+    const t = source.timer;
+    if (!isRecord(t) || !['countdown', 'stopwatch'].includes(String(t.timerMode)) ||
+      typeof t.timerPartIndex !== 'number' || !Number.isInteger(t.timerPartIndex) ||
+      !WEEKS[cw - 1].days[cd - 1].parts[t.timerPartIndex] ||
+      typeof t.timerRunning !== 'boolean') throw new Error('Invalid saved timer');
+    for (const key of ['timerTargetSeconds', 'timerRemaining', 'timerElapsed'] as const) {
+      if (typeof t[key] !== 'number' || !Number.isFinite(t[key]) || t[key] < 0 || t[key] > 86400) throw new Error('Invalid saved timer');
+    }
+    if ((t.timerRemaining as number) > (t.timerTargetSeconds as number) ||
+      (t.timerMode === 'stopwatch' && (t.timerTargetSeconds !== 0 || t.timerRemaining !== 0)) ||
+      (t.timerMode === 'countdown' && t.timerTargetSeconds === 0) ||
+      (t.timerStartedAt !== null && (typeof t.timerStartedAt !== 'number' || !Number.isFinite(t.timerStartedAt) || t.timerStartedAt < 0)) ||
+      (t.timerRunning !== (t.timerStartedAt !== null))) throw new Error('Invalid saved timer');
+    timer = {
+      timerMode: t.timerMode as TimerProgress['timerMode'], timerPartIndex: t.timerPartIndex,
+      timerTargetSeconds: t.timerTargetSeconds as number, timerRemaining: t.timerRemaining as number,
+      timerRunning: t.timerRunning, timerElapsed: t.timerElapsed as number,
+      timerStartedAt: t.timerStartedAt as number | null,
+    };
+  }
+  return { ...(timer ? { timer } : {}), done, dayHours, dayNotes, weekNotes, ms, counters, start, cw, cd, paceFlex, kitChecked, theme, onboarded };
 }
 
 export function parseCloudProgress(data: unknown, defaults: Pick<Progress, 'start' | 'cw' | 'cd'>): Progress {

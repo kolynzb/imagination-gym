@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { state, actions, cloudStatus, savePending } from './lib/store';
+  import { state, actions, cloudStatus, savePending, progressConflicts } from './lib/store';
+  import ProgressConflict from './components/ProgressConflict.svelte';
   import Navigation from './components/Navigation.svelte';
   import TodayView from './components/TodayView.svelte';
   import WeekView from './components/WeekView.svelte';
@@ -23,7 +24,7 @@
     const isTyping = target.matches('input, textarea, select') || target.isContentEditable;
 
     // Dialogs and focus mode own their keyboard interactions.
-    if (!s.isSignedIn || s.focus || s.onboardingOpen || s.authModalOpen || s.activeExerciseDrawer) return;
+    if ($progressConflicts.length || !s.isSignedIn || s.focus || s.onboardingOpen || s.authModalOpen || s.activeExerciseDrawer) return;
     if (isTyping || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
 
     // Spacebar toggles timer
@@ -48,11 +49,11 @@
 
 <svelte:window onkeydown={handleKeydown} onbeforeunload={handleBeforeUnload} />
 
-<div class="app-layout">
+<div class="app-layout" inert={s.isSignedIn && $progressConflicts.length > 0}>
   {#if s.isSignedIn}
-  <Navigation />
+  <div class="navigation-wrapper" inert={s.focus || s.onboardingOpen || s.authModalOpen}><Navigation /></div>
 
-  <main class="main-content">
+  <main class="main-content" inert={s.focus || s.onboardingOpen || s.authModalOpen}>
     {#if $cloudStatus.status === 'error'}
       <div class="sync-notice" role="alert">
         {$cloudStatus.message}
@@ -98,7 +99,13 @@
   <SignInModal />
 </div>
 
+{#if s.isSignedIn && $progressConflicts.length}
+  <ProgressConflict />
+{/if}
+
 <style>
+  .navigation-wrapper { display: contents; }
+
   .app-layout {
     display: flex;
     min-height: 100dvh;

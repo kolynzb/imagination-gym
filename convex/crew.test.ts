@@ -96,13 +96,29 @@ describe("Crew authorization", () => {
     expect((await alice.query(api.crew.getMyProgress, { roomCode: "PROGRESS" }))?.doneJson).toBe(valid);
   });
 
+  test("persists a timer checkpoint and returns it with a revision conflict", async () => {
+    const t = convexTest(schema, modules);
+    const alice = t.withIdentity({ tokenIdentifier: "google|alice", subject: "alice" });
+    await alice.mutation(api.crew.signInOrRegister, { roomCode: "TIMERS", name: "Alice" });
+    const timer = { timerMode: "countdown", timerPartIndex: 0, timerTargetSeconds: 600,
+      timerRemaining: 535, timerElapsed: 65, timerRunning: false, timerStartedAt: null };
+    const payload = { roomCode: "TIMERS", week: 1, day: 1, hours: 0, streak: 0, expectedVersion: 0,
+      doneJson: JSON.stringify({ ...JSON.parse(progress()), timer }) };
+    await alice.mutation(api.crew.syncProgress, payload);
+    const saved = await alice.query(api.crew.getMyProgress, { roomCode: "TIMERS" });
+    expect(JSON.parse(saved!.doneJson!).timer).toEqual(timer);
+    await expect(alice.mutation(api.crew.syncProgress, payload)).rejects.toMatchObject({
+      data: { code: "PROGRESS_CONFLICT", progressVersion: 1, doneJson: saved!.doneJson },
+    });
+  });
+
   test("rejects stale device writes instead of replacing newer progress", async () => {
     const t = convexTest(schema, modules);
     const alice = t.withIdentity({ tokenIdentifier: "google|alice", subject: "alice" });
     await alice.mutation(api.crew.signInOrRegister, { roomCode: "VERSIONS", name: "Alice" });
     const payload = { roomCode: "VERSIONS", week: 1, day: 1, hours: 0, streak: 0, expectedVersion: 0, doneJson: progress({ w1d1p0: true }) };
     expect(await alice.mutation(api.crew.syncProgress, payload)).toBe(1);
-    await expect(alice.mutation(api.crew.syncProgress, { ...payload, doneJson: progress() })).rejects.toThrow("another device");
+    await expect(alice.mutation(api.crew.syncProgress, { ...payload, doneJson: progress() })).rejects.toMatchObject({ data: { code: "PROGRESS_CONFLICT", progressVersion: 1, doneJson: expect.any(String) } });
     expect((await alice.query(api.crew.getMyProgress, { roomCode: "VERSIONS" }))?.doneJson).toBe(payload.doneJson);
   });
 
