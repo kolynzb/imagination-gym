@@ -38,6 +38,7 @@
         <input
           type="text"
           class="search-input"
+          aria-label="Search videos"
           placeholder="Search videos by title, instructor, or topic (e.g. Peter Han, Drawabox, ghosting)..."
           bind:value={searchQuery}
         />
@@ -165,7 +166,8 @@
 
   .search-input {
     width: 100%;
-    padding: 12px 38px 12px 42px;
+    padding: 12px 48px 12px 42px;
+    min-height: 44px;
     border-radius: 999px;
     background: var(--card);
     border: 1px solid var(--line);
@@ -183,7 +185,10 @@
 
   .clear-search-btn {
     position: absolute;
-    right: 12px;
+    right: 2px;
+    width: 44px;
+    height: 44px;
+    color: var(--ink);
     background: transparent;
     border: 0;
     cursor: pointer;
@@ -296,8 +301,9 @@
     color: var(--accent-ink);
     text-decoration: none;
     margin-top: auto;
-    padding-top: 6px;
-    display: inline-block;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
     transition: color 120ms ease;
   }
 
