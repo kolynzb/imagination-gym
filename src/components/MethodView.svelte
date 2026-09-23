@@ -195,7 +195,7 @@
   }
 
   .page-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 64px;
     line-height: 1.05;
     letter-spacing: 0.02em;
@@ -216,7 +216,7 @@
   }
 
   .section-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 34px;
     letter-spacing: 0.02em;
     margin: 0 0 18px;
@@ -232,14 +232,14 @@
   .rule-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 22px;
     display: flex;
     flex-direction: column;
   }
 
   .rule-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 32px;
     letter-spacing: 0.02em;
     margin: 0 0 8px;
@@ -265,7 +265,7 @@
   .date-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 22px;
     display: flex;
     justify-content: space-between;
@@ -291,7 +291,7 @@
   .date-input {
     background: var(--canvas);
     border: 1px solid var(--line-2);
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     padding: 10px 14px;
     font-size: 15px;
     color: var(--ink);
@@ -306,7 +306,7 @@
   .part-doc-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 22px;
     display: flex;
     flex-direction: column;
@@ -327,7 +327,7 @@
   }
 
   .part-doc-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 28px;
     letter-spacing: 0.02em;
     margin: 4px 0 0;
@@ -356,12 +356,12 @@
   .kit-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     padding: 24px;
   }
 
   .kit-type-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 28px;
     letter-spacing: 0.02em;
     margin: 0 0 16px;
@@ -408,7 +408,7 @@
   .scaffold-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -416,7 +416,7 @@
   }
 
   .scaffold-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 26px;
     letter-spacing: 0.02em;
     margin: 0;
@@ -443,12 +443,12 @@
   .credits-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     padding: 24px;
   }
 
   .credits-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 28px;
     letter-spacing: 0.02em;
     margin: 0 0 10px;
@@ -482,7 +482,7 @@
     align-items: center;
     gap: 20px;
     padding: 24px 28px;
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     background: var(--card);
     border: 1px solid var(--line);
     margin-bottom: 32px;
@@ -504,7 +504,7 @@
   }
 
   .hero-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 26px;
     letter-spacing: 0.02em;
     margin: 0;
@@ -523,7 +523,7 @@
     background: var(--accent);
     color: var(--on-accent);
     border: 0;
-    border-radius: 14px;
+    border-radius: var(--radius-action);
     padding: 12px 20px;
     font-size: 13px;
     font-weight: 700;

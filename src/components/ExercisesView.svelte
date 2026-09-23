@@ -142,7 +142,7 @@
   }
 
   .page-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 64px;
     line-height: 1.05;
     letter-spacing: 0.02em;
@@ -179,10 +179,10 @@
   .search-input {
     width: 100%;
     padding: 12px 38px 12px 42px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--card);
     border: 1px solid var(--line);
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-body);
     font-size: 14px;
     color: var(--ink);
     outline: none;
@@ -223,7 +223,7 @@
     appearance: none;
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     padding: 8px 16px;
     font-size: 13px;
     font-weight: 500;
@@ -252,7 +252,7 @@
   .exercise-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 24px;
     display: flex;
     flex-direction: column;
@@ -286,13 +286,13 @@
     font-size: 11px;
     font-weight: 700;
     padding: 3px 8px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--line);
     color: var(--ink);
   }
 
   .ex-name {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 26px;
     line-height: 1.15;
     letter-spacing: 0.02em;
@@ -326,7 +326,7 @@
   .pitfall-box {
     background: var(--canvas);
     border: 1px solid var(--line);
-    border-radius: 14px;
+    border-radius: var(--radius-action);
     padding: 12px 14px;
     display: flex;
     flex-direction: column;
@@ -367,7 +367,7 @@
   .empty-state {
     background: var(--card);
     border: 1px dashed var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 60px 24px;
     text-align: center;
     display: flex;
@@ -377,7 +377,7 @@
   }
 
   .empty-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 28px;
     margin: 8px 0 0;
     color: var(--ink);
@@ -395,7 +395,7 @@
     background: var(--ink);
     color: var(--canvas);
     border: 0;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     padding: 8px 20px;
     font-size: 13px;
     font-weight: 600;

@@ -279,7 +279,7 @@
   }
 
   .ob-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 22px;
     letter-spacing: 0.03em;
   }
@@ -298,7 +298,7 @@
   .step-dot {
     width: 8px;
     height: 8px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     background: var(--line-3);
   }
 
@@ -333,7 +333,7 @@
   }
 
   .step-heading {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 60px;
     line-height: 1.05;
     letter-spacing: 0.02em;
@@ -352,7 +352,7 @@
   .video-embed-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     overflow: hidden;
     margin-bottom: 32px;
   }
@@ -405,12 +405,12 @@
   .triad-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 20px;
   }
 
   .triad-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 28px;
     letter-spacing: 0.02em;
     margin: 0 0 8px;
@@ -425,7 +425,7 @@
   }
 
   .sub-heading {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 32px;
     letter-spacing: 0.02em;
     margin: 0 0 8px;
@@ -446,7 +446,7 @@
   .parts-table {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -490,7 +490,7 @@
   }
 
   .lvl-num {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 26px;
     color: var(--accent);
   }
@@ -504,7 +504,7 @@
   .date-picker-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 22px;
     margin-bottom: 32px;
   }
@@ -526,7 +526,7 @@
   .date-input-lg {
     background: var(--canvas);
     border: 1px solid var(--line-2);
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     padding: 10px 14px;
     font-size: 15px;
     color: var(--ink);
@@ -553,7 +553,7 @@
   .kit-checklist {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -608,12 +608,12 @@
   .callout-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 20px;
   }
 
   .callout-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 28px;
     letter-spacing: 0.02em;
     margin: 0 0 8px;
@@ -706,7 +706,7 @@
     border: 1.5px solid var(--line-2);
     background: transparent;
     padding: 10px 22px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     font-size: 14px;
     font-weight: 500;
     color: var(--ink);
@@ -719,7 +719,7 @@
     color: var(--on-accent);
     border: 1.5px solid var(--accent);
     padding: 10px 28px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;

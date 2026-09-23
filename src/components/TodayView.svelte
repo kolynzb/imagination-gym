@@ -361,7 +361,7 @@
   .schedule-alert {
     background: var(--sulfur-band);
     border: 1px solid var(--line-2);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     padding: 20px 24px;
     margin-bottom: 28px;
     display: flex;
@@ -394,7 +394,7 @@
     font-size: 14px;
     font-weight: 500;
     padding: 8px 18px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     cursor: pointer;
   }
 
@@ -441,11 +441,11 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
     padding: 2px 8px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
   }
 
   .page-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 56px;
     line-height: 1.05;
     letter-spacing: 0.02em;
@@ -476,7 +476,7 @@
     appearance: none;
     background: transparent;
     border: 1.5px solid var(--line-2);
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     padding: 8px 18px;
     font-size: 14px;
     font-weight: 500;
@@ -617,11 +617,11 @@
     background: var(--ink);
     color: var(--canvas);
     padding: 2px 8px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
   }
 
   .part-purpose {
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: var(--font-body);
     font-size: 16px;
     font-weight: 700;
     color: var(--ink);
@@ -647,7 +647,7 @@
     appearance: none;
     background: transparent;
     border: 1px solid var(--line-2);
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     padding: 5px 12px;
     font-size: 13px;
     font-weight: 500;
@@ -664,7 +664,7 @@
   .session-log-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     padding: 22px 24px;
   }
 
@@ -693,7 +693,7 @@
     width: 100px;
     padding: 8px 12px;
     border: 1px solid var(--line-2);
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     background: var(--canvas);
     font-size: 15px;
     color: var(--ink);
@@ -704,7 +704,7 @@
     min-height: 72px;
     padding: 10px 12px;
     border: 1px solid var(--line-2);
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     background: var(--canvas);
     font-size: 14px;
     line-height: 1.5;
@@ -726,7 +726,7 @@
     background: var(--accent);
     color: var(--on-accent);
     padding: 12px 26px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;
@@ -745,7 +745,7 @@
     background: transparent;
     color: var(--ink);
     padding: 12px 20px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
@@ -773,7 +773,7 @@
   .week-context-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     padding: 20px 22px;
   }
 
@@ -785,7 +785,7 @@
   }
 
   .project-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 26px;
     line-height: 1.15;
     letter-spacing: 0.02em;
@@ -829,7 +829,7 @@
     align-items: center;
     gap: 16px;
     padding: 16px 20px;
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     background: var(--accent-14);
     border: 1px solid var(--line-2);
     margin-bottom: 24px;
@@ -864,7 +864,7 @@
     background: var(--accent);
     color: var(--on-accent);
     border: 0;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     font-size: 13px;
     font-weight: 700;
     padding: 8px 16px;
@@ -884,7 +884,7 @@
     color: var(--ink-55);
     cursor: pointer;
     padding: 6px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     line-height: 1;
   }
 

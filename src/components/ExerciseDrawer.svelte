@@ -149,7 +149,7 @@
     text-transform: uppercase;
     background: var(--line);
     padding: 2px 8px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     color: var(--ink-72);
   }
 
@@ -163,7 +163,7 @@
     color: var(--ink-62);
     cursor: pointer;
     padding: 4px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
   }
 
   .close-btn:hover {
@@ -171,7 +171,7 @@
   }
 
   .ex-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 44px;
     line-height: 1;
     letter-spacing: 0.02em;
@@ -207,7 +207,7 @@
   }
 
   .reps-val {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 28px;
     color: var(--accent);
     letter-spacing: 0.02em;

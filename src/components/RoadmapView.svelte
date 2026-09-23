@@ -106,7 +106,7 @@
   }
 
   .page-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 64px;
     line-height: 1.05;
     letter-spacing: 0.02em;
@@ -125,7 +125,7 @@
   .ladder-section {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     padding: 24px;
     margin-bottom: 48px;
     overflow-x: auto;
@@ -166,7 +166,7 @@
     width: 32px;
     height: 140px;
     background: var(--track);
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -177,14 +177,14 @@
   .bar-fill {
     width: 100%;
     background: var(--ink);
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     transition: height 0.3s ease;
   }
 
   .bar-num {
     margin-bottom: 8px;
     text-align: center;
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: var(--font-body);
     font-size: 11px;
     font-weight: 700;
     color: var(--ink);
@@ -206,7 +206,7 @@
   }
 
   .section-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 36px;
     letter-spacing: 0.02em;
     margin: 0 0 18px;
@@ -226,7 +226,7 @@
   .phase-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 22px;
   }
 
@@ -238,7 +238,7 @@
   }
 
   .phase-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 44px;
     letter-spacing: 0.02em;
     margin: 6px 0 12px;
@@ -260,7 +260,7 @@
   .matrix-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     overflow-x: auto;
   }
 

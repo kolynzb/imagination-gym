@@ -1,4 +1,12 @@
 :root {
+  /* Extracted from the shipped interface; see DESIGN.md. */
+  --font-display: 'Bebas Neue', Impact, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --radius-control: 12px;
+  --radius-action: 14px;
+  --radius-card: 20px;
+  --radius-panel: 24px;
+  --radius-pill: 800px;
   color-scheme: light;
   --canvas: #e2e2df;
   --card: #f7f6f2;
@@ -70,7 +78,7 @@ html, body {
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Bebas Neue', Impact, sans-serif;
+  font-family: var(--font-display);
   font-weight: 400;
 }
 

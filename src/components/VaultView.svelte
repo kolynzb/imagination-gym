@@ -125,7 +125,7 @@
   }
 
   .page-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 64px;
     line-height: 1.05;
     letter-spacing: 0.02em;
@@ -168,10 +168,10 @@
     width: 100%;
     padding: 12px 48px 12px 42px;
     min-height: 44px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--card);
     border: 1px solid var(--line);
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-body);
     font-size: 14px;
     color: var(--ink);
     outline: none;
@@ -217,7 +217,7 @@
   }
 
   .group-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 32px;
     letter-spacing: 0.02em;
     margin: 0 0 20px;
@@ -230,7 +230,7 @@
   }
 
   .group-count {
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-body);
     font-size: 14px;
     font-weight: 500;
     color: var(--ink-42);
@@ -245,7 +245,7 @@
   .video-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -314,7 +314,7 @@
   .empty-state {
     background: var(--card);
     border: 1px dashed var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 60px 24px;
     text-align: center;
     display: flex;
@@ -324,7 +324,7 @@
   }
 
   .empty-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 28px;
     margin: 8px 0 0;
     color: var(--ink);
@@ -342,7 +342,7 @@
     background: var(--ink);
     color: var(--canvas);
     border: 0;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     padding: 8px 20px;
     font-size: 13px;
     font-weight: 600;

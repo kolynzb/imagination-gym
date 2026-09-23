@@ -127,7 +127,7 @@
   .timer-box {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     padding: 20px 22px;
   }
 
@@ -154,7 +154,7 @@
   .sound-test-btn {
     background: transparent;
     border: 1px solid var(--line);
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     width: 32px;
     height: 32px;
     cursor: pointer;
@@ -184,7 +184,7 @@
     font-size: 13px;
     font-weight: 500;
     padding: 6px 12px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     cursor: pointer;
     transition: all 0.15s ease;
   }
@@ -202,7 +202,7 @@
   }
 
   .clock-display {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 72px;
     line-height: 0.95;
     letter-spacing: 0.04em;
@@ -225,7 +225,7 @@
   .progress-bar {
     height: 5px;
     background: var(--track);
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     overflow: hidden;
     margin-top: 14px;
   }
@@ -250,7 +250,7 @@
     font-weight: 500;
     min-height: 42px;
     padding: 0 18px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     cursor: pointer;
     transition: transform 140ms var(--ease-out), background-color 140ms ease, border-color 140ms ease;
   }

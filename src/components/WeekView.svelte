@@ -172,7 +172,7 @@
     appearance: none;
     border: 1.5px solid var(--line-2);
     background: transparent;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     padding: 8px 18px;
     font-size: 14px;
     font-weight: 500;
@@ -202,7 +202,7 @@
   }
 
   .page-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 64px;
     line-height: 1.05;
     letter-spacing: 0.02em;
@@ -228,7 +228,7 @@
   .info-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     padding: 22px 24px;
   }
 
@@ -249,7 +249,7 @@
   }
 
   .project-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 28px;
     letter-spacing: 0.02em;
     color: var(--ink);
@@ -273,7 +273,7 @@
     border: 1px solid var(--line-2);
     background: transparent;
     padding: 6px 14px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     font-size: 13px;
     color: var(--ink);
     cursor: pointer;
@@ -291,7 +291,7 @@
   }
 
   .section-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 32px;
     letter-spacing: 0.02em;
     margin: 0 0 16px;
@@ -301,7 +301,7 @@
   .days-list {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -331,7 +331,7 @@
 
   .day-badge {
     width: 36px;
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: var(--font-body);
     font-size: 13px;
     font-weight: 700;
     color: var(--ink-55);
@@ -427,7 +427,7 @@
     width: 100%;
     aspect-ratio: 16 / 9;
     border: 0;
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     background: var(--ink);
   }
 

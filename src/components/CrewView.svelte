@@ -343,7 +343,7 @@
     min-height: 44px;
     padding: 10px 14px;
     border: 1px solid var(--line-2);
-    border-radius: 14px;
+    border-radius: var(--radius-action);
     background: var(--card);
     color: var(--ink);
     font: inherit;
@@ -379,7 +379,7 @@
   }
 
   .page-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 64px;
     line-height: 1.05;
     letter-spacing: 0.02em;
@@ -398,7 +398,7 @@
   .room-pill-box {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 14px 18px;
     display: flex;
     flex-direction: column;
@@ -433,7 +433,7 @@
   .table-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     overflow: hidden;
   }
 
@@ -490,7 +490,7 @@
     font-size: 10px;
     font-weight: 700;
     padding: 2px 6px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
   }
 
   .progress-cell {
@@ -503,7 +503,7 @@
     flex: 1;
     height: 5px;
     background: var(--track);
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     overflow: hidden;
   }
 
@@ -532,7 +532,7 @@
   }
 
   .sub-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 36px;
     letter-spacing: 0.02em;
     margin: 0;
@@ -550,7 +550,7 @@
   .upload-crit-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 18px 20px;
     margin-bottom: 28px;
   }
@@ -568,7 +568,7 @@
     background: var(--canvas);
     border: 1px solid var(--line-2);
     padding: 8px 14px;
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     font-size: 13px;
     font-weight: 500;
     color: var(--ink);
@@ -593,7 +593,7 @@
     flex: 1;
     background: var(--canvas);
     border: 1px solid var(--line-2);
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     padding: 10px 14px;
     font-size: 14px;
     color: var(--ink);
@@ -604,7 +604,7 @@
     border: 1.5px solid var(--ink);
     background: var(--ink);
     color: var(--canvas);
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     padding: 10px 20px;
     font-size: 14px;
     font-weight: 600;
@@ -626,7 +626,7 @@
   .empty-crit-card {
     grid-column: 1 / -1;
     border: 1px dashed var(--line-2);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 36px 20px;
     text-align: center;
     color: var(--ink-62);
@@ -636,7 +636,7 @@
   .crit-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     overflow: hidden;
     display: flex;
     flex-direction: column;

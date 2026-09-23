@@ -259,7 +259,7 @@
   }
 
   .day-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 28px;
     letter-spacing: 0.02em;
     margin: 2px 0 0;
@@ -270,7 +270,7 @@
     appearance: none;
     border: 1.5px solid var(--line-2);
     background: transparent;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     padding: 8px 18px;
     font-size: 14px;
     font-weight: 500;
@@ -314,7 +314,7 @@
     flex: 1;
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     overflow: hidden;
     position: relative;
     display: flex;
@@ -389,7 +389,7 @@
     border: 0;
     width: 32px;
     height: 32px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     cursor: pointer;
     font-size: 14px;
   }
@@ -406,7 +406,7 @@
   .timer-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     padding: 22px;
   }
 
@@ -417,7 +417,7 @@
     gap: 12px;
     padding: 12px 14px;
     border: 1px solid var(--line-2);
-    border-radius: 14px;
+    border-radius: var(--radius-action);
     background: var(--sulfur-band);
     color: var(--ink);
     font-size: 13px;
@@ -427,7 +427,7 @@
   .focus-sync-error button {
     flex: 0 0 auto;
     border: 1px solid var(--ink);
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     background: transparent;
     color: var(--ink);
     padding: 6px 12px;
@@ -437,7 +437,7 @@
   }
 
   .timer-clock {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 76px;
     line-height: 0.95;
     letter-spacing: 0.04em;
@@ -508,7 +508,7 @@
     font-size: 13px;
     font-weight: 500;
     padding: 8px 14px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     cursor: pointer;
   }
 
@@ -619,7 +619,7 @@
     width: 100%;
     margin-top: auto;
     border: 1.5px solid var(--accent);
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     background: var(--accent);
     color: var(--on-accent);
     padding: 10px 14px;

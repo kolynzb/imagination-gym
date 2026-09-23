@@ -185,7 +185,7 @@
   }
 
   .page-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 64px;
     line-height: 1.05;
     letter-spacing: 0.02em;
@@ -211,7 +211,7 @@
   .metric-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -226,7 +226,7 @@
   }
 
   .m-value {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 48px;
     letter-spacing: 0.02em;
     line-height: 1.1;
@@ -247,7 +247,7 @@
   .m-track {
     height: 4px;
     background: var(--track);
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     overflow: hidden;
     margin-top: 8px;
   }
@@ -258,7 +258,7 @@
   }
 
   .section-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 34px;
     letter-spacing: 0.02em;
     margin: 0 0 18px;
@@ -291,7 +291,7 @@
     gap: 8px;
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 16px;
     color: var(--ink);
     font-size: 14px;
@@ -302,7 +302,7 @@
     min-height: 96px;
     resize: vertical;
     border: 1px solid var(--line-2);
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     padding: 10px;
     background: var(--canvas);
     color: var(--ink);
@@ -325,7 +325,7 @@
     gap: 4px;
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     padding: 3px;
   }
 
@@ -336,7 +336,7 @@
     padding: 6px 14px;
     font-size: 13px;
     font-weight: 500;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     color: var(--ink-62);
     cursor: pointer;
   }
@@ -350,7 +350,7 @@
   .cal-matrix-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: var(--radius-panel);
     padding: 22px;
     overflow-x: auto;
   }
@@ -399,7 +399,7 @@
     appearance: none;
     border: 1px solid var(--line-2);
     background: var(--canvas);
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     aspect-ratio: 1 / 1;
     display: flex;
     flex-direction: column;
@@ -451,7 +451,7 @@
   .counter-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 18px;
     display: flex;
     flex-direction: column;
@@ -469,7 +469,7 @@
   .c-bar {
     height: 5px;
     background: var(--track);
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     overflow: hidden;
     margin-bottom: 14px;
   }
@@ -490,7 +490,7 @@
     border: 1px solid var(--line-2);
     background: transparent;
     padding: 6px;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     font-size: 13px;
     font-weight: 500;
     color: var(--ink);
@@ -514,7 +514,7 @@
   .rubric-card {
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     padding: 20px;
     display: flex;
     flex-direction: column;

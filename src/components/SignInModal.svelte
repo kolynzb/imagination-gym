@@ -148,11 +148,11 @@
   .auth-modal-logo {
     width: 44px;
     height: 44px;
-    border-radius: 12px;
+    border-radius: var(--radius-control);
   }
 
   h1 {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 32px;
     letter-spacing: 0.02em;
     margin: 16px 0;
@@ -173,7 +173,7 @@
   .action-buttons button {
     flex: 1;
     padding: 12px 20px;
-    border-radius: 14px;
+    border-radius: var(--radius-action);
     border: 1px solid var(--line-2);
     background: var(--card);
     color: var(--ink);
@@ -209,7 +209,7 @@
   .practice-path p { font-size: 14px; margin: 8px 0 0; line-height: 1.5; }
   .welcome .practice-commitment { max-width: 520px; font-size: 13px; color: var(--ink-72); margin: 24px 0 0; }
   .welcome .auth-card { text-align: left; max-height: none; overflow: visible; border: 0; border-radius: 18px; padding: 32px; background: var(--card); }
-  .welcome h2 { font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 700; line-height: 1.2; margin: 0 0 16px; }
+  .welcome h2 { font-family: var(--font-body); font-size: 24px; font-weight: 700; line-height: 1.2; margin: 0 0 16px; }
   .welcome .auth-card p { font-size: 15px; }
   .welcome .google-slot-wrap { justify-content: flex-start; width: 100%; margin: 24px 0; }
   .welcome .auth-card .saving-explainer { border-top: 1px solid var(--line); padding-top: 20px; font-size: 14px; }

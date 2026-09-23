@@ -72,16 +72,16 @@
 
 <style>
   .conflict-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(7,6,7,.65); display: flex; align-items: center; justify-content: center; padding: 16px; }
-  .conflict-dialog { width: min(800px, 100%); max-height: 90dvh; overflow: auto; padding: 28px; border: 1px solid var(--line); border-radius: 24px; background: var(--canvas); color: var(--ink); }
-  h1 { font-family: 'Bebas Neue', Impact, sans-serif; font-size: 36px; line-height: 1.05; letter-spacing: .02em; margin: 0 0 10px; }
-  h2 { font-family: 'DM Sans', system-ui, sans-serif; font-size: 18px; line-height: 1.35; margin: 0 0 14px; }
-  h3 { font-family: 'DM Sans', system-ui, sans-serif; font-size: 15px; font-weight: 700; margin: 0 0 6px; }
+  .conflict-dialog { width: min(800px, 100%); max-height: 90dvh; overflow: auto; padding: 28px; border: 1px solid var(--line); border-radius: var(--radius-panel); background: var(--canvas); color: var(--ink); }
+  h1 { font-family: var(--font-display); font-size: 36px; line-height: 1.05; letter-spacing: .02em; margin: 0 0 10px; }
+  h2 { font-family: var(--font-body); font-size: 18px; line-height: 1.35; margin: 0 0 14px; }
+  h3 { font-family: var(--font-body); font-size: 15px; font-weight: 700; margin: 0 0 6px; }
   p { font-size: 15px; line-height: 1.55; margin: 12px 0 18px; color: var(--ink-78); }
   article { border-top: 1px solid var(--line); margin-top: 24px; padding-top: 20px; }
   .versions { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   .versions > div { min-width: 0; border: 1px solid var(--line); border-radius: 16px; padding: 16px; background: var(--card); }
   pre { font: inherit; font-size: 14px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 220px; overflow: auto; margin: 0 0 14px; padding: 8px 0 8px 12px; border-left: 2px solid var(--line-2); background: transparent; }
-  button { font: inherit; min-height: 44px; border: 1px solid var(--line-2); border-radius: 800px; padding: 9px 16px; background: var(--canvas); color: var(--ink); cursor: pointer; }
+  button { font: inherit; min-height: 44px; border: 1px solid var(--line-2); border-radius: var(--radius-pill); padding: 9px 16px; background: var(--canvas); color: var(--ink); cursor: pointer; }
   .conflict-dialog > button { border-color: var(--accent); background: var(--accent); color: var(--on-accent); font-weight: 700; }
   .versions button { width: 100%; }
   button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }

@@ -328,14 +328,14 @@
   }
 
   .title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 21px;
     line-height: 1;
     letter-spacing: 0.03em;
   }
 
   .subtitle {
-    font-family: 'DM Sans', system-ui, sans-serif;
+    font-family: var(--font-body);
     font-size: 13px;
     color: var(--ink-62);
     margin-top: 3px;
@@ -367,13 +367,13 @@
   .profile-avatar {
     width: 28px;
     height: 28px;
-    border-radius: 14px;
+    border-radius: var(--radius-action);
     background: var(--ink);
     color: var(--canvas);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Bebas Neue', Impact, sans-serif;
+    font-family: var(--font-display);
     font-size: 16px;
     flex: 0 0 28px;
   }
@@ -422,7 +422,7 @@
     border: 1px solid var(--line);
     margin: 10px 14px 4px;
     padding: 12px 14px;
-    border-radius: 20px;
+    border-radius: var(--radius-card);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -490,7 +490,7 @@
     width: 100%;
     min-height: 40px;
     padding: 8px 14px;
-    border-radius: 14px;
+    border-radius: var(--radius-action);
     font-size: 15px;
     color: var(--ink-72);
     font-weight: 500;
@@ -530,7 +530,7 @@
   .progress-track {
     height: 5px;
     background: var(--track);
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     overflow: hidden;
     margin: 6px 0;
   }
@@ -579,7 +579,7 @@
     padding: 3px;
     background: var(--card);
     border: 1px solid var(--line);
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
   }
 
   .theme-btn {
@@ -590,7 +590,7 @@
     padding: 6px 10px;
     font-size: 13px;
     font-weight: 500;
-    border-radius: 800px;
+    border-radius: var(--radius-pill);
     color: var(--ink-62);
     cursor: pointer;
     text-align: center;
@@ -710,7 +710,7 @@
     }
 
     .sheet-title {
-      font-family: 'Bebas Neue', Impact, sans-serif;
+      font-family: var(--font-display);
       font-size: 24px;
       letter-spacing: 0.02em;
     }
@@ -735,7 +735,7 @@
       appearance: none;
       background: var(--card);
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: var(--radius-action);
       padding: 14px 16px;
       text-align: left;
       font-size: 15px;

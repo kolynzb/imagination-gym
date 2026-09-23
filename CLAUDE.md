@@ -7,8 +7,9 @@ impeccable.style/slop, 67 patterns). Treat a hit as a reason to look closer, not
 an automatic fail — an intentional, design-system-grounded choice wins.
 
 ### Design system
-Caldera is binding. Flag any font, color, font size, or corner radius that is
-not a Caldera token. Use an existing token or add it deliberately.
+The extracted system in DESIGN.md is binding. It is derived from this app and
+its original prototype; no external Caldera reference exists. Use the shared
+tokens in src/app.css. Flag unrecognized values and document deliberate additions.
 
 ### Visual details
 - Decorative grid-line backgrounds (keep grids only for canvases/maps/measurement)
