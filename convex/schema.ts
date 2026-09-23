@@ -28,7 +28,8 @@ export default defineSchema({
     .index("by_roomCode", ["roomCode"])
     .index("by_roomCode_and_name", ["roomCode", "name"])
     .index("by_email", ["email"])
-    .index("by_roomCode_and_tokenIdentifier", ["roomCode", "tokenIdentifier"]),
+    .index("by_roomCode_and_tokenIdentifier", ["roomCode", "tokenIdentifier"])
+    .index("by_tokenIdentifier_and_lastActive", ["tokenIdentifier", "lastActive"]),
 
   critPosts: defineTable({
     roomCode: v.string(),

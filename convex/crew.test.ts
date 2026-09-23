@@ -8,10 +8,36 @@ import schema from "./schema";
 const modules = import.meta.glob("./**/*.ts");
 const progress = (done: Record<string, boolean> = {}, cw = 1, cd = 1) => JSON.stringify({
   done, dayHours: {}, dayNotes: {}, weekNotes: {}, ms: {}, counters: {},
-  start: '2026-09-22', cw, cd, paceFlex: false, kitChecked: {},
+  start: '2026-09-22', cw, cd, paceFlex: false, kitChecked: {}, theme: 'light', onboarded: true,
 });
 
 describe("Crew authorization", () => {
+  test("sign-in creates an account without requiring room setup", async () => {
+    const t = convexTest(schema, modules);
+    const alice = t.withIdentity({ tokenIdentifier: "google|alice", subject: "alice" });
+    const result = await alice.mutation(api.crew.signInOrRegister, { name: "Alice" });
+    expect(result.member.roomCode).toBe("GYM-CREW");
+    expect(result.created).toBe(true);
+    await expect(t.mutation(api.crew.signInOrRegister, { name: "Alice" })).rejects.toThrow("Sign in");
+  });
+
+  test("sign-in restores only the caller's most recently used room", async () => {
+    const t = convexTest(schema, modules);
+    const alice = t.withIdentity({ tokenIdentifier: "google|alice", subject: "alice" });
+    const bob = t.withIdentity({ tokenIdentifier: "google|bob", subject: "bob" });
+    const first = await alice.mutation(api.crew.signInOrRegister, { name: "Alice", roomCode: "FIRST" });
+    const latest = await alice.mutation(api.crew.signInOrRegister, { name: "Alice", roomCode: "LATEST" });
+    await bob.mutation(api.crew.signInOrRegister, { name: "Bob", roomCode: "PRIVATE" });
+    await t.run(async ctx => {
+      await ctx.db.patch(first.member._id, { lastActive: 100 });
+      await ctx.db.patch(latest.member._id, { lastActive: 200, doneJson: progress({ w3d2p0: true }, 3, 2), week: 3, day: 2 });
+    });
+    const restored = await alice.mutation(api.crew.signInOrRegister, { name: "Alice" });
+    expect(restored.member.roomCode).toBe("LATEST");
+    expect(restored.member.doneJson).toContain("w3d2p0");
+    expect(restored.created).toBe(false);
+  });
+
   test("denies unauthenticated reads and writes", async () => {
     const t = convexTest(schema, modules);
     await expect(t.query(api.crew.getMembers, { roomCode: "PRIVATE" })).rejects.toThrow("Sign in");

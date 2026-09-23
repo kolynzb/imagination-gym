@@ -43,7 +43,7 @@
       type="button"
       class="profile-btn"
       onclick={() => actions.openAuthModal()}
-      aria-label="Open artist profile and cloud sync settings"
+      aria-label="Open your account"
     >
       <div class="profile-avatar">
         {s.userName ? s.userName.charAt(0).toUpperCase() : 'Y'}
@@ -51,8 +51,7 @@
       <div class="profile-info">
         <div class="profile-name">{s.userName}</div>
         <div class="profile-sub">
-          <span class="sync-dot" class:active={s.isSignedIn}></span>
-          <span>{s.isSignedIn ? s.roomCode : 'Local · Sign In'}</span>
+          <span>{s.roomCode}</span>
         </div>
       </div>
       <span class="profile-gear"><Icon name="gear" size={16} /></span>
@@ -266,7 +265,7 @@
           <Icon name="goal" size={16} /> Start Here (Course Orientation)
         </button>
         <button class="sheet-btn profile-mobile-btn" onclick={() => { mobileMenuOpen = false; actions.openAuthModal(); }}>
-          <Icon name="user" size={16} /> Artist Profile & Sync ({s.userName} · {s.isSignedIn ? s.roomCode : 'Sign In'})
+          <Icon name="user" size={16} /> Your account ({s.userName})
         </button>
         <button class="sheet-btn" class:active={s.view === 'roadmap'} onclick={() => setView('roadmap')}>
           Roadmap & 4-Phase Pipeline
@@ -275,7 +274,7 @@
           Video Vault ({VAULT.reduce((count, group) => count + group.v.length, 0)} Videos)
         </button>
         <button class="sheet-btn" class:active={s.view === 'progress'} onclick={() => setView('progress')}>
-          Stats, 56-Day Calendar & Backup
+          Stats & 56-Day Calendar
         </button>
         <button class="sheet-btn" class:active={s.view === 'method'} onclick={() => setView('method')}>
           Method, Kit & Rubric
@@ -401,18 +400,6 @@
     display: flex;
     align-items: center;
     gap: 5px;
-  }
-
-  .sync-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 800px;
-    background: var(--ink-55);
-    flex: 0 0 6px;
-  }
-
-  .sync-dot.active {
-    background: #10b981;
   }
 
   .profile-gear {

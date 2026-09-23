@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { get } from 'svelte/store';
 
 const client = vi.hoisted(() => ({ mutation: vi.fn() }));
@@ -6,84 +6,95 @@ vi.mock('../src/lib/convex', () => ({
   convex: client,
   api: { crew: { signInOrRegister: 'signIn', syncProgress: 'sync' } },
   clearCloudAuth: vi.fn(),
-  isConvexEnabled: () => true,
 }));
-
-import { actions, state, hasDeviceBackup } from '../src/lib/store';
 
 const blank = {
   done: {}, dayHours: {}, dayNotes: {}, weekNotes: {}, ms: {}, counters: {},
-  start: '2026-09-22', cw: 1, cd: 1, paceFlex: false, kitChecked: {},
+  start: '2026-09-22', cw: 1, cd: 1, paceFlex: false, kitChecked: {}, theme: 'light', onboarded: true,
 };
+const member = (progress = blank, version = 0, id = 'student') => ({ member: {
+  _id: id, name: 'Student', roomCode: 'STUDIO', week: progress.cw, day: progress.cd,
+  progressVersion: version, doneJson: JSON.stringify(progress),
+} });
+let store: typeof import('../src/lib/store');
 
-beforeEach(() => {
-  actions.importBackup(blank);
+beforeEach(async () => {
+  vi.resetModules();
   client.mutation.mockReset();
+  store = await import('../src/lib/store');
 });
+afterEach(() => { vi.clearAllTimers(); vi.useRealTimers(); vi.unstubAllGlobals(); });
 
-describe('cloud restore and save ordering', () => {
-  it('returns to local mode when Google authentication expires', async () => {
-    client.mutation.mockResolvedValueOnce({ member: { week: 1, day: 1, progressVersion: 0, doneJson: JSON.stringify(blank) } });
-    await actions.signIn('Student', 'STUDIO', true);
-    actions.setDayNote(1, 1, 'Keep working');
-    actions.cloudSessionExpired();
-    expect(get(state).isSignedIn).toBe(false);
-    expect(get(state).dayNotes.w1d1).toBe('Keep working');
-    expect(await actions.syncToCloud()).toBe(false);
+describe('Convex-only course state', () => {
+  it('starts behind sign-in and restores only verified progress', async () => {
+    expect(get(store.state).isSignedIn).toBe(false);
+    expect(get(store.state).authModalOpen).toBe(true);
+    client.mutation.mockResolvedValueOnce(member({ ...blank, cd: 7 }));
+    await store.actions.signIn('Student');
+    expect(client.mutation.mock.calls[0][1]).toEqual({ name: 'Student' });
+    expect(get(store.state).roomCode).toBe('STUDIO');
+    expect(get(store.state).isSignedIn).toBe(true);
+    expect(get(store.state).timerMode).toBe('stopwatch');
+    expect(get(store.state).onboardingOpen).toBe(false);
   });
 
-  it('autosaves to cloud even when browser storage is full', async () => {
+  it('restores theme and onboarding from the account', async () => {
+    client.mutation.mockResolvedValueOnce(member({ ...blank, theme: 'dark', onboarded: false }));
+    await store.actions.signIn('Student');
+    expect(get(store.state).theme).toBe('dark');
+    expect(get(store.state).onboardingOpen).toBe(true);
+    store.actions.closeOnboarding();
+    client.mutation.mockResolvedValueOnce(1);
+    await store.actions.syncToCloud();
+    expect(JSON.parse(client.mutation.mock.calls[1][1].doneJson).onboarded).toBe(true);
+  });
+
+  it('saves elapsed practice before switching rooms', async () => {
+    client.mutation.mockResolvedValueOnce(member());
+    await store.actions.signIn('Student');
+    store.state.update(s => ({ ...s, timerElapsed: 60 }));
+    client.mutation.mockResolvedValueOnce(1);
+    client.mutation.mockResolvedValueOnce(member(blank, 0, 'other-room-membership'));
+    await store.actions.setRoomCode('OTHER-ROOM');
+    expect(Number(JSON.parse(client.mutation.mock.calls[1][1].doneJson).dayHours.w1d1)).toBeCloseTo(1 / 60, 5);
+  });
+
+  it('does not offer a nickname-only fallback after failed authentication', async () => {
+    client.mutation.mockRejectedValueOnce(new Error('Sign in with Google'));
+    await expect(store.actions.signIn('Student')).rejects.toThrow('Sign in');
+    expect(get(store.state).isSignedIn).toBe(false);
+    expect(get(store.state).authModalOpen).toBe(true);
+  });
+
+  it('autosaves without reading or writing browser storage', async () => {
     vi.useFakeTimers();
     vi.resetModules();
+    const storage = { getItem: vi.fn(), setItem: vi.fn(), removeItem: vi.fn() };
     vi.stubGlobal('window', {});
     vi.stubGlobal('document', { documentElement: { setAttribute: vi.fn() } });
-    vi.stubGlobal('localStorage', {
-      getItem: (key: string) => key === 'imaginationGym.v2' ? JSON.stringify(blank) : null,
-      setItem: () => { throw new Error('QuotaExceededError'); },
-    });
-    try {
-      const store = await import('../src/lib/store');
-      client.mutation.mockResolvedValueOnce({ member: { week: 1, day: 1, progressVersion: 0, doneJson: JSON.stringify(blank) } });
-      client.mutation.mockResolvedValueOnce(1);
-      await store.actions.signIn('Student', 'STUDIO', true);
-      store.actions.setDayNote(1, 1, 'Cloud must still save this');
-      await vi.advanceTimersByTimeAsync(1600);
-      expect(get(store.localSaveFailed)).toBe(true);
-      expect(client.mutation).toHaveBeenCalledTimes(2);
-      expect(JSON.parse(client.mutation.mock.calls[1][1].doneJson).dayNotes.w1d1).toBe('Cloud must still save this');
-    } finally {
-      vi.clearAllTimers();
-      vi.useRealTimers();
-      vi.unstubAllGlobals();
-    }
+    vi.stubGlobal('localStorage', storage);
+    store = await import('../src/lib/store');
+    client.mutation.mockResolvedValueOnce(member());
+    client.mutation.mockResolvedValueOnce(1);
+    await store.actions.signIn('Student');
+    store.actions.setDayNote(1, 1, 'Save to my account');
+    await vi.advanceTimersByTimeAsync(400);
+    expect(JSON.parse(client.mutation.mock.calls[1][1].doneJson).dayNotes.w1d1).toBe('Save to my account');
+    expect(get(store.savePending)).toBe(false);
+    for (const method of Object.values(storage)) expect(method).not.toHaveBeenCalled();
   });
 
-  it('keeps device work recoverable when cloud progress replaces it', async () => {
-    actions.setDayNote(1, 1, 'Device-only work');
-    client.mutation.mockResolvedValueOnce({ member: {
-      week: 1, day: 7, progressVersion: 3,
-      doneJson: JSON.stringify({ ...blank, cd: 7, dayNotes: { w1d7: 'Cloud work' } }),
-    } });
-    await actions.signIn('Student', 'STUDIO', true);
-    expect(get(state).dayNotes.w1d7).toBe('Cloud work');
-    expect(get(state).timerMode).toBe('stopwatch');
-    expect(get(hasDeviceBackup)).toBe(true);
-    actions.restoreDeviceBackup();
-    expect(get(state).dayNotes.w1d1).toBe('Device-only work');
-    expect(get(state).isSignedIn).toBe(false);
-  });
-
-  it('serializes snapshots and uses the revision returned by each save', async () => {
-    client.mutation.mockResolvedValueOnce({ member: { week: 1, day: 1, progressVersion: 3, doneJson: JSON.stringify(blank) } });
-    await actions.signIn('Student', 'STUDIO', true);
-    let finishFirst: (version: number) => void = () => { throw new Error('First save was not started'); };
+  it('serializes snapshots using each returned revision', async () => {
+    client.mutation.mockResolvedValueOnce(member(blank, 3));
+    await store.actions.signIn('Student');
+    let finishFirst: (version: number) => void = () => { throw new Error('Save not started'); };
     client.mutation.mockImplementationOnce(() => new Promise<number>(resolve => { finishFirst = resolve; }));
     client.mutation.mockResolvedValueOnce(5);
-    actions.setDayNote(1, 1, 'First');
-    const first = actions.syncToCloud();
+    store.actions.setDayNote(1, 1, 'First');
+    const first = store.actions.syncToCloud();
     await Promise.resolve();
-    actions.setDayNote(1, 1, 'Second');
-    const second = actions.syncToCloud();
+    store.actions.setDayNote(1, 1, 'Second');
+    const second = store.actions.syncToCloud();
     await Promise.resolve();
     expect(client.mutation).toHaveBeenCalledTimes(2);
     finishFirst(4);
@@ -94,21 +105,58 @@ describe('cloud restore and save ordering', () => {
     expect(JSON.parse(client.mutation.mock.calls[2][1].doneJson).dayNotes.w1d1).toBe('Second');
   });
 
-  it('restores legacy progress owned by a verified member using its saved course position', async () => {
-    client.mutation.mockResolvedValueOnce({ member: { week: 2, day: 4, progressVersion: 0,
-      doneJson: JSON.stringify({ done: {}, dayHours: {}, dayNotes: { w2d4: 'Legacy note' } }),
-    } });
-    await actions.signIn('Student', 'STUDIO', true);
-    expect(get(state).cw).toBe(2);
-    expect(get(state).cd).toBe(4);
-    expect(get(state).dayNotes.w2d4).toBe('Legacy note');
+  it('does not discard changes or sign out when saving fails', async () => {
+    client.mutation.mockResolvedValueOnce(member());
+    await store.actions.signIn('Student');
+    store.actions.setDayNote(1, 1, 'Not saved yet');
+    client.mutation.mockRejectedValueOnce(new Error('Offline'));
+    expect(await store.actions.signOut()).toBe(false);
+    expect(get(store.state).isSignedIn).toBe(true);
+    expect(get(store.state).dayNotes.w1d1).toBe('Not saved yet');
+    expect(get(store.savePending)).toBe(true);
+    expect(get(store.cloudStatus).status).toBe('error');
   });
 
-  it('leaves local work untouched when cloud data is invalid', async () => {
-    actions.setDayNote(1, 1, 'Keep this');
-    client.mutation.mockResolvedValueOnce({ member: { week: 1, day: 1, progressVersion: 0, doneJson: '{}' } });
-    await expect(actions.signIn('Student', 'STUDIO', true)).rejects.toThrow();
-    expect(get(state).dayNotes.w1d1).toBe('Keep this');
-    expect(get(state).isSignedIn).toBe(false);
+  it('flushes changes and clears account data on sign-out', async () => {
+    client.mutation.mockResolvedValueOnce(member());
+    await store.actions.signIn('Student');
+    store.actions.setDayNote(1, 1, 'Saved before leaving');
+    client.mutation.mockResolvedValueOnce(1);
+    expect(await store.actions.signOut()).toBe(true);
+    expect(JSON.parse(client.mutation.mock.calls[1][1].doneJson).dayNotes.w1d1).toBe('Saved before leaving');
+    expect(get(store.state).dayNotes).toEqual({});
+    expect(get(store.state).isSignedIn).toBe(false);
+  });
+
+  it('preserves pending edits across same-account reauthentication', async () => {
+    client.mutation.mockResolvedValueOnce(member());
+    await store.actions.signIn('Student');
+    store.actions.setDayNote(1, 1, 'Keep working');
+    store.actions.cloudSessionExpired();
+    expect(get(store.state).isSignedIn).toBe(false);
+    client.mutation.mockResolvedValueOnce(member());
+    client.mutation.mockResolvedValueOnce(1);
+    await store.actions.signIn('Student');
+    expect(get(store.state).dayNotes.w1d1).toBe('Keep working');
+    expect(get(store.savePending)).toBe(false);
+  });
+
+  it('does not upload one account’s pending notes to a different account', async () => {
+    client.mutation.mockResolvedValueOnce(member());
+    await store.actions.signIn('Student');
+    store.actions.setDayNote(1, 1, 'Private');
+    store.actions.cloudSessionExpired();
+    client.mutation.mockResolvedValueOnce(member(blank, 0, 'other-student'));
+    await expect(store.actions.signIn('Other Student')).rejects.toThrow('previous account');
+    expect(get(store.state).dayNotes.w1d1).toBe('Private');
+    expect(get(store.state).isSignedIn).toBe(false);
+    expect(client.mutation).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not replace cloud data when its saved payload is invalid', async () => {
+    client.mutation.mockResolvedValueOnce({ member: { ...member().member, doneJson: '{}' } });
+    await expect(store.actions.signIn('Student')).rejects.toThrow();
+    expect(get(store.state).isSignedIn).toBe(false);
+    expect(client.mutation).toHaveBeenCalledTimes(1);
   });
 });

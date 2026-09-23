@@ -13,6 +13,8 @@ export interface Progress {
   cd: number;
   paceFlex: boolean;
   kitChecked: Record<string, boolean>;
+  theme: 'light' | 'dark';
+  onboarded: boolean;
 }
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -58,15 +60,17 @@ export function serializeProgress(state: Progress): Progress {
     cw: state.cw,
     cd: state.cd,
     paceFlex: state.paceFlex,
-    kitChecked: { ...state.kitChecked }
+    kitChecked: { ...state.kitChecked },
+    theme: state.theme,
+    onboarded: state.onboarded
   };
 }
 
 export function parseProgress(data: unknown): Progress {
-  if (!isRecord(data)) throw new Error('Backup must be an object');
+  if (!isRecord(data)) throw new Error('Progress must be an object');
   const source = data;
   for (const field of ['done', 'dayHours', 'dayNotes', 'start', 'cw', 'cd']) {
-    if (!Object.hasOwn(source, field)) throw new Error(`Backup is missing ${field}`);
+    if (!Object.hasOwn(source, field)) throw new Error(`Progress is missing ${field}`);
   }
   const mapField = (key: string): unknown => key in source ? source[key] : {};
   const done = mapOf(mapField('done'), 'done', booleanValue, (key) => {
@@ -89,8 +93,10 @@ export function parseProgress(data: unknown): Progress {
   const cw = optional(source, 'cw', 1, (value): value is number => typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 8);
   const cd = optional(source, 'cd', 1, (value): value is number => typeof value === 'number' && Number.isInteger(value) && value >= 1 && value <= 7);
   const paceFlex = optional(source, 'paceFlex', false, booleanValue);
+  const theme = optional(source, 'theme', 'light', (value): value is 'light' | 'dark' => value === 'light' || value === 'dark');
+  const onboarded = optional(source, 'onboarded', true, booleanValue);
   parseLocalDate(start);
-  return { done, dayHours, dayNotes, weekNotes, ms, counters, start, cw, cd, paceFlex, kitChecked };
+  return { done, dayHours, dayNotes, weekNotes, ms, counters, start, cw, cd, paceFlex, kitChecked, theme, onboarded };
 }
 
 export function parseCloudProgress(data: unknown, defaults: Pick<Progress, 'start' | 'cw' | 'cd'>): Progress {

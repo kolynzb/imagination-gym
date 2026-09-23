@@ -22,6 +22,7 @@ const leaderboardMemberValidator = v.object({
 });
 
 const ownMemberValidator = leaderboardMemberValidator.extend({
+  roomCode: v.string(),
   doneJson: v.optional(v.string()),
   progressVersion: v.number(),
 });
@@ -93,7 +94,7 @@ export const getMyProgress = query({
   handler: async (ctx, args) => {
     const code = roomCode(args.roomCode);
     const { member } = await requireMember(ctx, code);
-    return { ...asLeaderboardMember(member), progressVersion: member.progressVersion ?? 0, ...(member.doneJson ? { doneJson: member.doneJson } : {}) };
+    return { ...asLeaderboardMember(member), roomCode: member.roomCode, progressVersion: member.progressVersion ?? 0, ...(member.doneJson ? { doneJson: member.doneJson } : {}) };
   },
 });
 
@@ -117,11 +118,14 @@ export const getCritPosts = query({
 });
 
 export const signInOrRegister = mutation({
-  args: { roomCode: v.string(), name: v.string() },
+  args: { roomCode: v.optional(v.string()), name: v.string() },
   returns: v.object({ member: ownMemberValidator, created: v.boolean() }),
   handler: async (ctx, args) => {
     const identity = await requireIdentity(ctx);
-    const code = roomCode(args.roomCode);
+    const previous = args.roomCode ? null : await ctx.db.query("members")
+      .withIndex("by_tokenIdentifier_and_lastActive", q => q.eq("tokenIdentifier", identity.tokenIdentifier))
+      .order("desc").first();
+    const code = roomCode(args.roomCode ?? previous?.roomCode ?? "GYM-CREW");
     const name = displayName(args.name);
     let room = await ctx.db.query("rooms").withIndex("by_code", (q) => q.eq("code", code)).first();
     if (!room) {
@@ -140,7 +144,7 @@ export const signInOrRegister = mutation({
       member = await ctx.db.get(member._id);
     }
     if (!member) throw new Error("Could not create member");
-    return { member: { ...asLeaderboardMember(member), progressVersion: member.progressVersion ?? 0, ...(member.doneJson ? { doneJson: member.doneJson } : {}) }, created };
+    return { member: { ...asLeaderboardMember(member), roomCode: member.roomCode, progressVersion: member.progressVersion ?? 0, ...(member.doneJson ? { doneJson: member.doneJson } : {}) }, created };
   },
 });
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { state, actions, derivedStats, hasDeviceBackup } from '../lib/store';
+  import { state, actions, derivedStats } from '../lib/store';
   import { WEEKS, RUBRIC } from '../lib/curriculum';
   import Icon from './Icon.svelte';
 
@@ -7,8 +7,6 @@
   let stats = $derivedStats;
   $: s = $state;
   $: stats = $derivedStats;
-  let backupMessage = '';
-  let backupError = false;
 
   const COUNTER_TARGETS = [
     { k: 'boxes', t: 'Boxes in Perspective', target: 100 },
@@ -23,42 +21,6 @@
     { k: 'highlight', t: 'Daily Memory Highlights', target: 56 }
   ];
 
-  function handleExport() {
-    const at = new Date().toISOString().slice(0, 10);
-    const blob = new Blob([JSON.stringify(actions.exportBackup(), null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `imagination-gym-backup-${at}.json`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    backupError = false;
-    backupMessage = 'Backup exported successfully.';
-  }
-
-  function handleImport(e: Event) {
-    const input = e.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      if (!confirm('Importing a backup replaces your current local progress and notes. Continue?')) {
-        input.value = '';
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const data = JSON.parse(reader.result as string);
-          actions.importBackup(data);
-          backupError = false;
-          backupMessage = 'Backup imported successfully.';
-        } catch (err) {
-          backupError = true;
-          backupMessage = err instanceof Error ? err.message : 'Backup could not be imported.';
-        }
-      };
-      reader.readAsText(input.files[0]);
-      input.value = '';
-    }
-  }
 </script>
 
 <div class="progress-view">
@@ -155,7 +117,7 @@
 
   <section class="reflection-section">
     <h2 class="section-title">Weekly Reflections</h2>
-    <p class="section-desc">Keep the lesson from each week in the app. These notes are included in backups.</p>
+    <p class="section-desc">Keep the lesson from each week in your reflection notes.</p>
     <div class="reflections-grid">
       {#each WEEKS as week}
         <label class="reflection-card">
@@ -190,39 +152,6 @@
           </div>
         </div>
       {/each}
-    </div>
-  </section>
-
-  <!-- Backup & Export Card -->
-  <section class="backup-section">
-    <div class="backup-card">
-      <div class="backup-info">
-        <h3 class="backup-title">Local Data & Backup</h3>
-        <p class="backup-desc">
-          All your ticks, hours, and notes are preserved in your local browser storage. Export a JSON backup periodically so you never lose your training history.
-        </p>
-      </div>
-      <div class="backup-btns">
-        {#if $hasDeviceBackup}
-          <button type="button" class="action-btn outline" onclick={() => {
-            if (confirm('Restore the device progress saved before cloud restore? This replaces the current device progress and turns off cloud sync.')) {
-              actions.restoreDeviceBackup();
-              backupError = false;
-              backupMessage = 'Previous device progress restored. Cloud sync is off.';
-            }
-          }}>Restore Device Backup</button>
-        {/if}
-        <button type="button" class="action-btn primary" onclick={handleExport}>
-          <Icon name="download" size={15} /> Export Backup (.json)
-        </button>
-        <label class="action-btn outline file-label">
-          <Icon name="upload" size={15} /> Import Backup
-          <input type="file" accept=".json,application/json" onchange={handleImport} />
-        </label>
-      </div>
-      {#if backupMessage}
-        <p class:error={backupError} class="backup-message" role={backupError ? 'alert' : 'status'}>{backupMessage}</p>
-      {/if}
     </div>
   </section>
 
@@ -568,86 +497,6 @@
 
   .c-buttons button:hover {
     border-color: var(--ink);
-  }
-
-  .backup-section {
-    margin-bottom: 48px;
-  }
-
-  .backup-card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 24px;
-    padding: 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    flex-wrap: wrap;
-  }
-
-  .backup-message {
-    flex-basis: 100%;
-    margin: 0;
-    color: var(--accent-ink);
-    font-size: 13px;
-  }
-
-  .backup-message.error {
-    color: var(--danger, #9d2b2b);
-  }
-
-  .backup-title {
-    font-family: 'Bebas Neue', Impact, sans-serif;
-    font-size: 28px;
-    letter-spacing: 0.02em;
-    margin: 0;
-    color: var(--ink);
-  }
-
-  .backup-desc {
-    font-size: 14px;
-    line-height: 1.55;
-    color: var(--ink-78);
-    max-width: 55ch;
-    margin: 6px 0 0;
-  }
-
-  .backup-btns {
-    display: flex;
-    gap: 10px;
-  }
-
-  .action-btn {
-    appearance: none;
-    padding: 10px 20px;
-    border-radius: 800px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  .action-btn.primary {
-    background: var(--accent);
-    color: var(--on-accent);
-    border: 1.5px solid var(--accent);
-  }
-
-  .action-btn.outline {
-    background: transparent;
-    border: 1.5px solid var(--line-2);
-    color: var(--ink);
-  }
-
-  .file-label {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
-
-  .file-label input {
-    display: none;
   }
 
   .rubric-section {

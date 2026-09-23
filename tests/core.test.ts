@@ -15,11 +15,14 @@ const backup = {
   cw: 1,
   cd: 1,
   paceFlex: false,
-  kitChecked: { pencil: true }
+  kitChecked: { pencil: true }, theme: 'light', onboarded: true
 };
 
 describe('dates and progress', () => {
-  beforeEach(() => actions.importBackup(backup));
+  beforeEach(() => {
+    actions.resetTimer();
+    state.update(s => ({ ...s, ...parseProgress(backup), isSignedIn: false }));
+  });
   afterEach(() => vi.useRealTimers());
 
   it('formats local EAT dates and clamps session boundaries', () => {
@@ -32,19 +35,15 @@ describe('dates and progress', () => {
 
   it('validates progress and leaves state unchanged on invalid import', () => {
     const before = get(state);
-    expect(() => actions.importBackup({ ...backup, dayHours: { w1d1: '25' } })).toThrow(/dayHours/);
+    expect(() => parseProgress({ ...backup, dayHours: { w1d1: '25' } })).toThrow(/dayHours/);
     expect(get(state).dayHours).toEqual(before.dayHours);
-    expect(() => actions.importBackup({ ...backup, done: { nope: true } })).toThrow(/done/);
+    expect(() => parseProgress({ ...backup, done: { nope: true } })).toThrow(/done/);
   });
 
-  it('restores only progress and never restores auth or timer state', () => {
-    state.update((s) => ({ ...s, isSignedIn: true, timerRunning: true }));
-    actions.importBackup(backup);
-    const restored = get(state);
-    expect(restored.dayHours.w1d1).toBe('0.125');
-    expect(restored.isSignedIn).toBe(false);
-    expect(restored.timerRunning).toBe(false);
-    expect(actions.exportBackup()).toEqual(backup);
+  it('does not accept authentication fields as saved progress', () => {
+    const restored = parseProgress({ ...backup, isSignedIn: true, timerRunning: true });
+    expect(restored).not.toHaveProperty('isSignedIn');
+    expect(restored).not.toHaveProperty('timerRunning');
   });
 
   it('uses wall-clock elapsed time, keeps sub-hour precision, and logs once', () => {

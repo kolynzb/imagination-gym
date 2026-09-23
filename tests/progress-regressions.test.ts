@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseProgress } from '../src/lib/progress';
+import { parseProgress, serializeProgress } from '../src/lib/progress';
 import { calendarDayIndex } from '../src/lib/dates';
 import { actions, state } from '../src/lib/store';
 import { get } from 'svelte/store';
@@ -11,21 +11,21 @@ const progress = {
 
 describe('progress boundary regressions', () => {
   it('round-trips every accepted hours entry and long student notes', () => {
-    actions.importBackup(progress);
+    state.update(s => ({ ...s, ...parseProgress(progress) }));
     actions.setDayNote(1, 1, 'keep my work');
     for (const hours of ['1.', ' ', '1.5', '0.0000001', '1e-7']) {
       actions.setDayHours(1, 1, hours);
-      expect(() => parseProgress(actions.exportBackup())).not.toThrow();
+      expect(() => parseProgress(serializeProgress(get(state)))).not.toThrow();
     }
     actions.setDayNote(1, 1, 'n'.repeat(10001));
     actions.setWeekNote(1, 'r'.repeat(10001));
-    expect(() => parseProgress(actions.exportBackup())).not.toThrow();
+    expect(() => parseProgress(serializeProgress(get(state)))).not.toThrow();
   });
 
-  it('resets imported play-day timers to the selected curriculum', () => {
-    actions.importBackup(progress);
+  it('resets play-day timers to the selected curriculum', () => {
+    state.update(s => ({ ...s, ...parseProgress(progress) }));
     actions.selectTimerPart(2, 30);
-    actions.importBackup({ ...progress, cd: 7 });
+    actions.jumpToDay(1, 7);
     expect(get(state).timerMode).toBe('stopwatch');
     expect(get(state).timerTargetSeconds).toBe(0);
     expect(get(state).timerPartIndex).toBe(0);

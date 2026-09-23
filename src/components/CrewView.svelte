@@ -1,17 +1,13 @@
 <script lang="ts">
-  import { state, actions, derivedStats } from '../lib/store';
+  import { state, actions } from '../lib/store';
   import { api, getConvexSiteUrl, isConvexEnabled, convex, type CrewMember, type CritPost } from '../lib/convex';
-  import { onMount, onDestroy } from 'svelte';
+  import { onDestroy } from 'svelte';
   import Icon from './Icon.svelte';
 
   let s = $state;
-  let stats = $derivedStats;
   $: s = $state;
-  $: stats = $derivedStats;
 
-  let pasteVal = '';
-  let pasteStatus = '';
-  let syncing = false;
+  let uploadError = '';
 
   // Real-time Convex data
   let convexMembers: CrewMember[] = [];
@@ -27,37 +23,14 @@
   let critUploading = false;
 
   $: hasConvex = isConvexEnabled();
-  $: cloudCrewReady = hasConvex && s.isSignedIn;
-  $: if (cloudCrewReady && subscribedRoom !== s.roomCode) subscribeConvexRoom();
-  $: if (!cloudCrewReady && subscribedRoom) clearSubscriptions();
+  $: crewReady = hasConvex && s.isSignedIn;
+  $: if (crewReady && subscribedRoom !== s.roomCode) subscribeConvexRoom();
+  $: if (!crewReady && subscribedRoom) clearSubscriptions();
 
-  // Combine user's own status with crew
-  $: myEntry = {
-    id: 'me',
-    name: s.userName || 'You',
-    week: s.cw,
-    day: s.cd,
-    hours: parseFloat(stats.totalHoursNum) || 0,
-    streak: stats.streak,
-    locked: true
-  };
-
-  // If Convex is active, use Convex members; otherwise use localCrew
-  $: displayMembers = cloudCrewReady && convexMembers.length > 0
-    ? convexMembers.map((m) => ({
-        ...m,
-        locked: m.name.toLowerCase() === s.userName.toLowerCase()
-      }))
-    : [
-        myEntry,
-        ...s.localCrew.map((m) => ({ ...m, locked: false }))
-      ].sort((a, b) => b.hours - a.hours);
-
-  onMount(() => {
-    if (cloudCrewReady && convex) {
-      subscribeConvexRoom();
-    }
-  });
+  $: displayMembers = convexMembers.map(member => ({
+    ...member,
+    locked: member.name.toLowerCase() === s.userName.toLowerCase()
+  }));
 
   onDestroy(() => {
     clearSubscriptions();
@@ -75,116 +48,72 @@
   }
 
   function subscribeConvexRoom() {
-    if (!convex || !cloudCrewReady) return;
+    if (!convex || !crewReady) return;
     clearSubscriptions();
     const roomCode = s.roomCode;
     subscribedRoom = roomCode;
+    const onError = () => {
+      if (subscribedRoom === roomCode) subscriptionError = 'Could not load this crew room.';
+    };
     try {
       unsubscribeMembers = convex.onUpdate(api.crew.getMembers, { roomCode }, (members: CrewMember[]) => {
         if (subscribedRoom !== roomCode) return;
         convexMembers = members;
-      });
+      }, onError);
       unsubscribeCrits = convex.onUpdate(api.crew.getCritPosts, { roomCode }, (posts: CritPost[]) => {
         if (subscribedRoom !== roomCode) return;
         critPosts = posts;
-      });
+      }, onError);
     } catch (err) {
       console.warn('Convex subscription error:', err);
       subscriptionError = 'Could not load this crew room.';
     }
   }
 
-  async function handleSyncMyProgress() {
-    syncing = true;
-    if (cloudCrewReady && convex) {
-      try {
-        pasteStatus = await actions.syncToCloud() ? 'Cloud progress synced to this room.' : 'Cloud sync did not complete. Your local practice is safe.';
-      } catch (e) {
-        console.error('Failed to sync to Convex:', e);
-        pasteStatus = 'Cloud sync failed. Your local practice is safe.';
-      }
-    } else {
-      // Generate code to clipboard
-      navigator.clipboard.writeText(`${s.userName}: ${stats.shareCode}`);
-      pasteStatus = `✓ Copied code: ${s.userName}: ${stats.shareCode}`;
-    }
-    syncing = false;
-    setTimeout(() => (pasteStatus = ''), 3000);
-  }
-
   let inviteCopiedMsg = '';
   async function handleCopyInviteLink() {
-    const link = await actions.copyInviteLink(s.roomCode);
-    inviteCopiedMsg = `✓ Invite link copied: ${link}`;
+    try {
+      const link = await actions.copyInviteLink(s.roomCode);
+      inviteCopiedMsg = `Invite link copied: ${link}`;
+    } catch {
+      inviteCopiedMsg = 'Could not copy the invite link. Please try again.';
+    }
     setTimeout(() => (inviteCopiedMsg = ''), 4000);
   }
 
-  function handlePaste() {
-    if (!pasteVal.trim()) return;
-    const ok = actions.pasteSyncCode(pasteVal);
-    if (ok) {
-      pasteStatus = '✓ Friend added / updated in place!';
-      pasteVal = '';
-    } else {
-      pasteStatus = 'Invalid code format. Expected: Name: IG-W.D.H';
-    }
-    setTimeout(() => (pasteStatus = ''), 3500);
-  }
-
   async function handleUploadCrit() {
-    if (!critFile) return;
+    if (!critFile || critUploading) return;
     critUploading = true;
 
-    if (cloudCrewReady && convex) {
-      try {
-        const siteUrl = getConvexSiteUrl();
-        const auth = convex.getAuth();
-        if (!siteUrl || !auth) throw new Error('Cloud uploads are not configured or signed in');
-        const res = await fetch(`${siteUrl}/crit-upload`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${auth.token}`,
-            'Content-Type': critFile.type,
-            'X-Crit-Room-Code': s.roomCode,
-            'X-Crit-Week': String(s.cw),
-            'X-Crit-Day': String(s.cd),
-            'X-Crit-Size': String(critFile.size),
-            'X-Crit-Prompt': encodeURIComponent(critPrompt || 'Check line convergence and minor axes.')
-          },
-          body: critFile
-        });
-        if (!res.ok) throw new Error('Image upload was rejected');
+    uploadError = '';
+    try {
+      if (!crewReady || !convex) throw new Error('Sign in to post a sketch');
+      const siteUrl = getConvexSiteUrl();
+      const auth = convex.getAuth();
+      if (!siteUrl || !auth) throw new Error('Sketch uploads are unavailable');
+      const res = await fetch(`${siteUrl}/crit-upload`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${auth.token}`,
+          'Content-Type': critFile.type,
+          'X-Crit-Room-Code': s.roomCode,
+          'X-Crit-Week': String(s.cw),
+          'X-Crit-Day': String(s.cd),
+          'X-Crit-Size': String(critFile.size),
+          'X-Crit-Prompt': encodeURIComponent(critPrompt || 'Check line convergence and minor axes.')
+        },
+        body: critFile
+      });
+      if (!res.ok) throw new Error('Image upload was rejected');
 
-        critPrompt = '';
-        critFile = null;
-      } catch (err) {
+      critPrompt = '';
+      critFile = null;
+    } catch (err) {
       console.error('Crit upload error:', err);
-      pasteStatus = 'Sketch was not posted. Check the image and Google sign-in, then try again.';
-      }
-    } else {
-      // Temporary local preview only. It is not shared or durable.
-      const reader = new FileReader();
-      reader.onload = () => {
-        critPosts = [
-          {
-            _id: `local-${Date.now()}`,
-            roomCode: s.roomCode,
-            authorName: s.userName,
-            week: s.cw,
-            day: s.cd,
-            imageUrl: typeof reader.result === 'string' ? reader.result : '',
-            prompt: critPrompt || 'Reviewing linework',
-            createdAt: Date.now()
-          },
-          ...critPosts
-        ];
-        pasteStatus = 'Temporary local preview only. Sign in with Google to post this sketch to the Crew.';
-        critPrompt = '';
-        critFile = null;
-      };
-      reader.readAsDataURL(critFile);
+      uploadError = 'Sketch was not posted. Check the image and Google sign-in, then try again.';
+    } finally {
+      critUploading = false;
     }
-    critUploading = false;
   }
 </script>
 
@@ -193,7 +122,7 @@
     <div class="crew-title-group">
       <h1 class="page-title">The Crew</h1>
       <p class="subtitle">
-        Group accountability engine. Sync your week, day, and hours with your drawing crew in real time or via lightweight codes.
+        Practice alongside your drawing crew. Follow their progress and share sketches for feedback.
       </p>
     </div>
 
@@ -221,13 +150,7 @@
           }}
         />
       </div>
-      <div class="backend-status" class:online={cloudCrewReady}>
-        {#if cloudCrewReady}
-          <Icon name="flash-on" size={14} /> Convex Real-Time Active
-        {:else}
-          <span class="local-dot"></span> Local Practice Mode
-        {/if}
-      </div>
+
     </div>
   </header>
 
@@ -260,7 +183,7 @@
         <Icon name="copy" size={14} /> Copy Invite Link
       </button>
       <button type="button" class="action-chip-btn" onclick={() => actions.openAuthModal()}>
-        <Icon name="user" size={14} /> Profile & Switch Room
+        <Icon name="user" size={14} /> Your account
       </button>
     </div>
   </div>
@@ -278,7 +201,6 @@
       <span class="col num-col">Day</span>
       <span class="col num-col">Hours</span>
       <span class="col prog-col">Through</span>
-      <span class="col act-col"></span>
     </div>
 
     <div class="table-rows">
@@ -301,59 +223,14 @@
             </div>
             <span class="pct-text">{pct}%</span>
           </div>
-          <div class="col act-col">
-            {#if !member.locked && 'id' in member && member.id}
-              <button
-                type="button"
-                class="remove-mate-btn"
-                onclick={() => actions.removeFriend(member.id)}
-                title="Remove friend"
-              >
-                <Icon name="cancel" size={12} />
-              </button>
-            {/if}
-          </div>
+
         </div>
       {/each}
     </div>
   </div>
 
-  <!-- Sync Action Buttons & Code Paster -->
-  <div class="sync-actions-row">
-    <button
-      type="button"
-      class="sync-btn primary"
-      disabled={syncing}
-      onclick={handleSyncMyProgress}
-    >
-      {#if syncing}
-        Syncing...
-      {:else if cloudCrewReady}
-        <Icon name="flash-on" size={16} /> Sync My Progress to Room
-      {:else}
-        <Icon name="copy" size={16} /> Copy My Code · {stats.shareCode}
-      {/if}
-    </button>
-
-    <div class="paste-code-group">
-      <input
-        type="text"
-        placeholder="Paste friend code (e.g. Mia: IG-3.4.22)"
-        bind:value={pasteVal}
-        onkeydown={(e) => e.key === 'Enter' && handlePaste()}
-      />
-      <button type="button" class="paste-btn" onclick={handlePaste}>
-        Add / Update from Code
-      </button>
-    </div>
-  </div>
-
-  {#if pasteStatus}
-    <div class="paste-feedback">{pasteStatus}</div>
-  {/if}
-
   {#if subscriptionError}
-    <div class="paste-feedback">{subscriptionError}</div>
+    <div class="feedback" role="alert">{subscriptionError}</div>
   {/if}
 
   <!-- Shared Crit Wall -->
@@ -382,7 +259,7 @@
             <Icon name="opened-folder" size={16} /> Choose Drawing / Sketch Photo
           {/if}
         </label>
-        <span class="posting-as">{cloudCrewReady ? `Posting as ${s.userName}` : 'Temporary local preview'} (W{s.cw} D{s.cd})</span>
+        <span class="posting-as">Posting as {s.userName} (W{s.cw} D{s.cd})</span>
       </div>
       <div class="upload-bottom">
         <input
@@ -393,13 +270,17 @@
         <button
           type="button"
           class="post-crit-btn"
-          disabled={!critFile || critUploading}
+          disabled={!crewReady || !critFile || critUploading}
           onclick={handleUploadCrit}
         >
           {critUploading ? 'Uploading...' : 'Post to Crit Wall'}
         </button>
       </div>
     </div>
+
+    {#if uploadError}
+      <p class="feedback" role="alert">{uploadError}</p>
+    {/if}
 
     <!-- Feed of Posts -->
     <div class="crit-grid">
@@ -498,18 +379,6 @@
     color: var(--ink);
   }
 
-  .backend-status {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--ink-62);
-    border-top: 1px solid var(--line);
-    padding-top: 8px;
-  }
-
-  .backend-status.online {
-    color: #107c41;
-  }
-
   .table-card {
     background: var(--card);
     border: 1px solid var(--line);
@@ -557,7 +426,6 @@
   .name-col { flex: 1.5; min-width: 120px; }
   .num-col { width: 70px; flex: 0 0 70px; }
   .prog-col { flex: 1; min-width: 120px; }
-  .act-col { width: 32px; flex: 0 0 32px; }
 
   .name-cell {
     display: flex;
@@ -599,73 +467,7 @@
     width: 34px;
   }
 
-  .remove-mate-btn {
-    background: transparent;
-    border: 0;
-    color: var(--ink-35);
-    cursor: pointer;
-    font-size: 14px;
-  }
-
-  .remove-mate-btn:hover {
-    color: var(--accent);
-  }
-
-  .sync-actions-row {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-    margin-top: 20px;
-  }
-
-  .sync-btn {
-    appearance: none;
-    background: var(--accent);
-    color: var(--on-accent);
-    border: 1.5px solid var(--accent);
-    padding: 12px 24px;
-    border-radius: 800px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .paste-code-group {
-    display: flex;
-    gap: 8px;
-    flex: 1;
-    min-width: 280px;
-  }
-
-  .paste-code-group input {
-    flex: 1;
-    background: var(--card);
-    border: 1px solid var(--line-2);
-    border-radius: 800px;
-    padding: 11px 16px;
-    font-size: 14px;
-    color: var(--ink);
-  }
-
-  .paste-btn {
-    appearance: none;
-    border: 1.5px solid var(--line-2);
-    background: transparent;
-    color: var(--ink);
-    padding: 11px 20px;
-    border-radius: 800px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-
-  .paste-btn:hover {
-    border-color: var(--ink);
-  }
-
-  .paste-feedback {
+  .feedback {
     margin-top: 10px;
     font-size: 14px;
     font-weight: 500;

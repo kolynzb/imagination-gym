@@ -1,11 +1,9 @@
 import { writable, derived, get } from 'svelte/store';
 import { WEEKS, type Week, type Day, type DayPart } from './curriculum';
 import { playChime, playBlip } from './audio';
-import { api, clearCloudAuth, convex, isConvexEnabled } from './convex';
+import { api, clearCloudAuth, convex } from './convex';
 import { calendarDayIndex, formatLocalDate, getMondayOf as localMondayOf, shiftLocalDate, parseLocalDate } from './dates';
-import { parseProgress, parseCloudProgress, serializeProgress, type Progress } from './progress';
-
-export const LS_KEY = 'imaginationGym.v2';
+import { parseCloudProgress, serializeProgress } from './progress';
 
 export interface AppState {
   view: 'today' | 'week' | 'roadmap' | 'exercises' | 'vault' | 'progress' | 'crew' | 'method';
@@ -24,7 +22,6 @@ export interface AppState {
   activeExerciseDrawer: string | null; // e.g. "01"
   roomCode: string;
   userName: string;
-  localCrew: Array<{ id: string; name: string; week: number; day: number; hours: number; streak: number }>;
   timerRunning: boolean;
   timerMode: 'countdown' | 'stopwatch';
   timerTargetSeconds: number; // e.g. 600 for 10 min
@@ -51,102 +48,21 @@ function sessionTimer(cw: number, cd: number) {
     timerRunning: false, timerElapsed: 0, timerStartedAt: null };
 }
 
-let localLoadFailed = false;
-
 function getInitialState(): AppState {
-  const defaultStart = formatLocalDate(new Date());
-  let saved: Partial<AppState> | null = null;
-  if (typeof window !== 'undefined') {
-    try {
-      const raw = localStorage.getItem(LS_KEY) || localStorage.getItem('imaginationGym.v1');
-      if (raw) {
-        const parsed: unknown = JSON.parse(raw);
-        const progress = parseProgress(parsed);
-        saved = { ...progress };
-        if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
-          const legacy = parsed as Record<string, unknown>;
-          if (typeof legacy.roomCode === 'string') saved.roomCode = legacy.roomCode;
-          if (typeof legacy.userName === 'string') saved.userName = legacy.userName;
-          if (legacy.theme === 'light' || legacy.theme === 'dark') saved.theme = legacy.theme;
-          if (typeof legacy.onboarded === 'boolean') saved.onboarded = legacy.onboarded;
-          if (Array.isArray(legacy.localCrew)) {
-            saved.localCrew = legacy.localCrew.filter((member: unknown): member is AppState['localCrew'][number] => {
-              if (typeof member !== 'object' || member === null) return false;
-              return 'id' in member && typeof member.id === 'string'
-                && 'name' in member && typeof member.name === 'string'
-                && 'week' in member && typeof member.week === 'number' && Number.isInteger(member.week) && member.week >= 1 && member.week <= 8
-                && 'day' in member && typeof member.day === 'number' && Number.isInteger(member.day) && member.day >= 1 && member.day <= 7
-                && 'hours' in member && typeof member.hours === 'number' && Number.isFinite(member.hours) && member.hours >= 0
-                && 'streak' in member && typeof member.streak === 'number' && Number.isFinite(member.streak) && member.streak >= 0;
-            });
-          }
-          if (typeof legacy.userEmail === 'string' || legacy.userEmail === null) saved.userEmail = legacy.userEmail;
-          if (typeof legacy.userAvatar === 'string' || legacy.userAvatar === null) saved.userAvatar = legacy.userAvatar;
-        }
-      }
-    } catch (e) {
-      localLoadFailed = true;
-      console.warn('Stored progress could not be read. Leaving it untouched:', e);
-    }
-  }
-
-  // Parse invite / room parameter from URL: e.g. ?room=CREW-8MJE or ?invite=STUDIO-4K
-  let urlRoom: string | null = null;
-  if (typeof window !== 'undefined' && window.location?.search) {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const r = params.get('room') || params.get('invite');
-      if (r && r.trim()) {
-        urlRoom = r.trim().toUpperCase();
-      }
-    } catch (e) {
-      console.warn('Failed to parse URL query params:', e);
-    }
-  }
-
-  const activeRoom = urlRoom || saved?.roomCode || 'GYM-CREW';
-  const isInvited = !!urlRoom && urlRoom !== saved?.roomCode;
-
+  const invitedRoom = typeof window !== 'undefined'
+    ? new URLSearchParams(window.location?.search || '').get('room')?.toUpperCase().trim() || null
+    : null;
   return {
-    view: 'today',
-    cw: saved?.cw || 1,
-    cd: saved?.cd || 1,
-    done: saved?.done || {},
-    dayHours: saved?.dayHours || {},
-    dayNotes: saved?.dayNotes || {},
-    weekNotes: saved?.weekNotes || {},
-    ms: saved?.ms || {},
-    counters: saved?.counters || {
-      boxes: 0,
-      cyl: 0,
-      sil: 0,
-      sym: 0,
-      refman: 0,
-      imgman: 0,
-      intman: 0,
-      texbar: 0,
-      blob: 0,
-      highlight: 0
-    },
-    start: saved?.start || defaultStart,
-    theme: saved?.theme || 'light',
-    paceFlex: saved?.paceFlex ?? false,
-    focus: false,
-    activeExerciseDrawer: null,
-    roomCode: activeRoom,
-    userName: saved?.userName || 'You',
-    localCrew: saved?.localCrew || [],
-    ...sessionTimer(saved?.cw || 1, saved?.cd || 1),
-    onboarded: saved?.onboarded ?? false,
-    onboardingOpen: saved?.onboarded ? false : !isInvited,
-    onboardingStep: 1,
-    kitChecked: saved?.kitChecked || {},
-    authModalOpen: isInvited && !saved?.isSignedIn,
-    isSignedIn: false,
-    invitedRoomCode: urlRoom,
-    inviteBannerDismissed: false,
-    userEmail: null,
-    userAvatar: null
+    view: 'today', cw: 1, cd: 1,
+    done: {}, dayHours: {}, dayNotes: {}, weekNotes: {}, ms: {}, counters: {},
+    start: formatLocalDate(new Date()), theme: 'light', paceFlex: false,
+    focus: false, activeExerciseDrawer: null,
+    roomCode: invitedRoom || 'GYM-CREW', userName: 'You',
+    ...sessionTimer(1, 1),
+    onboarded: false, onboardingOpen: false, onboardingStep: 1,
+    kitChecked: {}, authModalOpen: true, isSignedIn: false,
+    invitedRoomCode: invitedRoom, inviteBannerDismissed: false,
+    userEmail: null, userAvatar: null,
   };
 }
 
@@ -155,53 +71,29 @@ export function getMondayOf(d: Date): Date {
 }
 
 export const state = writable<AppState>(getInitialState());
-export const localSaveFailed = writable(false);
-export const cloudStatus = writable<{ status: 'local' | 'syncing' | 'synced' | 'error'; message: string }>({ status: 'local', message: 'Saved on this device.' });
+export const cloudStatus = writable<{ status: 'idle' | 'syncing' | 'synced' | 'error'; message: string }>({ status: 'idle', message: '' });
+export const savePending = writable(false);
 let authAttempt = 0;
 let cloudVersion = 0;
+let activeMemberId: string | null = null;
+let lastSavedJson = '';
+let lastObservedJson = '';
 let cloudSyncQueue = Promise.resolve(false);
-const DEVICE_BACKUP_KEY = `${LS_KEY}.beforeCloudRestore`;
-let deviceBackup: Progress | null = null;
-try {
-  const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(DEVICE_BACKUP_KEY) : null;
-  if (raw) deviceBackup = parseProgress(JSON.parse(raw));
-} catch { /* An unreadable recovery file must not prevent local practice. */ }
-export const hasDeviceBackup = writable(deviceBackup !== null);
-
 let cloudSyncTimer: ReturnType<typeof setTimeout> | null = null;
 let cloudRestoreComplete = false;
-function triggerDebouncedCloudSync() {
-  if (typeof window === 'undefined') return;
-  if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
-  cloudSyncTimer = setTimeout(() => {
-    if (cloudRestoreComplete) actions.syncToCloud().catch(() => {});
-  }, 1500);
-}
 
-// Auto-persist to localStorage on state changes (memoized to avoid write churn during timer ticks)
-if (typeof window !== 'undefined') {
-  let lastPersistedJson = '';
-  let lastObservedJson = '';
-  state.subscribe((s) => {
-    const { timerRunning, timerElapsed, timerRemaining, timerStartedAt, focus, activeExerciseDrawer, onboardingOpen, authModalOpen, isSignedIn, userEmail, userAvatar, ...persisted } = s;
-    const currentJson = JSON.stringify(persisted);
-    document.documentElement.setAttribute('data-theme', s.theme);
-    if (currentJson !== lastObservedJson) {
-      lastObservedJson = currentJson;
-      if (s.isSignedIn && isConvexEnabled() && cloudRestoreComplete) triggerDebouncedCloudSync();
-    }
-    try {
-      if (localLoadFailed) throw new Error('Stored progress could not be read. Import a valid backup before replacing it.');
-      if (currentJson !== lastPersistedJson) {
-        localStorage.setItem(LS_KEY, currentJson);
-        lastPersistedJson = currentJson;
-        localSaveFailed.set(false);
-      }
-    } catch {
-      localSaveFailed.set(true);
-    }
-  });
-}
+state.subscribe((s) => {
+  if (typeof document !== 'undefined') document.documentElement.setAttribute('data-theme', s.theme);
+  if (!s.isSignedIn || !cloudRestoreComplete) return;
+  const json = JSON.stringify(serializeProgress(s));
+  savePending.set(json !== lastSavedJson);
+  if (json === lastObservedJson) return;
+  lastObservedJson = json;
+  if (typeof window === 'undefined' || json === lastSavedJson) return;
+  cloudStatus.set({ status: 'syncing', message: 'Saving...' });
+  if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
+  cloudSyncTimer = setTimeout(() => { void actions.syncToCloud(); }, 300);
+});
 
 function settleTimer(s: AppState, now = Date.now()): AppState {
   if (!s.timerRunning || s.timerStartedAt === null) return s;
@@ -245,9 +137,7 @@ let timerInterval: ReturnType<typeof setInterval> | null = null;
 
 if (typeof window !== 'undefined') {
   timerInterval = setInterval(() => {
-    state.update((s) => {
-      return settleTimer(s);
-    });
+    if (get(state).timerRunning) state.update((s) => settleTimer(s));
   }, 1000);
 }
 
@@ -273,12 +163,23 @@ export const actions = {
 
   async setRoomCode(roomCode: string) {
     const s = get(state);
-    try { await actions.signIn(s.userName, roomCode, s.isSignedIn); }
+    if (!s.isSignedIn) return;
+    state.update(current => creditTimer(current));
+    if (get(savePending) && !await actions.syncToCloud()) return;
+    if (get(savePending)) return;
+    try { await actions.signIn(s.userName, roomCode); }
     catch { /* The cloud status explains the failure; keep the current room. */ }
   },
 
-  setUserName(userName: string) {
-    state.update((s) => ({ ...s, userName: userName.trim() }));
+  async setUserName(userName: string) {
+    const s = get(state);
+    if (!s.isSignedIn || !convex || !userName.trim()) return;
+    try {
+      const result = await convex.mutation(api.crew.signInOrRegister, { roomCode: s.roomCode, name: userName.trim() });
+      state.update((current) => ({ ...current, userName: result.member.name }));
+    } catch {
+      cloudStatus.set({ status: 'error', message: 'Your name could not be updated. Try again.' });
+    }
   },
 
   openExerciseDrawer(exerciseNum: string) {
@@ -434,71 +335,6 @@ export const actions = {
     });
   },
 
-  importBackup(data: unknown): void {
-    const progress = parseProgress(data);
-    localLoadFailed = false;
-    actions.signOut();
-    state.update((s) => ({ ...s, ...progress, ...sessionTimer(progress.cw, progress.cd), isSignedIn: false }));
-  },
-
-  restoreDeviceBackup() {
-    if (!deviceBackup) throw new Error('No previous device backup is available.');
-    actions.importBackup(deviceBackup);
-  },
-
-  exportBackup(): Progress {
-    return serializeProgress(get(state));
-  },
-
-  // Crew & Code Sync (Prevents Duplication Bug!)
-  pasteSyncCode(rawCode: string) {
-    const match = /^\s*(?:([^:]+):)?\s*IG-([1-8])\.([1-7])\.(\d+(?:\.\d+)?)\s*$/i.exec(rawCode);
-    if (!match) return false;
-
-    const name = (match[1] || 'Friend').trim();
-    const week = parseInt(match[2], 10) || 1;
-    const day = parseInt(match[3], 10) || 1;
-    const hours = parseFloat(match[4]) || 0;
-    if (!Number.isFinite(hours) || hours < 0) return false;
-    const streak = 0; // The share code contains no streak information.
-
-    state.update((s) => {
-      // Check if friend with this name already exists -> update in place!
-      const existingIdx = s.localCrew.findIndex((m) => m.name.toLowerCase() === name.toLowerCase());
-      let localCrew = [...s.localCrew];
-
-      if (existingIdx >= 0) {
-        localCrew[existingIdx] = {
-          ...localCrew[existingIdx],
-          week,
-          day,
-          hours,
-          streak
-        };
-      } else {
-        localCrew.push({
-          id: 'm_' + Date.now(),
-          name,
-          week,
-          day,
-          hours,
-          streak
-        });
-      }
-
-      return { ...s, localCrew };
-    });
-
-    return true;
-  },
-
-  removeFriend(id: string) {
-    state.update((s) => ({
-      ...s,
-      localCrew: s.localCrew.filter((m) => m.id !== id)
-    }));
-  },
-
   // Onboarding Actions
   openOnboarding() {
     state.update((s) => ({ ...s, onboardingOpen: true, onboardingStep: 1 }));
@@ -509,9 +345,7 @@ export const actions = {
       ...s,
       onboardingOpen: false,
       onboarded: true,
-      view: 'today',
-      cw: 1,
-      cd: 1
+      view: 'today'
     }));
   },
 
@@ -548,16 +382,19 @@ export const actions = {
     };
     cloudSyncQueue = cloudSyncQueue.then(async () => {
       if (attempt !== authAttempt || !cloudRestoreComplete) return false;
-      cloudStatus.set({ status: 'syncing', message: 'Saving progress to cloud...' });
+      if (payload.doneJson === lastSavedJson) return true;
+      cloudStatus.set({ status: 'syncing', message: 'Saving...' });
       try {
         const version = await client.mutation(api.crew.syncProgress, { ...payload, expectedVersion: cloudVersion });
         if (attempt === authAttempt) {
           cloudVersion = version;
-          cloudStatus.set({ status: 'synced', message: 'Cloud progress saved.' });
+          lastSavedJson = payload.doneJson;
+          savePending.set(JSON.stringify(serializeProgress(get(state))) !== lastSavedJson);
+          cloudStatus.set({ status: 'synced', message: 'Saved' });
         }
         return true;
       } catch {
-        if (attempt === authAttempt) cloudStatus.set({ status: 'error', message: 'Cloud save failed or another device has newer progress. Your work is saved here. Sign in again to restore cloud progress.' });
+        if (attempt === authAttempt) cloudStatus.set({ status: 'error', message: 'Your changes have not saved. Keep this tab open and retry.' });
         return false;
       }
     });
@@ -601,58 +438,49 @@ export const actions = {
     }));
   },
 
-  async signIn(name: string, roomCode: string, cloudSignIn = false) {
+  async signIn(name: string, roomCode?: string) {
+    if (!convex) throw new Error('Sign-in is unavailable. Please try again later.');
     const cleanName = name.trim();
-    const cleanRoom = roomCode.toUpperCase().trim();
-    if (!cleanName || !/^[A-Z0-9-]{3,48}$/.test(cleanRoom)) throw new Error('Enter a name and a room code of 3 to 48 letters, numbers or hyphens.');
+    const cleanRoom = roomCode?.toUpperCase().trim();
+    if (!cleanName || (cleanRoom !== undefined && !/^[A-Z0-9-]{3,48}$/.test(cleanRoom))) throw new Error('Invalid name or room code.');
     const attempt = ++authAttempt;
     cloudRestoreComplete = false;
     if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
-
-    if (!cloudSignIn) {
-      clearCloudAuth();
-      state.update((s) => ({ ...s, userName: cleanName, roomCode: cleanRoom, isSignedIn: false, userEmail: null, userAvatar: null, invitedRoomCode: null, inviteBannerDismissed: true }));
-      cloudStatus.set({ status: 'local', message: 'Saved on this device. Google sign-in is optional.' });
-      return;
-    }
-    if (!convex) throw new Error('Cloud sync is not configured. Local practice is still available.');
-    state.update((s) => ({ ...creditTimer(s), isSignedIn: false }));
-    cloudStatus.set({ status: 'syncing', message: 'Verifying sign-in and loading cloud progress...' });
+    state.update((s) => ({ ...creditTimer(s), timerRunning: false, timerStartedAt: null, isSignedIn: false }));
+    cloudStatus.set({ status: 'syncing', message: 'Opening your course...' });
     try {
-      const result = await convex.mutation(api.crew.signInOrRegister, { roomCode: cleanRoom, name: cleanName });
+      const result = await convex.mutation(api.crew.signInOrRegister, { name: cleanName, ...(cleanRoom ? { roomCode: cleanRoom } : {}) });
       if (attempt !== authAttempt) return;
-      const local = serializeProgress(get(state));
+      if (activeMemberId && activeMemberId !== result.member._id && get(savePending)) throw new Error('Sign back into your previous account to save your changes before switching accounts.');
+      const pending = activeMemberId === result.member._id && get(savePending);
+      if (pending && result.member.progressVersion !== cloudVersion) throw new Error('Your course changed on another device. Keep this tab open so your unsaved changes are not lost.');
+      const initial = getInitialState();
       const restored = result.member.doneJson ? parseCloudProgress(JSON.parse(result.member.doneJson), {
-        start: local.start, cw: result.member.week, cd: result.member.day,
+        start: initial.start, cw: result.member.week, cd: result.member.day,
       }) : null;
-      if (restored && JSON.stringify(restored) !== JSON.stringify(local)) {
-        // Save first. If browser storage is full, abort the restore instead of losing device work.
-        if (typeof localStorage !== 'undefined') localStorage.setItem(DEVICE_BACKUP_KEY, JSON.stringify(local));
-        deviceBackup = local;
-        hasDeviceBackup.set(true);
-      }
+      const progress = pending ? serializeProgress(get(state)) : restored || serializeProgress(initial);
+      activeMemberId = result.member._id;
       cloudVersion = result.member.progressVersion;
-      state.update((s) => {
-        const progress = restored || serializeProgress(s);
-        return {
-          ...s, ...progress, userName: cleanName, roomCode: cleanRoom, isSignedIn: true,
-          invitedRoomCode: null, inviteBannerDismissed: true, userEmail: null,
-          userAvatar: result.member.avatarUrl || null,
-          ...sessionTimer(progress.cw, progress.cd),
-        };
-      });
+      lastSavedJson = restored ? JSON.stringify(restored) : '';
+      lastObservedJson = JSON.stringify(progress);
+      state.update((s) => ({
+        ...s, ...progress, userName: result.member.name, roomCode: result.member.roomCode,
+        isSignedIn: true, authModalOpen: false,
+        onboardingOpen: !progress.onboarded,
+        invitedRoomCode: null, inviteBannerDismissed: true, userEmail: null,
+        userAvatar: result.member.avatarUrl || null, ...sessionTimer(progress.cw, progress.cd),
+      }));
       cloudRestoreComplete = true;
-      if (!restored) {
-        if (!await actions.syncToCloud()) throw new Error('Signed in, but the initial cloud save failed. Your progress is still on this device.');
-      } else {
-        cloudStatus.set({ status: 'synced', message: 'Cloud progress restored. Previous device progress is available under Stats & Streak > Restore Device Backup.' });
-      }
+      savePending.set(lastObservedJson !== lastSavedJson);
+      if (get(savePending)) {
+        if (!await actions.syncToCloud()) throw new Error('Your course could not be saved. Please retry.');
+      } else cloudStatus.set({ status: 'synced', message: 'Saved' });
     } catch (error) {
       if (attempt === authAttempt) {
         cloudRestoreComplete = false;
         clearCloudAuth();
-        state.update((s) => ({ ...s, isSignedIn: false }));
-        cloudStatus.set({ status: 'error', message: 'Cloud sign-in or restore failed. Local progress is preserved. Please try again.' });
+        state.update((s) => ({ ...s, isSignedIn: false, authModalOpen: true }));
+        cloudStatus.set({ status: 'error', message: error instanceof Error ? error.message : 'Sign-in failed. Please try again.' });
       }
       throw error;
     }
@@ -660,17 +488,30 @@ export const actions = {
 
   cloudSessionExpired() {
     if (!get(state).isSignedIn) return;
-    actions.signOut();
-    cloudStatus.set({ status: 'error', message: 'Your Google session expired. Sign in again to resume cloud sync. Device progress is unchanged.' });
-  },
-
-  signOut() {
     authAttempt++;
-    clearCloudAuth();
     cloudRestoreComplete = false;
     if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
-    cloudStatus.set({ status: 'local', message: 'Saved on this device.' });
-    state.update((s) => ({ ...s, userName: 'You', userEmail: null, userAvatar: null, isSignedIn: false, authModalOpen: false }));
+    state.update((s) => ({ ...creditTimer(s), timerRunning: false, timerStartedAt: null, isSignedIn: false, authModalOpen: true }));
+    savePending.set(JSON.stringify(serializeProgress(get(state))) !== lastSavedJson);
+    clearCloudAuth();
+    cloudStatus.set({ status: 'error', message: 'Sign in again to continue.' });
+  },
+
+  async signOut() {
+    if (get(state).isSignedIn) state.update(s => creditTimer(s));
+    if (get(savePending) && !await actions.syncToCloud()) return false;
+    if (get(savePending)) return false;
+    authAttempt++;
+    cloudRestoreComplete = false;
+    if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
+    activeMemberId = null;
+    lastSavedJson = '';
+    lastObservedJson = '';
+    state.set(getInitialState());
+    savePending.set(false);
+    clearCloudAuth();
+    cloudStatus.set({ status: 'idle', message: '' });
+    return true;
   }
 };
 
@@ -746,8 +587,6 @@ export const derivedStats = derived(state, ($s) => {
     }
   }
 
-  const shareCode = `IG-${$s.cw}.${$s.cd}.${totalHoursNum.toFixed(1)}`;
-
   return {
     doneDaysCount,
     totalHoursNum: totalHoursNum.toFixed(1),
@@ -756,7 +595,6 @@ export const derivedStats = derived(state, ($s) => {
     liveDayIndex,
     liveN,
     liveD,
-    missed,
-    shareCode
+    missed
   };
 });

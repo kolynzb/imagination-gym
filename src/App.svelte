@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { state, actions, cloudStatus, localSaveFailed } from './lib/store';
+  import { state, actions, cloudStatus, savePending } from './lib/store';
   import Navigation from './components/Navigation.svelte';
   import TodayView from './components/TodayView.svelte';
   import WeekView from './components/WeekView.svelte';
@@ -23,7 +23,7 @@
     const isTyping = target.matches('input, textarea, select') || target.isContentEditable;
 
     // Dialogs and focus mode own their keyboard interactions.
-    if (s.focus || s.onboardingOpen || s.authModalOpen || s.activeExerciseDrawer) return;
+    if (!s.isSignedIn || s.focus || s.onboardingOpen || s.authModalOpen || s.activeExerciseDrawer) return;
     if (isTyping || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
 
     // Spacebar toggles timer
@@ -39,19 +39,25 @@
       actions.togglePart(s.cw, s.cd, partIdx);
     }
   }
+  function handleBeforeUnload(event: BeforeUnloadEvent) {
+    if (!$savePending) return;
+    event.preventDefault();
+    event.returnValue = '';
+  }
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
+<svelte:window onkeydown={handleKeydown} onbeforeunload={handleBeforeUnload} />
 
 <div class="app-layout">
+  {#if s.isSignedIn}
   <Navigation />
 
   <main class="main-content">
-    {#if $localSaveFailed}
-      <div class="sync-notice" role="alert">This browser could not save your progress. Export a backup from Stats & Streak before closing this page.</div>
-    {/if}
-    {#if $cloudStatus.status === 'error' || $cloudStatus.status === 'syncing'}
-      <div class="sync-notice" role="status">{$cloudStatus.message}</div>
+    {#if $cloudStatus.status === 'error'}
+      <div class="sync-notice" role="alert">
+        {$cloudStatus.message}
+        <button type="button" onclick={() => actions.syncToCloud()}>Retry save</button>
+      </div>
     {/if}
     {#key s.view}
       <div class="view-enter">
@@ -86,6 +92,7 @@
 
   <!-- Global 3-Step Course Onboarding Modal -->
   <OnboardingModal />
+  {/if}
 
   <!-- Global Artist Profile & Cloud Sync Modal -->
   <SignInModal />

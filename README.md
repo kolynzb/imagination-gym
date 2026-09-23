@@ -22,12 +22,12 @@ Designed for self-taught artists with physical sketchbooks or iPads propped on t
 4. **Mobile & iPad-First Ergonomics:**
    - Sticky bottom navigation on mobile/portrait iPad so today's session is immediately visible without scrolling.
 5. **Convex.dev Real-Time Crew Sync + Shared Crit Wall:**
-   - Google sign-in verifies cloud membership. Room codes invite other signed-in students. Nickname-only practice stays local.
+   - Sign in with Google to open your course. Progress saves automatically to Convex. Room codes invite other signed-in students.
    - Live updating leaderboard ranked by hours logged.
    - Shared photo uploads for weekly group review calls.
-   - Local progress and code sharing work without a cloud account after the app loads. Offline page loading is not implemented.
+   - A Google account and internet connection are required. There is no local profile or browser-storage mode.
 6. **Portable Session Notes:**
-   - Copy or download today's completed session as standard Markdown. Daily and weekly notes remain first class in the app, and no external notes app or account is required.
+   - Copy or download today's completed session as standard Markdown. Daily and weekly notes save to your account. No external notes app is required.
 
 ---
 
@@ -41,7 +41,7 @@ Designed for self-taught artists with physical sketchbooks or iPads propped on t
 pnpm run dev
 ```
 
-### 2. Connect Convex (Optional for Live Multi-User Sync)
+### 2. Configure Convex and Google sign-in
 ```bash
 pnpm exec convex dev
 ```
@@ -52,10 +52,11 @@ Set `GOOGLE_CLIENT_ID` in the Convex deployment environment to the same client I
 Uploads use the deployment's `.convex.site` URL. For a custom domain or local Convex backend, set `VITE_CONVEX_SITE_URL` to its HTTP action origin.
 Deploy the backend and frontend together. Old clients cannot use the new authenticated write APIs.
 
-Cloud restore keeps the previous device snapshot under **Stats & Streak > Restore Device Backup**. Recovery replaces local progress and turns off cloud sync. Export it before signing in again if you need to keep both versions. The app retains only the most recent pre-restore snapshot, not a backup history.
-Concurrent device saves use a revision check. A stale device cannot replace newer cloud progress; sign in again to restore the newer copy.
+Convex is the only persistent store. Sign-in restores the most recently used crew room and its progress before enabling automatic saves. Theme and onboarding completion also save to Convex. Failed saves keep edits in memory and show a retry action; keep the tab open until saving succeeds. Signing out waits for pending changes to save.
 
-Legacy rows with client-supplied `authId` values are not treated as verified accounts. They remain in the database but require an ownership-verified migration before restore. Matching an email, name, or old `authId` is not sufficient proof. Export local backups before migrating an existing deployment.
+Concurrent saves use a revision check so stale tabs cannot overwrite newer progress. Existing browser data is left untouched but is no longer read, written, or imported by the app.
+
+Legacy rows with client-supplied `authId` values are not treated as verified accounts. They remain in the database but require an ownership-verified migration before restore. Matching an email, name, or old `authId` is not sufficient proof. Do not delete legacy records or browser data during deployment.
 
 ### Verify changes locally
 
@@ -66,7 +67,7 @@ pnpm run test:e2e
 pnpm run build
 ```
 
-Unit tests cover store behavior and Convex authorization with test identities. Browser tests cover local student flows. Before release, verify real Google sign-in, restore on another device, a concurrent-save conflict, and a crit image upload on the target deployment. These local tests do not prove production authentication.
+Unit tests cover store behavior and Convex authorization with test identities. Browser tests cover signed-in student flows using explicit Google and Convex transport doubles. Before release, verify real Google sign-in, restore on another device, a concurrent-save conflict, and a crit image upload on the target deployment. These local tests do not prove production authentication.
 
 ### 3. Build for Production
 ```bash
