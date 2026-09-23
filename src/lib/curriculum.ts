@@ -376,7 +376,7 @@ export const WEEKS: Week[] = [
     book: 'Ex 13 Bending Form (p.48), Ex 14 Organic Volumes (p.51), Ex 19 Volume Mapping (p.67), Ex 21 (p.72)',
     links: [
       { l: 'Tom Fox Draws: Why Studying Folds Won\u2019t Help You Draw Clothing', u: 'https://www.youtube.com/watch?v=1qIy7LyYLnI' },
-      { l: 'Michael Hampton (Proko): Understanding Every Type Of Clothing Fold', u: 'https://www.youtube.com/watch?v=d07NanfYT8U' },
+      { l: 'Marco Bucci: Understanding Every Type Of Clothing Fold', u: 'https://www.youtube.com/watch?v=d07NanfYT8U' },
       { l: 'brokendraw: how I design characters in 5 easy steps', u: 'https://www.youtube.com/watch?v=FBXb8woYQn0' },
       { l: 'Roadmap video: Week 6 @ 25:45', u: 'https://www.youtube.com/watch?v=zYzgxUVSpUc&t=1545s' }
     ],
@@ -601,8 +601,8 @@ export const VAULT = [
     { t: '25 essential drawing exercises: unlock your imagination', by: 'brokendraw', id: 'BKiopm83L8c' }
   ] },
   { g: 'Weeks 1–2 · Fundamentals & perspective primitives', v: [
-    { t: 'Dynamic sketching & line weight fundamentals', by: 'Peter Han', id: '1L1bQo4W81U' },
-    { t: 'Lines, ellipses, and ghosting method', by: 'Drawabox', id: 'd0e3rFpS04o' },
+    { t: 'Training yourself to draw from imagination', by: 'Peter Han · Proko', id: '6-8ED4DW6A0' },
+    { t: 'Lesson 1, exercise 2: ghosted lines', by: 'Drawabox', id: 'LkJG6pKTuRc' },
     { t: 'Visual communication with Nathan Cooke', by: 'Kazone Art', id: 'oK-4wUbBmJI' },
     { t: 'How to actually use boxes to draw better', by: 'brokendraw', id: 'VBAJDepILYc' },
     { t: 'Drawing the box', by: 'Athoro', id: 'Jwti08d0jYk' },
@@ -626,7 +626,7 @@ export const VAULT = [
   ] },
   { g: 'Weeks 6–7 · Clothing, textures & style', v: [
     { t: 'Why studying folds won\u2019t help you draw clothing', by: 'Tom Fox Draws', id: '1qIy7LyYLnI' },
-    { t: 'Understanding every type of clothing fold', by: 'Michael Hampton · Proko', id: 'd07NanfYT8U' },
+    { t: 'Understanding every type of clothing fold', by: 'Marco Bucci', id: 'd07NanfYT8U' },
     { t: 'How I design characters in 5 easy steps', by: 'brokendraw', id: 'FBXb8woYQn0' },
     { t: 'Texture drawing in shape and light', by: 'Modern Day James', id: '4Y0XVPprbYY' },
     { t: 'Learn to draw texture and materials', by: 'Tyler Edlin', id: '-2xhmKLsPO8' }
