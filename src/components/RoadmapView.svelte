@@ -42,8 +42,8 @@
           <div class="pct-label">{pct}%</div>
           <div class="bar-track">
             <div class="bar-fill" style="height: {pct}%"></div>
-            <span class="bar-num">W{week.n}</span>
           </div>
+          <span class="bar-num">W{week.n}</span>
           <div class="col-title">{week.title}</div>
           <div class="col-sub">{week.sub}</div>
         </button>
@@ -171,7 +171,7 @@
     overflow: hidden;
     display: flex;
     align-items: flex-end;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   .bar-fill {
@@ -182,16 +182,12 @@
   }
 
   .bar-num {
-    position: absolute;
-    bottom: 8px;
-    left: 0;
-    right: 0;
+    margin-bottom: 8px;
     text-align: center;
     font-family: 'DM Sans', system-ui, sans-serif;
     font-size: 11px;
     font-weight: 700;
-    color: var(--canvas);
-    z-index: 2;
+    color: var(--ink);
   }
 
   .col-title {
