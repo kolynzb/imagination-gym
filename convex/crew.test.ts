@@ -14,7 +14,7 @@ const progress = (done: Record<string, boolean> = {}, cw = 1, cd = 1) => JSON.st
 describe("Crew authorization", () => {
   test("sign-in creates an account without requiring room setup", async () => {
     const t = convexTest(schema, modules);
-    const alice = t.withIdentity({ tokenIdentifier: "google|alice", subject: "alice" });
+    const alice = t.withIdentity({ tokenIdentifier: "google|alice", issuer: "https://accounts.google.com", subject: "alice" });
     const result = await alice.mutation(api.crew.signInOrRegister, { name: "Alice" });
     expect(result.member.roomCode).toBe("GYM-CREW");
     expect(result.created).toBe(true);
@@ -23,8 +23,8 @@ describe("Crew authorization", () => {
 
   test("sign-in restores only the caller's most recently used room", async () => {
     const t = convexTest(schema, modules);
-    const alice = t.withIdentity({ tokenIdentifier: "google|alice", subject: "alice" });
-    const bob = t.withIdentity({ tokenIdentifier: "google|bob", subject: "bob" });
+    const alice = t.withIdentity({ tokenIdentifier: "google|alice", issuer: "https://accounts.google.com", subject: "alice" });
+    const bob = t.withIdentity({ tokenIdentifier: "google|bob", issuer: "https://accounts.google.com", subject: "bob" });
     const first = await alice.mutation(api.crew.signInOrRegister, { name: "Alice", roomCode: "FIRST" });
     const latest = await alice.mutation(api.crew.signInOrRegister, { name: "Alice", roomCode: "LATEST" });
     await bob.mutation(api.crew.signInOrRegister, { name: "Bob", roomCode: "PRIVATE" });
@@ -48,8 +48,8 @@ describe("Crew authorization", () => {
 
   test("isolates members, returns safe leaderboard data, and restores only the caller", async () => {
     const t = convexTest(schema, modules);
-    const alice = t.withIdentity({ tokenIdentifier: "google|alice", subject: "alice" });
-    const bob = t.withIdentity({ tokenIdentifier: "google|bob", subject: "bob" });
+    const alice = t.withIdentity({ tokenIdentifier: "google|alice", issuer: "https://accounts.google.com", subject: "alice" });
+    const bob = t.withIdentity({ tokenIdentifier: "google|bob", issuer: "https://accounts.google.com", subject: "bob" });
     await alice.mutation(api.crew.signInOrRegister, { roomCode: "STUDIO-A", name: "Alice" });
     await bob.mutation(api.crew.signInOrRegister, { roomCode: "STUDIO-A", name: "Bob" });
     await alice.mutation(api.crew.syncProgress, {
@@ -70,7 +70,7 @@ describe("Crew authorization", () => {
 
   test("does not authorize legacy authId records or expose legacy posts", async () => {
     const t = convexTest(schema, modules);
-    const alice = t.withIdentity({ tokenIdentifier: "google|alice", subject: "alice" });
+    const alice = t.withIdentity({ tokenIdentifier: "google|alice", issuer: "https://accounts.google.com", subject: "alice" });
     await t.run(async (ctx) => {
       await ctx.db.insert("rooms", { code: "LEGACY", name: "Legacy", createdAt: 1, memberCount: 1 });
       for (let i = 0; i < 100; i++) {
@@ -88,7 +88,7 @@ describe("Crew authorization", () => {
 
   test("rejects malformed progress without overwriting the last valid progress", async () => {
     const t = convexTest(schema, modules);
-    const alice = t.withIdentity({ tokenIdentifier: "google|alice", subject: "alice" });
+    const alice = t.withIdentity({ tokenIdentifier: "google|alice", issuer: "https://accounts.google.com", subject: "alice" });
     await alice.mutation(api.crew.signInOrRegister, { roomCode: "PROGRESS", name: "Alice" });
     const valid = progress({ w1d1p0: true });
     await alice.mutation(api.crew.syncProgress, { roomCode: "PROGRESS", week: 1, day: 1, hours: 1, streak: 1, expectedVersion: 0, doneJson: valid });
@@ -98,7 +98,7 @@ describe("Crew authorization", () => {
 
   test("persists a timer checkpoint and returns it with a revision conflict", async () => {
     const t = convexTest(schema, modules);
-    const alice = t.withIdentity({ tokenIdentifier: "google|alice", subject: "alice" });
+    const alice = t.withIdentity({ tokenIdentifier: "google|alice", issuer: "https://accounts.google.com", subject: "alice" });
     await alice.mutation(api.crew.signInOrRegister, { roomCode: "TIMERS", name: "Alice" });
     const timer = { timerMode: "countdown", timerPartIndex: 0, timerTargetSeconds: 600,
       timerRemaining: 535, timerElapsed: 65, timerRunning: false, timerStartedAt: null };
@@ -114,7 +114,7 @@ describe("Crew authorization", () => {
 
   test("rejects stale device writes instead of replacing newer progress", async () => {
     const t = convexTest(schema, modules);
-    const alice = t.withIdentity({ tokenIdentifier: "google|alice", subject: "alice" });
+    const alice = t.withIdentity({ tokenIdentifier: "google|alice", issuer: "https://accounts.google.com", subject: "alice" });
     await alice.mutation(api.crew.signInOrRegister, { roomCode: "VERSIONS", name: "Alice" });
     const payload = { roomCode: "VERSIONS", week: 1, day: 1, hours: 0, streak: 0, expectedVersion: 0, doneJson: progress({ w1d1p0: true }) };
     expect(await alice.mutation(api.crew.syncProgress, payload)).toBe(1);
@@ -138,13 +138,13 @@ describe("Crew authorization", () => {
       body: new Blob(["sketch"], { type: "image/png" }),
     };
     expect((await t.fetch("/crit-upload", request)).status).toBe(401);
-    const alice = t.withIdentity({ tokenIdentifier: "google|alice", subject: "alice" });
+    const alice = t.withIdentity({ tokenIdentifier: "google|alice", issuer: "https://accounts.google.com", subject: "alice" });
     expect((await alice.fetch("/crit-upload", request)).status).toBe(403);
   });
 
   test("HTTP upload stores a fresh owned blob and records a valid post", async () => {
     const t = convexTest(schema, modules);
-    const alice = t.withIdentity({ tokenIdentifier: "google|alice", subject: "alice" });
+    const alice = t.withIdentity({ tokenIdentifier: "google|alice", issuer: "https://accounts.google.com", subject: "alice" });
     await alice.mutation(api.crew.signInOrRegister, { roomCode: "UPLOAD", name: "Alice" });
     const oldStorageId = await t.run((ctx) => ctx.storage.store(new Blob(["sketch"], { type: "image/png" })));
     const failedResponse = await alice.fetch("/crit-upload", {

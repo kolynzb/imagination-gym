@@ -8,8 +8,12 @@
  * @module
  */
 
+import type * as auth from "../auth.js";
 import type * as crew from "../crew.js";
 import type * as http from "../http.js";
+import type * as identity from "../identity.js";
+import type * as session from "../session.js";
+import type * as sessionLifecycle from "../sessionLifecycle.js";
 
 import type {
   ApiFromModules,
@@ -18,8 +22,12 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  auth: typeof auth;
   crew: typeof crew;
   http: typeof http;
+  identity: typeof identity;
+  session: typeof session;
+  sessionLifecycle: typeof sessionLifecycle;
 }>;
 
 /**

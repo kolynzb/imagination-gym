@@ -1,6 +1,6 @@
 <script lang="ts">
   import { state, actions, cloudStatus } from '../lib/store';
-  import { isConvexEnabled, setGoogleCredential } from '../lib/convex';
+  import { isConvexEnabled, setGoogleCredential, sessionLoading, sessionError, retrySession } from '../lib/convex';
   import { cancelGoogleSignInPrompt, isGoogleAuthAvailable, renderGoogleButton, type GoogleCredential } from '../lib/googleAuth';
 
   let s = $state;
@@ -24,16 +24,13 @@
     return { destroy() { mounted = false; cancelGoogleSignInPrompt(); } };
   }
 
-  async function handleGoogleLogin({ credential, profile }: GoogleCredential) {
+  async function handleGoogleLogin({ credential }: GoogleCredential) {
     if (isSubmitting) return;
     isSubmitting = true;
     message = 'Signing in...';
     isError = false;
     try {
-      setGoogleCredential(credential, authenticated => {
-        if (!authenticated) actions.cloudSessionExpired();
-      });
-      await actions.signIn(profile.name, s.invitedRoomCode || undefined);
+      await setGoogleCredential(credential);
       message = '';
       actions.closeAuthModal();
     } catch (err) {
@@ -92,7 +89,13 @@
       {:else}
         <h2>Your practice starts here</h2>
         <p>Sign in to open your course, follow today’s session and keep your notes together.</p>
-        {#if signInAvailable}
+        {#if $sessionError}
+          <p class="error" role="alert">{$sessionError}</p>
+          <div class="action-buttons"><button type="button" onclick={() => retrySession().catch(() => {})}>Retry saved session</button></div>
+        {/if}
+        {#if $sessionLoading}
+          <p role="status">Opening your saved practice…</p>
+        {:else if signInAvailable}
           <div class="google-slot-wrap" aria-busy={isSubmitting} use:mountGoogleButton></div>
         {:else}
           <p class="error" role="alert">Sign-in is unavailable. Please try again later.</p>

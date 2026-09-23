@@ -10,9 +10,13 @@ export const test = base.extend<{ cloud: TestCloud }>({
     }), version: 0, failSave: false };
     // Identity and transport doubles: backend authorization is covered by convex/crew.test.ts.
     await page.route('https://www.youtube-nocookie.com/**', route => route.abort());
-    await page.route('**/src/lib/convex.ts', route => route.fulfill({
+    await page.route('**/src/lib/session.svelte.ts*', route => route.fulfill({ contentType: 'application/javascript', body: 'export function initializeSession() {}' }));
+    await page.route('**/src/lib/convex.ts*', route => route.fulfill({
       contentType: 'application/javascript',
       body: `
+        export const sessionError = { subscribe(run) { run(''); return () => {}; } };
+        export const retrySession = async () => {};
+        export const sessionLoading = { subscribe(run) { run(false); return () => {}; } };
         const rpc = (fn, args) => fetch('/__test_convex', {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fn, args })
         }).then(async r => {
@@ -28,7 +32,8 @@ export const test = base.extend<{ cloud: TestCloud }>({
         export const convex = { mutation: rpc, onUpdate(fn, args, cb) { rpc(fn, args).then(cb); return () => {}; } };
         export const isConvexEnabled = () => true;
         export const getConvexSiteUrl = () => location.origin;
-        export const setGoogleCredential = () => {};
+        export const setGoogleCredential = async () => { const { actions } = await import('/src/lib/store.ts'); await actions.signIn('Student'); };
+        export const revokeCloudSession = async () => {};
         export const clearCloudAuth = () => {};
       `,
     }));

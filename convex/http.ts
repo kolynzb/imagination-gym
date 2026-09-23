@@ -1,9 +1,11 @@
+import { auth } from "./auth";
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { isSupportedImageType, MAX_IMAGE_BYTES } from "./crew";
 
 const http = httpRouter();
+auth.addHttpRoutes(http);
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Authorization, Content-Type, X-Crit-Room-Code, X-Crit-Week, X-Crit-Day, X-Crit-Size, X-Crit-Prompt",
@@ -32,6 +34,10 @@ http.route({
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return response("Sign in with Google before uploading", 401);
 
+    let tokenIdentifier: string;
+    try { tokenIdentifier = await ctx.runQuery(internal.session.uploadIdentity, {}); }
+    catch { return response("Sign in with Google before uploading", 401); }
+
     const roomCode = request.headers.get("x-crit-room-code") ?? "";
     const week = headerInteger(request, "x-crit-week");
     const day = headerInteger(request, "x-crit-day");
@@ -45,7 +51,7 @@ http.route({
     const declaredSize = headerInteger(request, "x-crit-size");
     if (!isSupportedImageType(contentType) || !roomCode || week === null || week < 1 || week > 8 || day === null || day < 1 || day > 7 || !prompt.trim() || prompt.length > 500 || declaredSize === null || declaredSize <= 0 || declaredSize > MAX_IMAGE_BYTES) return response("Invalid image upload", 400);
 
-    const isMember: boolean = await ctx.runQuery(internal.crew.canUploadCrit, { roomCode, tokenIdentifier: identity.tokenIdentifier });
+    const isMember: boolean = await ctx.runQuery(internal.crew.canUploadCrit, { roomCode, tokenIdentifier });
     if (!isMember) return response("Join this room before posting to it", 403);
 
     const reader = request.body?.getReader();
@@ -67,7 +73,7 @@ http.route({
 
     const storageId = await ctx.storage.store(blob);
     try {
-      const postId = await ctx.runMutation(internal.crew.recordUploadedCrit, { roomCode, tokenIdentifier: identity.tokenIdentifier, week, day, storageId, contentType, size: blob.size, prompt });
+      const postId = await ctx.runMutation(internal.crew.recordUploadedCrit, { roomCode, tokenIdentifier, week, day, storageId, contentType, size: blob.size, prompt });
       return new Response(JSON.stringify({ postId }), { status: 201, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     } catch (error) {
       await ctx.storage.delete(storageId);

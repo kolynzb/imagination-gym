@@ -1,3 +1,4 @@
+import { requireIdentity } from "./identity";
 import { internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import type { MutationCtx, QueryCtx } from "./_generated/server";
 import type { Doc } from "./_generated/dataModel";
@@ -37,12 +38,6 @@ function displayName(value: string) {
   const name = value.trim().slice(0, 48);
   if (!name) throw new Error("A display name is required");
   return name;
-}
-
-async function requireIdentity(ctx: QueryCtx | MutationCtx) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) throw new Error("Sign in with Google to use cloud crew features");
-  return identity;
 }
 
 async function requireMember(ctx: QueryCtx | MutationCtx, code: string) {

@@ -1,7 +1,8 @@
+import { savePendingDraft, readPendingDraft, removePendingDraft } from "./pendingDraft";
 import { writable, derived, get } from 'svelte/store';
 import { WEEKS, type Week, type Day, type DayPart } from './curriculum';
 import { playChime, playBlip } from './audio';
-import { api, clearCloudAuth, convex } from './convex';
+import { api, clearCloudAuth, revokeCloudSession, convex } from './convex';
 import { disableAutomaticGoogleSignIn } from './googleAuth';
 import { mergeProgress, resolveProgressConflict, conflictValue, type ProgressConflict } from './mergeProgress';
 import { calendarDayIndex, formatLocalDate, getMondayOf as localMondayOf, shiftLocalDate, parseLocalDate } from './dates';
@@ -155,11 +156,20 @@ let cloudSyncQueue = Promise.resolve(false);
 let cloudSyncTimer: ReturnType<typeof setTimeout> | null = null;
 let cloudRestoreComplete = false;
 
+function persistPendingDraft() {
+  if (!activeMemberId) return;
+  if (!get(savePending)) { removePendingDraft(activeMemberId); return; }
+  if (!cloudRestoreComplete || get(progressConflicts).length) return;
+  savePendingDraft(activeMemberId, { progress: serializeProgress(get(state)), baseJson: lastSavedJson, version: cloudVersion });
+}
+savePending.subscribe(() => persistPendingDraft());
+
 state.subscribe((s) => {
   if (typeof document !== 'undefined') document.documentElement.setAttribute('data-theme', s.theme);
   if (!s.isSignedIn || !cloudRestoreComplete || get(progressConflicts).length) return;
   const json = JSON.stringify(serializeProgress(s));
   savePending.set(json !== lastSavedJson);
+  persistPendingDraft();
   if (json === lastObservedJson) return;
   lastObservedJson = json;
   if (typeof window === 'undefined' || json === lastSavedJson) return;
@@ -569,13 +579,20 @@ export const actions = {
       const result = await convex.mutation(api.crew.signInOrRegister, { name: cleanName, ...(cleanRoom ? { roomCode: cleanRoom } : {}) });
       if (attempt !== authAttempt) return;
       if (activeMemberId && activeMemberId !== result.member._id && get(savePending)) throw new Error('Sign back into your previous account to save your changes before switching accounts.');
+      const recoveredDraft = !activeMemberId ? readPendingDraft(result.member._id) : null;
+      if (recoveredDraft) {
+        activeMemberId = result.member._id;
+        cloudVersion = recoveredDraft.version;
+        lastSavedJson = recoveredDraft.baseJson;
+        savePending.set(true);
+      }
       const pending = activeMemberId === result.member._id && get(savePending);
       const changedRemotely = pending && result.member.progressVersion !== cloudVersion;
       const initial = getInitialState();
       const restored = result.member.doneJson ? parseCloudProgress(JSON.parse(result.member.doneJson), {
         start: initial.start, cw: result.member.week, cd: result.member.day,
       }) : null;
-      const progress = pending ? conflictProgress || serializeProgress(get(state)) : restored || serializeProgress(initial);
+      const progress = pending ? recoveredDraft?.progress || conflictProgress || serializeProgress(get(state)) : restored || serializeProgress(initial);
       activeMemberId = result.member._id;
       if (!changedRemotely) {
         cloudVersion = result.member.progressVersion;
@@ -609,13 +626,17 @@ export const actions = {
     }
   },
 
-  cloudSessionExpired() {
-    if (!get(state).isSignedIn) return;
+  suspendSession() {
     authAttempt++;
     cloudRestoreComplete = false;
     if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
     updateState((s) => ({ ...creditTimer(s), timerRunning: false, timerStartedAt: null, isSignedIn: false, authModalOpen: true }));
     savePending.set(JSON.stringify(serializeProgress(get(state))) !== lastSavedJson);
+  },
+
+  cloudSessionExpired() {
+    if (!get(state).isSignedIn) return;
+    actions.suspendSession();
     clearCloudAuth();
     cloudStatus.set({ status: 'error', message: 'Sign in again to continue.' });
   },
@@ -625,6 +646,7 @@ export const actions = {
     if (get(savePending) && !await actions.syncToCloud()) return false;
     if (get(savePending)) return false;
     disableAutomaticGoogleSignIn();
+    await revokeCloudSession();
     authAttempt++;
     cloudRestoreComplete = false;
     if (cloudSyncTimer) clearTimeout(cloudSyncTimer);
@@ -635,7 +657,6 @@ export const actions = {
     lastObservedJson = '';
     state.set(getInitialState());
     savePending.set(false);
-    clearCloudAuth();
     cloudStatus.set({ status: 'idle', message: '' });
     return true;
   }

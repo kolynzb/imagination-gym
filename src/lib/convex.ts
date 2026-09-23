@@ -1,3 +1,4 @@
+import { writable } from "svelte/store";
 import { ConvexClient } from 'convex/browser';
 import { api } from '../../convex/_generated/api';
 
@@ -46,13 +47,26 @@ export function getConvexSiteUrl(): string {
 
 export { api };
 
-export function setGoogleCredential(credential: string, onAuthChange: (authenticated: boolean) => void): void {
-  if (!convex) throw new Error('Cloud sync is not configured.');
-  convex.setAuth(async () => credential, onAuthChange);
+export const sessionLoading = writable(false);
+export const sessionError = writable('');
+interface SessionActions {
+  signIn(credential: string): Promise<void>;
+  signOut(): Promise<void>;
+  restore(): Promise<void>;
 }
-
+let sessionActions: SessionActions | null = null;
+export function registerSession(actions: SessionActions): void { sessionActions = actions; }
+export async function setGoogleCredential(credential: string): Promise<void> {
+  if (!sessionActions) throw new Error('Sign-in is still loading. Please try again.');
+  await sessionActions.signIn(credential);
+}
+export async function retrySession(): Promise<void> { await sessionActions?.restore(); }
+export async function revokeCloudSession(): Promise<void> {
+  await sessionActions?.signOut();
+}
 export function clearCloudAuth(): void {
-  convex?.setAuth(async () => null);
+  if (sessionActions) void sessionActions.signOut();
+  else convex?.setAuth(async () => null);
 }
 
 export interface CrewMember {

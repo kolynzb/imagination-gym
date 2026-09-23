@@ -6,6 +6,7 @@ vi.mock('../src/lib/convex', () => ({
   convex: client,
   api: { crew: { signInOrRegister: 'signIn', syncProgress: 'sync' } },
   clearCloudAuth: vi.fn(),
+  revokeCloudSession: vi.fn(),
 }));
 
 const blank = {

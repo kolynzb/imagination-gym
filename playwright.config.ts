@@ -12,7 +12,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'pnpm run dev --host 127.0.0.1 --port 5180 --strictPort',
+    command: 'node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5180 --strictPort',
     url: 'http://127.0.0.1:5180',
     reuseExistingServer: false,
     env: { VITE_CONVEX_URL: '', VITE_GOOGLE_CLIENT_ID: 'playwright-client-id' },

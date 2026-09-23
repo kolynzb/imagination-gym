@@ -12,8 +12,17 @@
     "strict": true,
     "noUncheckedIndexedAccess": false,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "composite": false
   },
-  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],
-  "exclude": ["node_modules", "convex"]
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.ts",
+    "src/**/*.js",
+    "src/**/*.svelte"
+  ],
+  "exclude": [
+    "node_modules",
+    "convex"
+  ]
 }

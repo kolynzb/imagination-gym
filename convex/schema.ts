@@ -1,7 +1,17 @@
 import { defineSchema, defineTable } from "convex/server";
+import { authTables } from "@convex-dev/auth/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  ...authTables,
+  authSessions: defineTable({
+    ...authTables.authSessions.validator.fields,
+    expiryScheduled: v.optional(v.boolean()),
+  }).index("userId", ["userId"]),
+  users: defineTable({
+    ...authTables.users.validator.fields,
+    googleTokenIdentifier: v.optional(v.string()),
+  }).index("email", ["email"]).index("phone", ["phone"]),
   rooms: defineTable({
     code: v.string(),
     name: v.string(),

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { initializeSession } from "./lib/session.svelte";
+  initializeSession();
   import { state, actions, cloudStatus, savePending, progressConflicts } from './lib/store';
   import ProgressConflict from './components/ProgressConflict.svelte';
   import Navigation from './components/Navigation.svelte';
