@@ -76,3 +76,13 @@ pnpm run build
 The current deploy artifact is the root `dist/` directory. It is a self-contained static web app ready to deploy to Netlify, Vercel, Cloudflare Pages, or GitHub Pages.
 
 The legacy `site/` folder is an obsolete static prototype and is not a deploy source. Do not publish it or regenerate it.
+
+### Local Google sign-in
+
+Use **http://localhost:5173**, the development origin registered for the current Google OAuth client. `127.0.0.1` is a different origin and is not currently authorized. The dev server uses a strict port so a busy port cannot silently move the app to another origin. `origin_mismatch` is resolved by using the registered origin or explicitly registering the intended one in Google Cloud; changing redirect URIs does not fix this browser-origin error.
+
+### Recovering practice and simultaneous edits
+
+Timer checkpoints save with course progress on start, pause, interval changes, logging and completion. A recovered running countdown includes time since its saved checkpoint, capped at the interval's end; a stopwatch is capped at 24 hours. Recovered timers are paused so you choose when to resume. Wait for pending saves before closing; unsent edits still require this tab to stay open.
+
+Independent notes and checklist changes merge after a version conflict. Changes to the same field present both versions for a choice. The selected day, timer and logged hours are resolved together to avoid crediting the same time twice. A download of the drafts is available before choosing. Deploy the updated Convex functions with this frontend: older backends do not preserve timer checkpoints or return structured conflict data.
