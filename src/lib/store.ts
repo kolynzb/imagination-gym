@@ -2,6 +2,7 @@ import { writable, derived, get } from 'svelte/store';
 import { WEEKS, type Week, type Day, type DayPart } from './curriculum';
 import { playChime, playBlip } from './audio';
 import { api, clearCloudAuth, convex } from './convex';
+import { disableAutomaticGoogleSignIn } from './googleAuth';
 import { mergeProgress, resolveProgressConflict, conflictValue, type ProgressConflict } from './mergeProgress';
 import { calendarDayIndex, formatLocalDate, getMondayOf as localMondayOf, shiftLocalDate, parseLocalDate } from './dates';
 import { parseCloudProgress, serializeProgress, type TimerProgress, type Progress } from './progress';
@@ -623,6 +624,7 @@ export const actions = {
     if (get(state).isSignedIn) updateState(s => creditTimer(s));
     if (get(savePending) && !await actions.syncToCloud()) return false;
     if (get(savePending)) return false;
+    disableAutomaticGoogleSignIn();
     authAttempt++;
     cloudRestoreComplete = false;
     if (cloudSyncTimer) clearTimeout(cloudSyncTimer);

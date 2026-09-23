@@ -18,14 +18,27 @@ export interface GoogleCredential {
 interface GoogleIdentityApi {
   accounts?: {
     id?: {
-      initialize: (options: { client_id: string; callback: (response: { credential: string }) => void }) => void;
+      initialize: (options: { client_id: string; auto_select: boolean; callback: (response: { credential: string }) => void }) => void;
       renderButton: (container: HTMLElement, options: Record<string, string | number>) => void;
+      prompt?: () => void;
+      cancel?: () => void;
+      disableAutoSelect?: () => void;
     };
   };
 }
 
 function googleIdentity(): GoogleIdentityApi | undefined {
+  if (typeof window === 'undefined') return undefined;
   return (window as Window & { google?: GoogleIdentityApi }).google;
+}
+
+export function disableAutomaticGoogleSignIn(): void {
+  googleIdentity()?.accounts?.id?.disableAutoSelect?.();
+  cancelGoogleSignInPrompt();
+}
+
+export function cancelGoogleSignInPrompt(): void {
+  googleIdentity()?.accounts?.id?.cancel?.();
 }
 
 export function getGoogleClientId(): string {
@@ -95,6 +108,7 @@ export async function renderGoogleButton(
 
     google.accounts.id.initialize({
       client_id: clientId,
+      auto_select: true,
       callback: (response: { credential: string }) => {
         if (response.credential) {
           const user = parseJwtPayload(response.credential);
@@ -113,6 +127,12 @@ export async function renderGoogleButton(
       width: container.clientWidth || 280,
     });
 
+    // A blocked or unavailable One Tap prompt must not hide the manual button.
+    try {
+      google.accounts.id.prompt?.();
+    } catch (error) {
+      console.warn('Automatic Google sign-in is unavailable:', error);
+    }
     return true;
   } catch (e) {
     console.warn('Google Sign-In button render error:', e);

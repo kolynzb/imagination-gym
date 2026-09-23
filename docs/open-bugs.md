@@ -21,3 +21,13 @@ This is the current open-work list. Earlier QA reports are historical findings; 
 
 - Opening illustrations: user deferred the redesign; research exists in the separate illustration task.
 - Further visual refinement should be a bounded, prioritized pass against DESIGN.md, not an indefinite series of cosmetic edits.
+
+### AUTH-01 investigation checkpoint — 2026-09-23
+
+The Google credential is held only by the in-memory Convex auth callback. Reload destroys it. Added Google's supported One Tap automatic selection request alongside the existing manual button, plus `disableAutoSelect` on successful explicit sign-out and prompt cancellation on view teardown. No credentials are persisted in browser storage.
+
+Validation: Svelte/TypeScript check clean, 63 unit tests pass, 21 mocked-provider browser regressions pass. Real Google manual sign-in on localhost restored existing QA progress. Navigating back to localhost still showed the welcome screen: automatic restoration is **not proven and AUTH-01 remains open**. Google documents consent requirements, browser restrictions and a ten-minute FedCM automatic-sign-in cooldown; One Tap alone cannot meet the durable-session acceptance criteria.
+
+Next implementation needs a supported application-session integration with renewal and revocation, preserving existing Convex `tokenIdentifier` ownership. Test migration/account identity continuity before deployment. This checkpoint is not production release evidence.
+
+Reference: https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { state, actions, cloudStatus } from '../lib/store';
   import { isConvexEnabled, setGoogleCredential } from '../lib/convex';
-  import { isGoogleAuthAvailable, renderGoogleButton, type GoogleCredential } from '../lib/googleAuth';
+  import { cancelGoogleSignInPrompt, isGoogleAuthAvailable, renderGoogleButton, type GoogleCredential } from '../lib/googleAuth';
 
   let s = $state;
   $: s = $state;
@@ -21,7 +21,7 @@
         isError = true;
       }
     });
-    return { destroy() { mounted = false; } };
+    return { destroy() { mounted = false; cancelGoogleSignInPrompt(); } };
   }
 
   async function handleGoogleLogin({ credential, profile }: GoogleCredential) {
