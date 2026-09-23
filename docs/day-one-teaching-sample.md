@@ -17,3 +17,9 @@ Illustration: original AI-generated three-panel teaching image, visually inspect
 Validation: Svelte check has zero errors/warnings; production build passes; all seven practice UI browser tests pass. New regression covers keyboard disclosure activation without starting the timer, image loading, and document width at 390px. Live local browser inspection confirmed lesson rendering. Physical-phone and learner comprehension testing remain unverified.
 
 Review question: can a learner begin, practise and inspect an attempt without reopening the lecture? The sample is ready for a real practice session before expanding to other days.
+
+## Physical setup addition
+
+Added a reusable DrawingSetup section before the Day 1 warm-up in Today and Focus. It covers a common tripod pen grip, paper placement, whole-arm rehearsal and light hand support. It identifies shoulder-led movement as drill-specific rather than a universal rule. Original grip and arm demonstrations load only on selection; switching, closing or collapsing unloads the player.
+
+Read the full original https://drawabox.com/lesson/1/2 in the browser, including its grip and hover-hand sections. That page directly links https://youtu.be/_IR8zH4RCfU and https://youtu.be/0_AdsK8x9Lw. Live local rendering and selection controls were inspected; local embedded playback was not established. Seven existing practice UI regressions passed, plus a new player selection/unloading regression. The automated tests use mocked providers and do not prove YouTube playback.

@@ -1,6 +1,11 @@
 <script lang="ts">
+  import DrawingSetup from './DrawingSetup.svelte';
   export let part: string;
 </script>
+
+{#if part === 'A'}
+  <DrawingSetup />
+{/if}
 
 <details class="practice-guide" open={part === 'B'}>
   <summary>How to practise · Part {part}</summary>

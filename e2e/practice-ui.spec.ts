@@ -151,3 +151,17 @@ test('Day 1 guidance is keyboard-accessible without toggling the timer and stays
   await expect(why.locator('..')).toHaveAttribute('open', '');
   await expect(page.locator('.focus-modal').getByRole('button', { name: 'Start (Space)', exact: true })).toBeVisible();
 });
+
+test('setup demonstrations load on demand and unload when collapsed', async ({ page }) => {
+  await startCourse(page);
+  const setup = page.getByRole('region', { name: 'Before you start drawing', exact: true });
+  await expect(setup.locator('iframe')).toHaveCount(0);
+  await setup.locator('summary').click();
+  await setup.getByRole('button', { name: 'Holding your pen', exact: true }).click();
+  await expect(setup.locator('iframe')).toHaveAttribute('src', /_IR8zH4RCfU/);
+  await setup.getByRole('button', { name: 'Wrist, elbow and shoulder', exact: true }).click();
+  await expect(setup.locator('iframe')).toHaveCount(1);
+  await expect(setup.locator('iframe')).toHaveAttribute('src', /0_AdsK8x9Lw/);
+  await setup.locator('summary').click();
+  await expect(setup.locator('iframe')).toHaveCount(0);
+});
