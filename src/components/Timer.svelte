@@ -5,6 +5,7 @@
   import Icon from './Icon.svelte';
 
   export let plannedMins = 90;
+  export let showFocus = true;
 
   let s = $state;
   $: s = $state;
@@ -94,6 +95,7 @@
     >
       {s.timerRunning ? 'Pause' : 'Start'}
     </button>
+    {#if showFocus}
     <button
       type="button"
       class="action-btn outline"
@@ -101,6 +103,7 @@
     >
       Focus Mode
     </button>
+    {/if}
     <button
       type="button"
       class="action-btn outline"

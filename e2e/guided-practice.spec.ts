@@ -1,0 +1,36 @@
+import { mkdir } from 'node:fs/promises';
+import { test, expect, startCourse } from './fixtures';
+
+test('guided Day 1 separates preparation from timed practice and preserves work across help and exit', async ({ page }) => {
+  await mkdir('scratch/screenshots', { recursive: true });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await startCourse(page);
+  await page.getByRole('button', { name: 'Start guided practice →', exact: true }).click();
+  const pilot = page.getByRole('dialog', { name: 'Day 1 guided practice' });
+  await expect(pilot.getByRole('heading', { name: 'Give your arm room.' })).toBeVisible();
+  await expect(pilot.getByRole('button', { name: 'Start', exact: true })).toHaveCount(0);
+  await pilot.getByRole('navigation').getByRole('button', { name: /See the movement/ }).click();
+  await expect(pilot.getByRole('heading', { name: 'Plan the mark' })).toBeVisible();
+  await pilot.getByRole('button', { name: 'Next drawing', exact: true }).click();
+  await expect(pilot.getByRole('heading', { name: 'Rehearse above the page' })).toBeVisible();
+  await page.screenshot({ path: 'scratch/screenshots/guided-movement-phone.png' });
+  await page.setViewportSize({ width: 1440, height: 960 });
+  await page.screenshot({ path: 'scratch/screenshots/guided-movement-desktop.png' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await pilot.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+  await pilot.getByRole('navigation').getByRole('button', { name: /Try it/ }).click();
+  await expect(pilot.getByRole('button', { name: 'Start', exact: true })).toBeVisible();
+  await page.screenshot({ path: 'scratch/screenshots/guided-practice-phone.png' });
+  await pilot.getByRole('button', { name: 'Start', exact: true }).click();
+  await pilot.getByRole('navigation').getByRole('button', { name: /Get ready/ }).click();
+  await expect(pilot.getByRole('button', { name: 'Pause timer', exact: true })).toBeVisible();
+  await pilot.getByRole('button', { name: 'Pause timer', exact: true }).click();
+  await pilot.getByRole('navigation').getByRole('button', { name: /Inspect/ }).click();
+  await pilot.getByRole('textbox', { name: "Today's observation" }).fill('I will rehearse before each stroke.');
+  await pilot.getByRole('checkbox', { name: 'Warm-up', exact: true }).check();
+  await pilot.getByRole('button', { name: 'Back to Today', exact: true }).first().click();
+  await expect(page.getByRole('textbox', { name: 'Daily Blind Spot / Key Learning' })).toHaveValue('I will rehearse before each stroke.');
+  await page.getByRole('button', { name: 'Continue guided practice →', exact: true }).click();
+  await expect(pilot.getByRole('textbox', { name: "Today's observation" })).toHaveValue('I will rehearse before each stroke.');
+  await expect(pilot.getByRole('checkbox', { name: 'Warm-up', exact: true })).toBeChecked();
+});

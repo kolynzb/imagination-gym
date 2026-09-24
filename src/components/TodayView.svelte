@@ -5,6 +5,7 @@
   import { sessionDate } from '../lib/dates';
   import Timer from './Timer.svelte';
   import Icon from './Icon.svelte';
+  import { guidedPractice, practiceStage } from '../lib/practicePilot';
   import DayOneGuide from './DayOneGuide.svelte';
 
   let s = $state;
@@ -177,6 +178,12 @@
     </div>
   </header>
 
+  {#if s.cw === 1 && s.cd === 1}
+    <div class="practice-entry">
+      <div><strong>Learn the movement. Then make your marks.</strong><p>Setup, demonstration, practice and a quick self-check.</p></div>
+      <button type="button" onclick={() => { guidedPractice.set(true); actions.setFocus(true); }}>{$practiceStage > 0 ? 'Continue guided practice' : 'Start guided practice'} →</button>
+    </div>
+  {/if}
   <div class="day-layout">
     <!-- Main Left Column: Day Parts -->
     <div class="day-main">
@@ -220,7 +227,7 @@
                 <h3 class="part-purpose">{part.p}</h3>
                 <p class="part-desc">{part.d}</p>
                 {#if s.cw === 1 && s.cd === 1}
-                  <DayOneGuide part={part.k} />
+                  <details class="reference-guide"><summary>Read the practice guide</summary><DayOneGuide part={part.k} /></details>
                 {/if}
 
                 {#if exRefs.length > 0}
@@ -355,6 +362,12 @@
 </div>
 
 <style>
+  .practice-entry { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 20px 0; margin-bottom: 24px; border-block: 1px solid var(--line); }
+  .practice-entry p { margin: 6px 0 0; color: var(--ink-62); }
+  .practice-entry button { min-height: 44px; padding: 12px 18px; border: 0; border-radius: var(--radius-control); background: var(--accent); color: var(--on-accent); font: inherit; font-weight: 600; cursor: pointer; }
+  .reference-guide > summary { cursor: pointer; min-height: 44px; padding: 12px 0; }
+  @media(max-width: 650px) { .practice-entry { align-items: stretch; flex-direction: column; } }
+
   .today-view {
     padding: 36px 44px 80px;
     max-width: 1200px;

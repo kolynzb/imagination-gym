@@ -2,6 +2,8 @@
   import { state, actions, cloudStatus, progressConflicts } from '../lib/store';
   import { WEEKS } from '../lib/curriculum';
   import Icon from './Icon.svelte';
+  import GuidedPractice from './GuidedPractice.svelte';
+  import { guidedPractice } from '../lib/practicePilot';
   import DayOneGuide from './DayOneGuide.svelte';
 
   let s = $state;
@@ -21,6 +23,7 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
+    if ($guidedPractice && s.cw === 1 && s.cd === 1) return;
     if (e.key === 'Escape' && !s.activeExerciseDrawer) {
       close();
       return;
@@ -100,6 +103,9 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
+{#if $guidedPractice && s.cw === 1 && s.cd === 1}
+  <GuidedPractice />
+{:else}
 <div class="focus-modal">
   <header class="focus-header">
     <div class="header-info">
@@ -238,6 +244,8 @@
     </div>
   </div>
 </div>
+
+{/if}
 
 <style>
   .focus-modal {

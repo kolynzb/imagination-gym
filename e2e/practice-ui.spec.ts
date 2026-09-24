@@ -46,7 +46,7 @@ test('Today and Focus expose named checkbox state; Focus has full instructions a
   await expect(page.locator('.focus-modal').getByRole('button', { name: /Go to Next Day/ })).toBeVisible();
 });
 
-test('mobile and portrait tablet place the single timer immediately after Today heading', async ({ page }) => {
+test('mobile and portrait tablet keep the guided entry visible and the timer before lesson details', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await startCourse(page);
 
@@ -63,7 +63,7 @@ test('mobile and portrait tablet place the single timer immediately after Today 
   expect(lessonsBox).not.toBeNull();
   expect(timerBox!.y).toBeGreaterThanOrEqual(headerBox!.y + headerBox!.height);
   expect(timerBox!.y + timerBox!.height).toBeLessThanOrEqual(lessonsBox!.y);
-  const startBox = await page.getByRole('button', { name: 'Start', exact: true }).boundingBox();
+  const startBox = await page.getByRole('button', { name: 'Start guided practice →', exact: true }).boundingBox();
   expect(startBox).not.toBeNull();
   expect(startBox!.y + startBox!.height).toBeLessThanOrEqual(844);
 
@@ -106,7 +106,7 @@ test('captures rendered desktop and phone Today and Focus screens', async ({ pag
   await page.screenshot({ path: resolve(screenshotDir, 'practice-today-desktop.png') });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: resolve(screenshotDir, 'practice-today-phone.png') });
-  const phoneStart = await page.getByRole('button', { name: 'Start', exact: true }).boundingBox();
+  const phoneStart = await page.getByRole('button', { name: 'Start guided practice →', exact: true }).boundingBox();
   expect(phoneStart).not.toBeNull();
   expect(phoneStart!.y + phoneStart!.height).toBeLessThanOrEqual(780);
   await page.setViewportSize({ width: 1440, height: 960 });
@@ -135,6 +135,8 @@ test('exercise drawer isolates the background and restores keyboard focus', asyn
 test('Day 1 guidance is keyboard-accessible without toggling the timer and stays within mobile width', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await startCourse(page);
+  await page.locator('.reference-guide > summary').first().click();
+  await page.locator('.reference-guide > summary').nth(1).click();
   const warmup = page.locator('summary').filter({ hasText: 'How to practise · Part A' });
   await warmup.focus();
   await page.keyboard.press('Space');
@@ -154,6 +156,7 @@ test('Day 1 guidance is keyboard-accessible without toggling the timer and stays
 
 test('setup demonstrations load on demand and unload when collapsed', async ({ page }) => {
   await startCourse(page);
+  await page.locator('.reference-guide > summary').first().click();
   const setup = page.getByRole('region', { name: 'Before you start drawing', exact: true });
   await expect(setup.locator('iframe')).toHaveCount(0);
   await setup.locator('summary').click();
