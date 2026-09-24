@@ -6,6 +6,7 @@
 
   export let plannedMins = 90;
   export let showFocus = true;
+  export let embedded = false;
 
   let s = $state;
   $: s = $state;
@@ -47,7 +48,7 @@
   }
 </script>
 
-<div class="timer-box">
+<div class="timer-box" class:embedded>
   <div class="timer-header">
     <div class="timer-title-group">
       <span class="timer-title">Interval Timer</span>
@@ -307,4 +308,14 @@
     font-family: monospace;
     font-size: 11px;
   }
+  .embedded { border-radius: var(--radius-card); padding: 24px; }
+  .embedded .sound-test-btn { width: 44px; height: 44px; border-radius: var(--radius-control); }
+  .embedded .interval-presets { gap: 0; border-bottom: 1px solid var(--line); }
+  .embedded .preset-btn { flex: 1; min-height: 44px; padding: 8px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; font-size: var(--text-control); }
+  .embedded .preset-btn.active { background: transparent; color: var(--ink); border-bottom-color: var(--accent); }
+  .embedded .clock-display { font-size: clamp(72px, 8vw, 104px); margin-top: 24px; letter-spacing: .02em; }
+  .embedded .clock-display.running { animation: none; }
+  .embedded .action-btn { min-height: 44px; border-radius: var(--radius-action); }
+  .embedded .action-btn.primary { flex: 1; }
+  .embedded .shortcut-tip { font-size: var(--text-control); margin-top: 16px; }
 </style>

@@ -75,7 +75,7 @@
           <details><summary>Check your setup</summary><DrawingSetup /></details>
           <details><summary>Full instructions for this part</summary><DayOneGuide part={['A','B','C'][$state.timerPartIndex] || 'A'} /></details>
         </div>
-        <Timer plannedMins={90} showFocus={false} />
+        <Timer plannedMins={90} showFocus={false} embedded />
       </div>
     {:else}
       <div class="stage-heading"><h2>Notice one thing to adjust.</h2><span>No perfect page required</span></div>
@@ -97,17 +97,20 @@
   h2 { font-family: var(--font-display); font-size: clamp(32px, 5vw, 48px); margin: 0; }
   h3 { font-family: var(--font-body); font-size: 24px; margin: 0 0 12px; }
   .eyebrow, .stage-heading > span, footer > span, .muted { color: var(--ink-62); font-size: var(--text-control); }
-  button { cursor: pointer; border: 1px solid var(--line); background: transparent; color: var(--ink); font: inherit; min-height: 44px; padding: 10px 16px; border-radius: var(--radius-control); }
+  button { cursor: pointer; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; font-size: var(--text-control); font-weight: 600; min-height: 44px; padding: 10px 16px; border-radius: var(--radius-control); }
   button:disabled { opacity: .4; cursor: default; }
   :is(button, summary, textarea, a, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
   nav { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--line); gap: 8px; }
-  nav button { border: 0; border-radius: 0; border-bottom: 3px solid transparent; text-align: left; color: var(--ink-62); }
+  nav button { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; background: transparent; border: 0; border-radius: 0; border-bottom: 3px solid transparent; text-align: left; color: var(--ink-62); }
   nav button[aria-current] { border-bottom-color: var(--accent); color: var(--ink); font-weight: 700; }
-  .step-number { display: block; font-size: 12px; margin-bottom: 4px; }
+  .step-number { display: block; font-family: var(--font-display); font-size: 24px; line-height: 1; margin-bottom: 8px; }
+  nav button[aria-current] .step-number { color: var(--accent-ink); }
+  button:not(:disabled):hover { border-color: var(--ink-62); }
+  nav button:not([aria-current]):hover { color: var(--ink); background: var(--card); }
   main { padding: 32px 0; min-height: 55vh; }
   .intro { font-size: 18px; max-width: 62ch; line-height: 1.6; }
   .demonstration, .practice-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; margin-top: 24px; align-items: start; }
-  .frame { width: 100%; max-width: 320px; margin: auto; overflow: hidden; border-radius: var(--radius-control); }
+  .frame { width: 100%; max-width: 320px; margin: auto; overflow: hidden; border-radius: var(--radius-card); border: 1px solid var(--line); }
   .frame img { display: block; width: 300%; max-width: none; height: auto; }
   .frame-copy { align-self: center; }
   .frame-copy p { line-height: 1.6; }
@@ -118,7 +121,11 @@
   .cue { border-left: 3px solid var(--accent); padding: 8px 20px; margin: 24px 0; }
   .cue span { display: block; color: var(--ink-62); margin-bottom: 8px; }
   .cue strong { font-size: 22px; line-height: 1.5; }
-  summary { padding: 14px 0; min-height: 44px; cursor: pointer; }
+  summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0; min-height: 44px; cursor: pointer; font-weight: 600; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; color: var(--ink-62); font-size: 22px; font-weight: 400; }
+  details[open] > summary::after { content: '−'; }
+  details[open] { padding-bottom: 20px; }
   details { border-top: 1px solid var(--line); }
   .checks { list-style: none; padding: 0; margin: 24px 0; }
   .checks li { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; border-bottom: 1px solid var(--line); padding: 18px 0; }
@@ -128,7 +135,7 @@
   .completion label { display: flex; align-items: center; gap: 8px; min-height: 44px; }
   input { accent-color: var(--accent); width: 20px; height: 20px; }
   footer { border-top: 1px solid var(--line); padding: 20px 0; }
-  .primary { background: var(--accent); color: var(--on-accent); border-color: transparent; font-weight: 600; }
+  .primary { border-radius: var(--radius-action); background: var(--accent); color: var(--on-accent); border-color: transparent; font-weight: 600; }
   .running-note { padding: 12px 0; margin-bottom: 16px; }
   @media(max-width: 650px) { .guided-practice { padding: 20px; } header { align-items: start; } h1 { font-size: 28px; } nav { gap: 0; } nav button { padding: 8px 4px; font-size: 13px; } .stage-heading { align-items: start; } .stage-heading > span { max-width: 100px; text-align: right; } .demonstration, .practice-layout { grid-template-columns: 1fr; gap: 20px; } .frame { max-width: 240px; margin: auto; } .practice-layout :global(.timer-box) { order: -1; } .checks li { grid-template-columns: 1fr; gap: 8px; } }
 </style>
