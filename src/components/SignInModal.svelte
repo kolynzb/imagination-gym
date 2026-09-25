@@ -1,4 +1,5 @@
 <script lang="ts">
+  import PencilLoader from './PencilLoader.svelte';
   import { state, actions, cloudStatus } from '../lib/store';
   import { isConvexEnabled, setGoogleCredential, sessionLoading, sessionError, retrySession } from '../lib/convex';
   import { cancelGoogleSignInPrompt, isGoogleAuthAvailable, renderGoogleButton, type GoogleCredential } from '../lib/googleAuth';
@@ -94,7 +95,7 @@
           <div class="action-buttons"><button type="button" onclick={() => retrySession().catch(() => {})}>Retry saved session</button></div>
         {/if}
         {#if $sessionLoading}
-          <p role="status">Opening your saved practice…</p>
+          <PencilLoader />
         {:else if signInAvailable}
           <div class="google-slot-wrap" aria-busy={isSubmitting} use:mountGoogleButton></div>
         {:else}
