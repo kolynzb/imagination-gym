@@ -58,15 +58,7 @@
         <p class="eyebrow">An eight-week drawing practice</p>
         <h1 id="auth-heading">Make room<br />for drawing.</h1>
         <p class="welcome-intro">Build the skills to draw from imagination, one focused session at a time. Bring a sketchbook or an iPad. We’ll bring the plan.</p>
-        <svg class="practice-sketch" viewBox="0 0 560 170" fill="none" aria-hidden="true">
-          <path d="M16 133C72 30 117 22 158 116M30 139C83 40 119 41 147 121M13 146L173 146" stroke="currentColor" stroke-width="1.5" />
-          <path d="M235 59L289 31L343 59L289 90L235 59ZM235 59V119L289 151L343 120V59M289 90V151" stroke="currentColor" stroke-width="1.8" />
-          <path d="M235 119L289 89L343 120M289 31V89" stroke="currentColor" stroke-opacity=".28" stroke-dasharray="4 5" />
-          <ellipse cx="455" cy="55" rx="49" ry="21" stroke="currentColor" stroke-width="1.5" />
-          <path d="M406 55V123C406 151 504 151 504 123V55" stroke="currentColor" stroke-width="1.5" />
-          <path d="M405 120C411 95 499 95 505 120" stroke="currentColor" stroke-opacity=".3" stroke-dasharray="4 5" />
-          <path d="M194 23L218 11M354 146L377 154M448 15L457 5" stroke="var(--accent)" stroke-width="3" stroke-linecap="round" />
-        </svg>
+        <img class="practice-sketch" src="/lessons/welcome-practice.jpg" width="2172" height="724" alt="A sketchbook page with curve warm-ups, dot-to-dot strokes and an observational mug drawing." />
         <ol class="practice-path">
           <li><span>01</span><strong>Warm up</strong><p>Loosen your shoulder and find your line.</p></li>
           <li><span>02</span><strong>Practise one skill</strong><p>Work through a focused drawing drill.</p></li>
@@ -205,7 +197,7 @@
   .welcome .eyebrow { margin: 44px 0 12px; font-size: 14px; color: var(--ink-72); }
   .welcome h1 { font-size: clamp(60px, 7vw, 96px); line-height: .96; margin: 0 0 24px; }
   .welcome-intro { max-width: 540px; font-size: 18px; line-height: 1.6; }
-  .practice-sketch { width: min(100%, 560px); height: auto; margin: 12px 0 24px; color: var(--ink-72); }
+  .practice-sketch { width: min(100%, 560px); height: auto; display: block; border-radius: var(--radius-control); margin: 12px 0 24px; }
   .practice-path { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; padding: 0; margin: 0; list-style: none; }
   .practice-path li { border-top: 1px solid var(--line-2); padding-top: 14px; }
   .practice-path span { display: block; font-size: 12px; color: var(--accent-ink); margin-bottom: 8px; }
