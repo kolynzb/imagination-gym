@@ -1,4 +1,5 @@
 <script lang="ts">
+  import PlaneGuide from './PlaneGuide.svelte';
   import DrawingSetup from './DrawingSetup.svelte';
   export let part: string;
 </script>
@@ -39,7 +40,7 @@
         <p>Planning and rehearsal give you time to decide and prepare. During the stroke, focus on a smooth motion instead of steering the pen back toward the target. Accuracy develops through further attempts.</p>
       </details>
       <h4>Then build a plane</h4>
-      <p>A plane here is a flat four-sided shape, not a box. Place four corner dots. Use the same plan, rehearse, draw process for every edge. Add the two corner-to-corner diagonals, then two lines across the shape joining opposite edges through the centre. Vary the shape and size on your next attempt.</p>
+      <PlaneGuide />
       <details>
         <summary>Check your work before the next attempt</summary>
         <ul>

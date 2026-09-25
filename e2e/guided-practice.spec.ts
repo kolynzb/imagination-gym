@@ -18,6 +18,19 @@ test('guided Day 1 separates preparation from timed practice and preserves work 
   await page.screenshot({ path: 'scratch/screenshots/guided-movement-desktop.png' });
   await page.setViewportSize({ width: 390, height: 844 });
   expect(await pilot.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+  await pilot.getByRole('button', { name: 'Build a plane', exact: true }).click();
+  await expect(pilot.getByRole('heading', { name: 'Place four corner dots' })).toBeVisible();
+  await expect(pilot.getByRole('button', { name: 'Previous step', exact: true })).toBeDisabled();
+  for (const heading of ['Connect the four edges', 'Join opposite corners', 'Add two centre lines']) {
+    await pilot.getByRole('button', { name: 'Next step', exact: true }).click();
+    await expect(pilot.getByRole('heading', { name: heading })).toBeVisible();
+  }
+  await expect(pilot.getByRole('button', { name: 'Next step', exact: true })).toBeDisabled();
+  expect(await pilot.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+  await page.screenshot({ path: 'scratch/screenshots/plane-guide-phone.png', fullPage: true });
+  await page.setViewportSize({ width: 1440, height: 960 });
+  await page.screenshot({ path: 'scratch/screenshots/plane-guide-desktop.png' });
+  await page.setViewportSize({ width: 390, height: 844 });
   await pilot.getByRole('navigation').getByRole('button', { name: /Try it/ }).click();
   await expect(pilot.getByRole('button', { name: 'Start', exact: true })).toBeVisible();
   await page.screenshot({ path: 'scratch/screenshots/guided-practice-phone.png' });

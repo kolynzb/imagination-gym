@@ -6,6 +6,7 @@
   import { practiceStage } from '../lib/practicePilot';
   import DrawingSetup from './DrawingSetup.svelte';
   import DayOneGuide from './DayOneGuide.svelte';
+  import PlaneGuide from './PlaneGuide.svelte';
   import Timer from './Timer.svelte';
   const stages = ['Get ready', 'See the movement', 'Try it', 'Inspect'];
   const frames = [
@@ -14,6 +15,7 @@
     { title: 'Commit once', body: 'Make one continuous stroke. Leave it visible even if it misses the endpoint.' }
   ];
   let frame = 0;
+  let movement: 'line' | 'plane' = 'line';
   const parts = ['Warm-up', 'Lines & planes', 'Baseline drawing'];
   const cues = [
     'Draw eight straight strokes, eight C-curves and eight S-curves. Repeat at different sizes for ten minutes.',
@@ -58,6 +60,14 @@
       <p class="intro">Check your grip and movement, then try one stroke. The timer starts only when you choose Start in practice.</p>
       <DrawingSetup />
     {:else if $practiceStage === 1}
+      <div class="movement-choice" role="group" aria-label="Choose a demonstration">
+        <button type="button" aria-pressed={movement === 'line'} onclick={() => movement = 'line'}>One line</button>
+        <button type="button" aria-pressed={movement === 'plane'} onclick={() => movement = 'plane'}>Build a plane</button>
+      </div>
+      {#if movement === 'plane'}
+        <h2>Build it one stroke at a time.</h2>
+        <PlaneGuide />
+      {:else}
       <div class="stage-heading"><h2>One mark. Three decisions.</h2><span>{frame + 1} / 3</span></div>
       <div class="demonstration">
         <div class="frame" role="img" aria-label={frames[frame].body}><img src="/lessons/ghosting-sequence.png" alt="" style={`transform: translateX(-${frame * 100 / 3}%);`} /></div>
@@ -66,6 +76,7 @@
           <a href="https://www.youtube.com/watch?v=LkJG6pKTuRc" target="_blank" rel="noreferrer">Watch Drawabox demonstrate ↗</a>
         </div>
       </div>
+      {/if}
     {:else if $practiceStage === 2}
       <div class="stage-heading"><h2>{parts[$state.timerPartIndex] || parts[0]}</h2><span>Practise on paper</span></div>
       <div class="practice-layout">
@@ -90,6 +101,8 @@
 </div>
 
 <style>
+  .movement-choice { display: flex; gap: 8px; margin-bottom: 24px; }
+  .movement-choice button[aria-pressed="true"] { background: var(--ink); color: var(--canvas); border-color: var(--ink); }
   .guided-practice { position: fixed; inset: 0; z-index: 121; background: var(--canvas); color: var(--ink); overflow-y: auto; padding: 28px max(24px, calc((100vw - 1120px) / 2)); }
   header, .stage-heading, footer { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
   header { padding-bottom: 24px; }
