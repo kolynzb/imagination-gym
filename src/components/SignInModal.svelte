@@ -14,15 +14,16 @@
 
   function mountGoogleButton(container: HTMLElement) {
     let mounted = true;
+    const controller = new AbortController();
     void renderGoogleButton(container, result => {
       if (mounted) void handleGoogleLogin(result);
-    }).then(rendered => {
+    }, controller.signal).then(rendered => {
       if (mounted && !rendered) {
         message = 'Google sign-in is unavailable. Please try again later.';
         isError = true;
       }
     });
-    return { destroy() { mounted = false; cancelGoogleSignInPrompt(); } };
+    return { destroy() { mounted = false; controller.abort(); cancelGoogleSignInPrompt(); } };
   }
 
   async function handleGoogleLogin({ credential }: GoogleCredential) {
@@ -132,6 +133,7 @@
     position: relative;
     width: 100%;
     max-width: 480px;
+    min-width: 0;
     background: var(--canvas);
     border: 1px solid var(--line-2);
     border-radius: 28px;
@@ -164,7 +166,7 @@
 
   .account-name { font-weight: 700; overflow-wrap: anywhere; }
   .error { color: var(--danger); }
-  .google-slot-wrap { display: flex; justify-content: center; min-height: 42px; }
+  .google-slot-wrap { width: 100%; max-width: 400px; min-width: 0; margin-inline: auto; display: flex; justify-content: center; min-height: 42px; }
   .action-buttons { display: flex; gap: 12px; }
   .action-buttons button {
     flex: 1;
