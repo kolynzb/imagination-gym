@@ -58,3 +58,21 @@ test('existing progress earns a level and later days use their own lesson and co
   await expect.poll(() => JSON.parse(cloud.progress).done.w2d1p0).toBe(true);
   await page.screenshot({ path: 'scratch/screenshots/practice-level-up.png' });
 });
+
+test('session path switches instruction without awarding XP and keeps source resources nearby', async ({ page, cloud }) => {
+  await startCourse(page);
+  await page.getByRole('button', { name: 'Start practice', exact: true }).click();
+  const practice = page.getByRole('dialog', { name: 'Guided practice', exact: true });
+  const path = practice.getByRole('navigation', { name: 'Session parts' });
+  await path.getByRole('button', { name: /Stroke trajectory/ }).click();
+  await expect(practice.locator('iframe')).toHaveAttribute('src', /LkJG6pKTuRc/);
+  await expect(path.getByRole('button', { name: /Stroke trajectory/ })).toHaveAttribute('aria-current', 'step');
+  expect(JSON.parse(cloud.progress).done).toEqual({});
+  await practice.getByText('Keep these nearby').click();
+  await expect(practice.getByRole('link', { name: 'Drawabox: Ghosted Lines' })).toHaveAttribute('href', 'https://drawabox.com/lesson/1/10');
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.screenshot({ path: 'scratch/screenshots/session-path-desktop.png' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await practice.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+  await page.screenshot({ path: 'scratch/screenshots/session-path-mobile.png' });
+});

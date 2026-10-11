@@ -22,6 +22,8 @@
   $: completedPartsList = currentDay?.parts.map((_, i) => !!s.done[`w${s.cw}d${s.cd}p${i}`]) || [];
   $: allPartsDone = completedPartsList.length > 0 && completedPartsList.every(Boolean);
 
+  $: nextPartIndex = completedPartsList.findIndex(done => !done);
+  $: nextPart = currentDay?.parts[Math.max(0, nextPartIndex)];
   let notesCopied = false;
   let markdownDownloaded = false;
   let notesError = '';
@@ -180,7 +182,10 @@
   </header>
 
   <div class="practice-entry">
-    <div><strong>{allPartsDone ? 'Today’s practice is complete.' : 'Watch. Practise. Keep the attempt.'}</strong><p>{completedPartsList.filter(Boolean).length} of {completedPartsList.length} parts complete. Every part counts.</p>
+    <div class="next-practice"><span class="entry-eyebrow">{allPartsDone ? 'Session complete' : completedPartsList.some(Boolean) ? 'Pick up where you left off' : 'Your next small win'}</span>
+      <h2>{allPartsDone ? 'A page well spent.' : nextPart?.p}</h2>
+      <p>{allPartsDone ? 'Every attempt adds up. Come back whenever you want to revisit.' : `${nextPart?.m ? `${nextPart.m} min` : 'At your pace'} · Part ${Math.max(0, nextPartIndex) + 1} of ${completedPartsList.length} · +20 XP after practice`}</p>
+      <div class="session-segments" aria-label={`${completedPartsList.filter(Boolean).length} of ${completedPartsList.length} parts complete`}>{#each completedPartsList as done, i}<span class:done class:next={i === nextPartIndex}></span>{/each}</div>
       <button type="button" onclick={() => {
         const next = completedPartsList.findIndex(done => !done);
         if (next >= 0 && next !== s.timerPartIndex) actions.selectTimerPart(next, currentDay.parts[next].m);
@@ -367,6 +372,8 @@
 </div>
 
 <style>
+.entry-eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--accent-ink)}.next-practice h2{font-family:var(--font-display);font-size:clamp(28px,3vw,40px);line-height:1.15;margin:8px 0}.session-segments{display:flex;gap:5px;max-width:300px;margin:20px 0}.session-segments span{flex:1;height:5px;background:var(--line-2);border-radius:4px}.session-segments .done{background:var(--ink)}.session-segments .next{background:var(--accent)}
+
   .practice-entry { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 20px 0; margin-bottom: 24px; border-block: 1px solid var(--line); }
   .practice-entry p { margin: 6px 0 0; color: var(--ink-62); }
   .practice-entry button { min-height: 44px; padding: 12px 18px; border: 0; border-radius: var(--radius-control); background: var(--accent); color: var(--on-accent); font: inherit; font-weight: 600; cursor: pointer; }
