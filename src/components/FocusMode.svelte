@@ -23,7 +23,7 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
-    if ($guidedPractice && s.cw === 1 && s.cd === 1) return;
+    if ($guidedPractice) return;
     if (e.key === 'Escape' && !s.activeExerciseDrawer) {
       close();
       return;
@@ -103,7 +103,7 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-{#if $guidedPractice && s.cw === 1 && s.cd === 1}
+{#if $guidedPractice}
   <GuidedPractice />
 {:else}
 <div class="focus-modal">

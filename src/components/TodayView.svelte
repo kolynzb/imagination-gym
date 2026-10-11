@@ -5,7 +5,8 @@
   import { sessionDate } from '../lib/dates';
   import Timer from './Timer.svelte';
   import Icon from './Icon.svelte';
-  import { guidedPractice, practiceStage } from '../lib/practicePilot';
+  import { guidedPractice } from '../lib/practicePilot';
+  import PracticeProgress from './PracticeProgress.svelte';
   import DayOneGuide from './DayOneGuide.svelte';
 
   let s = $state;
@@ -109,7 +110,7 @@
           {stats.missed.length === 1 ? '1 day is still unticked behind you' : `${stats.missed.length} days are still unticked behind you`}
         </div>
         <p class="alert-desc">
-          The reps only work daily, so don't double up to catch up. Either resume from where you stopped, or shift your schedule so the calendar matches reality.
+          Your completed practice still counts. Resume where you stopped, or shift your schedule to fit your time.
         </p>
       </div>
       <div class="alert-actions">
@@ -178,12 +179,16 @@
     </div>
   </header>
 
-  {#if s.cw === 1 && s.cd === 1}
-    <div class="practice-entry">
-      <div><strong>Learn the movement. Then make your marks.</strong><p>Setup, demonstration, practice and a quick self-check.</p></div>
-      <button type="button" onclick={() => { guidedPractice.set(true); actions.setFocus(true); }}>{$practiceStage > 0 ? 'Continue guided practice' : 'Start guided practice'} →</button>
+  <div class="practice-entry">
+    <div><strong>{allPartsDone ? 'Today’s practice is complete.' : 'Watch. Practise. Keep the attempt.'}</strong><p>{completedPartsList.filter(Boolean).length} of {completedPartsList.length} parts complete. Every part counts.</p>
+      <button type="button" onclick={() => {
+        const next = completedPartsList.findIndex(done => !done);
+        if (next >= 0 && next !== s.timerPartIndex) actions.selectTimerPart(next, currentDay.parts[next].m);
+        guidedPractice.set(true); actions.setFocus(true);
+      }}>{allPartsDone ? 'Revisit practice' : completedPartsList.some(Boolean) ? 'Continue practice' : 'Start practice'}</button>
     </div>
-  {/if}
+    <PracticeProgress />
+  </div>
   <div class="day-layout">
     <!-- Main Left Column: Day Parts -->
     <div class="day-main">
