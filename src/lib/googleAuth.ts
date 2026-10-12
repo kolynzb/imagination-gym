@@ -42,7 +42,7 @@ export function cancelGoogleSignInPrompt(): void {
 }
 
 export function getGoogleClientId(): string {
-  return ((import.meta as unknown as { env?: Record<string, string | undefined> }).env?.VITE_GOOGLE_CLIENT_ID || '').trim();
+  return (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim();
 }
 
 export function isGoogleAuthAvailable(): boolean {
