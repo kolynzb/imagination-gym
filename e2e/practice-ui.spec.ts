@@ -63,7 +63,7 @@ test('mobile and portrait tablet keep the guided entry visible and the timer bef
   expect(lessonsBox).not.toBeNull();
   expect(timerBox!.y).toBeGreaterThanOrEqual(headerBox!.y + headerBox!.height);
   expect(timerBox!.y + timerBox!.height).toBeLessThanOrEqual(lessonsBox!.y);
-  const startBox = await page.getByRole('button', { name: 'Start guided practice →', exact: true }).boundingBox();
+  const startBox = await page.getByRole('button', { name: 'Start practice', exact: true }).boundingBox();
   expect(startBox).not.toBeNull();
   expect(startBox!.y + startBox!.height).toBeLessThanOrEqual(844);
 
@@ -106,7 +106,7 @@ test('captures rendered desktop and phone Today and Focus screens', async ({ pag
   await page.screenshot({ path: resolve(screenshotDir, 'practice-today-desktop.png') });
   await page.setViewportSize({ width: 390, height: 844 });
   await page.screenshot({ path: resolve(screenshotDir, 'practice-today-phone.png') });
-  const phoneStart = await page.getByRole('button', { name: 'Start guided practice →', exact: true }).boundingBox();
+  const phoneStart = await page.getByRole('button', { name: 'Start practice', exact: true }).boundingBox();
   expect(phoneStart).not.toBeNull();
   expect(phoneStart!.y + phoneStart!.height).toBeLessThanOrEqual(780);
   await page.setViewportSize({ width: 1440, height: 960 });
@@ -142,9 +142,9 @@ test('Day 1 guidance is keyboard-accessible without toggling the timer and stays
   await page.keyboard.press('Space');
   await expect(warmup.locator('..')).toHaveAttribute('open', '');
   await expect(page.getByRole('button', { name: 'Start', exact: true })).toBeVisible();
-  const image = page.getByRole('img', { name: /Three stages: place two endpoint dots/ });
-  await expect(image).toBeVisible();
-  expect(await image.evaluate((element: HTMLImageElement) => element.complete && element.naturalWidth > 0)).toBe(true);
+  const video = page.locator('iframe[title="Drawabox: Ghosted lines"]');
+  await expect(video).toBeVisible();
+  await expect(video).toHaveAttribute('src', /LkJG6pKTuRc/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByRole('button', { name: 'Focus Mode', exact: true }).click();
   const why = page.locator('.focus-modal summary').filter({ hasText: 'Why rehearse before drawing?' });

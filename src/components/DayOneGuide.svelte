@@ -1,5 +1,5 @@
 <script lang="ts">
-  import PlaneGuide from './PlaneGuide.svelte';
+  import PracticeVideos from './PracticeVideos.svelte';
   import DrawingSetup from './DrawingSetup.svelte';
   export let part: string;
 </script>
@@ -23,11 +23,7 @@
     {:else if part === 'B'}
       <p><strong>Your task:</strong> practise planning a mark, rehearsing it, then drawing it once. Start with lines; apply the same process to the edges of flat four-sided shapes.</p>
       <p>Use a pen and plain paper. Keep a fresh area for each attempt. Today's roadmap target is two pages of ghosted lines and two of ghosted planes.</p>
-      <figure>
-        <!-- svelte-ignore a11y_no_noninteractive_tabindex (Keyboard users need to scroll this illustration region.) -->
-        <div class="illustration-scroll" tabindex="0" role="region" aria-label="Ghosting sequence, scroll horizontally on small screens"><img src="/lessons/ghosting-sequence.png" alt="Three stages: place two endpoint dots; rehearse the path above the paper; connect the dots with one ink stroke." width="1774" height="887" /></div>
-        <figcaption>Scroll across the illustration on a small screen. The orange path represents movement above the paper, not an extra line to draw.</figcaption>
-      </figure>
+      <PracticeVideos part={1} />
       <h4>Start with one line</h4>
       <ol>
         <li>Place two small dots to choose the start and end. Turn the page until the movement feels comfortable.</li>
@@ -40,7 +36,7 @@
         <p>Planning and rehearsal give you time to decide and prepare. During the stroke, focus on a smooth motion instead of steering the pen back toward the target. Accuracy develops through further attempts.</p>
       </details>
       <h4>Then build a plane</h4>
-      <PlaneGuide />
+      <p>Place four corner dots. Plan and rehearse each edge, draw each once, then practise the diagonals as shown in the original demonstration above.</p>
       <details>
         <summary>Check your work before the next attempt</summary>
         <ul>
@@ -58,7 +54,7 @@
         <a href="https://www.youtube.com/watch?v=JsG7cMasVjo" target="_blank" rel="noreferrer">Ghosted planes · Drawabox ↗</a>
         <a href="https://drawabox.com/lesson/1" target="_blank" rel="noreferrer">Read the full original lesson ↗</a>
       </details>
-      <p class="context">Exercise method: Drawabox / Uncomfortable. Wording, illustration, pacing and reflection prompts: Imagination Gym companion notes. This session is a selection from the roadmap, not the full Drawabox curriculum.</p>
+      <p class="context">Exercise method: Drawabox / Uncomfortable. Wording, pacing and reflection prompts: Imagination Gym companion notes. This session is a selection from the roadmap, not the full Drawabox curriculum.</p>
     {:else if part === 'C'}
       <p>Prepare the objects you will study this week: a mug, shoe, scissors, spray bottle and a tool, or five similarly varied household objects.</p>
       <ol>
@@ -83,12 +79,7 @@
   li + li { margin-top: 10px; }
   h4 { font-family: var(--font-body); color: var(--ink); font-size: inherit; margin: 24px 0 12px; }
   strong { color: var(--ink); }
-  figure { margin: 20px 0; }
-  .illustration-scroll { overflow-x: auto; border-radius: var(--radius-control); }
-  .illustration-scroll:focus-visible { outline: 2px solid var(--accent); }
-  img { min-width: 580px; display: block; width: 100%; height: auto; border-radius: var(--radius-control); }
-  figcaption, .context { font-size: var(--text-control); line-height: 1.5; }
-  figcaption { margin-top: 8px; }
+  .context { font-size: var(--text-control); line-height: 1.5; }
   .context { margin-top: 16px; color: var(--ink-62); }
   .guide-content details { border-top: 1px solid var(--line); margin-bottom: 12px; }
   a { display: block; padding: 10px 0; min-height: 44px; color: var(--accent-ink); text-underline-offset: 3px; }

@@ -42,7 +42,7 @@ export function cancelGoogleSignInPrompt(): void {
 }
 
 export function getGoogleClientId(): string {
-  return ((import.meta as unknown as { env?: Record<string, string | undefined> }).env?.VITE_GOOGLE_CLIENT_ID || '').trim();
+  return (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim();
 }
 
 export function isGoogleAuthAvailable(): boolean {
@@ -96,7 +96,8 @@ export function parseJwtPayload(token: string): GoogleUserPayload | null {
 
 export async function renderGoogleButton(
   container: HTMLElement,
-  onSuccess: (result: GoogleCredential) => void
+  onSuccess: (result: GoogleCredential) => void,
+  signal?: AbortSignal
 ): Promise<boolean> {
   const clientId = getGoogleClientId();
   if (!clientId) return false;
@@ -104,7 +105,7 @@ export async function renderGoogleButton(
   try {
     await loadGoogleIdentityScript();
     const google = googleIdentity();
-    if (!google?.accounts?.id) return false;
+    if (!google?.accounts?.id || signal?.aborted) return false;
 
     google.accounts.id.initialize({
       client_id: clientId,
@@ -117,15 +118,25 @@ export async function renderGoogleButton(
       },
     });
 
-    google.accounts.id.renderButton(container, {
-      type: 'standard',
-      theme: 'outline',
-      size: 'large',
-      text: 'signin_with',
-      shape: 'rectangular',
-      logo_alignment: 'left',
-      width: container.clientWidth || 280,
-    });
+    const identity = google.accounts.id;
+    let previousWidth = 0;
+    const render = () => {
+      if (signal?.aborted) return;
+      const width = Math.min(400, Math.floor(container.clientWidth));
+      if (width <= 0 || width === previousWidth) return;
+      previousWidth = width;
+      container.replaceChildren();
+      identity.renderButton(container, {
+        type: 'standard', theme: 'outline', size: 'large',
+        text: 'signin_with', shape: 'rectangular', logo_alignment: 'left', width,
+      });
+    };
+    render();
+    if (signal && typeof ResizeObserver !== 'undefined') {
+      const observer = new ResizeObserver(render);
+      observer.observe(container);
+      signal.addEventListener('abort', () => observer.disconnect(), { once: true });
+    }
 
     // A blocked or unavailable One Tap prompt must not hide the manual button.
     try {

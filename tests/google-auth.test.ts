@@ -12,7 +12,7 @@ describe('Google returning sign-in', () => {
 
   it('requests a fresh Google credential and delivers it through the normal callback', async () => {
     const success = vi.fn();
-    expect(await renderGoogleButton({ clientWidth: 280 } as HTMLElement, success)).toBe(true);
+    expect(await renderGoogleButton({ clientWidth: 280, replaceChildren: vi.fn() } as HTMLElement, success)).toBe(true);
     expect(id.initialize).toHaveBeenCalledWith(expect.objectContaining({ auto_select: true }));
     expect(id.prompt).toHaveBeenCalledOnce();
     const credential = `header.${btoa(JSON.stringify({ name: 'Artist', sub: 'account-a' }))}.signature`;
@@ -23,9 +23,34 @@ describe('Google returning sign-in', () => {
   it('keeps the manual button available when the browser blocks One Tap', async () => {
     id.prompt.mockImplementation(() => { throw new Error('blocked'); });
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    expect(await renderGoogleButton({ clientWidth: 280 } as HTMLElement, vi.fn())).toBe(true);
+    expect(await renderGoogleButton({ clientWidth: 280, replaceChildren: vi.fn() } as HTMLElement, vi.fn())).toBe(true);
     expect(id.renderButton).toHaveBeenCalledOnce();
     warn.mockRestore();
+  });
+
+  it('fits changing layouts, caps width, and stops observing on unmount', async () => {
+    let resize = () => {};
+    const disconnect = vi.fn();
+    vi.stubGlobal('ResizeObserver', class {
+      constructor(callback: () => void) { resize = callback; }
+      observe() {}
+      disconnect = disconnect;
+    });
+    const container = { clientWidth: 546, replaceChildren: vi.fn() };
+    const controller = new AbortController();
+    await renderGoogleButton(container as unknown as HTMLElement, vi.fn(), controller.signal);
+    expect(id.renderButton.mock.calls.at(-1)?.[1].width).toBe(400);
+    container.clientWidth = 248;
+    resize();
+    expect(id.renderButton.mock.calls.at(-1)?.[1].width).toBe(248);
+    resize();
+    expect(id.renderButton).toHaveBeenCalledTimes(2);
+    expect(id.initialize).toHaveBeenCalledOnce();
+    controller.abort();
+    expect(disconnect).toHaveBeenCalledOnce();
+    container.clientWidth = 320;
+    resize();
+    expect(id.renderButton).toHaveBeenCalledTimes(2);
   });
 
   it('disables auto-selection and cancels the prompt on explicit sign-out', () => {

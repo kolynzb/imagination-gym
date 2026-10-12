@@ -115,6 +115,10 @@ export const WEEKS: Week[] = [
     book: 'Level 1 Mechanics, pp. 6–26: Ex 01 Straights & Curves (p.7), Ex 02 Point Coordination (p.8), Ex 03 Tilting Planes (p.9), Ex 04 Parallel Ellipses (p.10)',
     links: [
       { l: 'Drawabox Lesson 1: Lines & Ellipses', u: 'https://drawabox.com/lesson/1' },
+      { l: 'Drawabox: Ghosted Lines', u: 'https://drawabox.com/lesson/1/10' },
+      { l: 'Drawabox: Ghosted Planes', u: 'https://drawabox.com/lesson/1/12' },
+      { l: 'Drawabox: Tables of Ellipses', u: 'https://drawabox.com/lesson/1/13' },
+      { l: 'Drawabox: Funnels', u: 'https://drawabox.com/lesson/1/15' },
       { l: 'Nathan Cooke: Visual Communication', u: 'https://www.youtube.com/watch?v=oK-4wUbBmJI' },
       { l: 'brokendraw: how to actually use boxes to draw better', u: 'https://www.youtube.com/watch?v=VBAJDepILYc' },
       { l: 'Roadmap video: Week 1 @ 08:38', u: 'https://www.youtube.com/watch?v=zYzgxUVSpUc&t=518s' }
@@ -166,6 +170,7 @@ export const WEEKS: Week[] = [
     links: [
       { l: 'Drawabox: The 250 Box Challenge', u: 'https://drawabox.com/lesson/250boxes' },
       { l: 'Drawabox: Rotated Boxes', u: 'https://drawabox.com/lesson/1/16' },
+      { l: 'Drawabox: Organic Perspective', u: 'https://drawabox.com/lesson/1/17' },
       { l: 'Athoro: Drawing The Box', u: 'https://www.youtube.com/watch?v=Jwti08d0jYk' },
       { l: 'Athoro: What to THINK of when drawing cylinders', u: 'https://www.youtube.com/watch?v=BHvXszH1fdI' },
       { l: 'Zeph Draws: Spatial Awareness 1: Form Rotation', u: 'https://www.youtube.com/watch?v=NijDzUGNVfQ' },
