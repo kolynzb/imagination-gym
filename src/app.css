@@ -175,3 +175,6 @@ button:not(:disabled):active {
     scroll-behavior: auto !important;
   }
 }
+
+/* Route headings receive programmatic focus to announce navigation. */
+h1[tabindex="-1"]:focus-visible { outline: none; }

@@ -28,6 +28,8 @@
       <div class="card-copy"><span class="kind">{board ? 'Reference board' : 'Drawing exercise'} <span aria-hidden="true">↗</span></span><strong>{link.l}</strong><span class="open-label">{board ? 'Explore references' : 'Open the exercise'}</span></div>
     </a>
   {/each}
+</div>
+<div class="resource-grid">
   <article class="reading-card"><span class="kind">On your bookshelf</span><h3>25 Drawing Exercises</h3><span class="author">brokendraw</span><p>{week.book}</p></article>
   <article class="reading-card"><span class="kind">On your bookshelf</span><h3>The Dynamic Bible</h3><span class="author">Peter Han</span><p>{week.han}</p></article>
 </div>
