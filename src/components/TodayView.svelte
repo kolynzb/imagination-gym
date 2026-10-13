@@ -3,6 +3,7 @@
   import { WEEKS } from '../lib/curriculum';
   import { formatSessionNotes } from '../lib/journal';
   import { sessionDate } from '../lib/dates';
+  import PracticeResources from './PracticeResources.svelte';
   import Timer from './Timer.svelte';
   import Icon from './Icon.svelte';
   import { guidedPractice } from '../lib/practicePilot';
@@ -104,36 +105,6 @@
     </div>
   {/if}
 
-  <!-- Schedule Shift Alert if behind -->
-  {#if stats.missed.length > 0}
-    <div class="schedule-alert">
-      <div class="alert-content">
-        <div class="alert-title">
-          {stats.missed.length === 1 ? '1 day is still unticked behind you' : `${stats.missed.length} days are still unticked behind you`}
-        </div>
-        <p class="alert-desc">
-          Your completed practice still counts. Resume where you stopped, or shift your schedule to fit your time.
-        </p>
-      </div>
-      <div class="alert-actions">
-        <button
-          type="button"
-          class="alert-btn primary"
-          onclick={() => actions.jumpToDay(stats.missed[0].n, stats.missed[0].d)}
-        >
-          Go to W{stats.missed[0].n} D{stats.missed[0].d} →
-        </button>
-        <button
-          type="button"
-          class="alert-btn outline"
-          onclick={() => actions.shiftSchedule(stats.missed.length)}
-        >
-          Shift schedule by {stats.missed.length}d
-        </button>
-      </div>
-    </div>
-  {/if}
-
   <!-- Header -->
   <header class="day-header">
     <div class="header-left">
@@ -194,6 +165,36 @@
     </div>
     <PracticeProgress />
   </div>
+  <!-- Schedule Shift Alert if behind -->
+  {#if stats.missed.length > 0}
+    <div class="schedule-alert">
+      <div class="alert-content">
+        <div class="alert-title">
+          Your course, your pace
+        </div>
+        <p class="alert-desc">
+          {stats.missed.length} earlier session{stats.missed.length === 1 ? ' is' : 's are'} unfinished. Pick up where you stopped or adjust your schedule.
+        </p>
+      </div>
+      <div class="alert-actions">
+        <button
+          type="button"
+          class="alert-btn primary"
+          onclick={() => actions.jumpToDay(stats.missed[0].n, stats.missed[0].d)}
+        >
+          Go to W{stats.missed[0].n} D{stats.missed[0].d} →
+        </button>
+        <button
+          type="button"
+          class="alert-btn outline"
+          onclick={() => actions.shiftSchedule(stats.missed.length)}
+        >
+          Shift schedule by {stats.missed.length}d
+        </button>
+      </div>
+    </div>
+  {/if}
+
   <div class="day-layout">
     <!-- Main Left Column: Day Parts -->
     <div class="day-main">
@@ -248,7 +249,7 @@
                         class="ref-chip"
                         onclick={() => actions.openExerciseDrawer(refNum)}
                       >
-                        Ex {refNum} Drawer ↗
+                        View exercise {refNum} →
                       </button>
                     {/each}
                   </div>
@@ -345,36 +346,22 @@
         <div class="context-label">Week {s.cw} Project</div>
         <div class="project-title">{currentWeek?.project}</div>
 
-        <div class="divider"></div>
-
-        <div class="context-label">Required Reading</div>
-        <div class="reading-item">
-          <strong>brokendraw book:</strong> {currentWeek?.book}
-        </div>
-        <div class="reading-item">
-          <strong>The Dynamic Bible:</strong> {currentWeek?.han}
-        </div>
-
-        {#if currentWeek?.links && currentWeek.links.length > 0}
-          <div class="divider"></div>
-          <div class="context-label">Week References</div>
-          <div class="links-list">
-            {#each currentWeek.links as link}
-              <a href={link.u} target="_blank" rel="noreferrer" class="ext-link">
-                {link.l} ↗
-              </a>
-            {/each}
-          </div>
-        {/if}
+        <button type="button" class="week-details-btn" onclick={() => actions.setView('week')}>Explore this week →</button>
       </div>
     </div>
   </div>
+  {#if currentWeek}<section class="today-resources"><h2>Keep these nearby</h2><p>The lessons and reading for Week {s.cw}, ready when you need a reference.</p><PracticeResources week={currentWeek} /></section>{/if}
 </div>
 
 <style>
+  .today-resources { margin-top: 40px; border-top: 1px solid var(--line); padding-top: 28px; }
+  .today-resources h2 { font-size: 32px; margin: 0; }
+  .today-resources > p { margin: 8px 0 20px; color: var(--ink-62); font-size: 14px; }
+  .week-details-btn { background: transparent; border: 0; color: var(--accent-ink); padding: 12px 0; min-height: 44px; text-align: left; cursor: pointer; font-weight: 700; }
+
 .entry-eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--accent-ink)}.next-practice h2{font-family:var(--font-display);font-size:clamp(28px,3vw,40px);line-height:1.15;margin:8px 0}.session-segments{display:flex;gap:5px;max-width:300px;margin:20px 0}.session-segments span{flex:1;height:5px;background:var(--line-2);border-radius:4px}.session-segments .done{background:var(--ink)}.session-segments .next{background:var(--accent)}
 
-  .practice-entry { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 20px 0; margin-bottom: 24px; border-block: 1px solid var(--line); }
+  .practice-entry { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 28px; margin-bottom: 24px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-panel); }
   .practice-entry p { margin: 6px 0 0; color: var(--ink-62); }
   .practice-entry button { min-height: 44px; padding: 12px 18px; border: 0; border-radius: var(--radius-control); background: var(--accent); color: var(--on-accent); font: inherit; font-weight: 600; cursor: pointer; }
   .reference-guide > summary { cursor: pointer; min-height: 44px; padding: 12px 0; }
@@ -388,7 +375,7 @@
   }
 
   .schedule-alert {
-    background: var(--sulfur-band);
+    background: transparent;
     border: 1px solid var(--line-2);
     border-radius: var(--radius-panel);
     padding: 20px 24px;
@@ -821,36 +808,10 @@
     color: var(--ink);
   }
 
-  .divider {
-    height: 1px;
-    background: var(--line);
-    margin: 14px 0;
-  }
 
-  .reading-item {
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--ink-78);
-    margin-bottom: 6px;
-  }
 
-  .links-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
 
-  .ext-link {
-    font-size: 13px;
-    color: var(--accent-ink);
-    text-decoration: none;
-    border-bottom: 1px solid var(--accent-14);
-  }
 
-  .ext-link:hover {
-    color: var(--ink);
-    border-bottom-color: var(--ink);
-  }
 
   .invite-top-banner {
     display: flex;

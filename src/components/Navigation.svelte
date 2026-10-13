@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from "svelte";
   import { VAULT } from '../lib/curriculum';
   import { state, actions, derivedStats } from '../lib/store';
   import Icon from './Icon.svelte';
@@ -11,16 +12,25 @@
 
   let mobileMenuOpen = false;
 
-  const NAV_ITEMS = [
-    { id: 'today', label: 'Today', group: 'Main' },
-    { id: 'week', label: 'This Week', group: 'Course' },
-    { id: 'roadmap', label: 'Roadmap', group: 'Course' },
-    { id: 'exercises', label: '25 Exercises', group: 'Library' },
-    { id: 'vault', label: 'Video Vault', group: 'Library' },
-    { id: 'method', label: 'Method & Kit', group: 'Library' },
-    { id: 'progress', label: 'Stats & Streak', group: 'Progress' },
-    { id: 'crew', label: 'The Crew', group: 'Progress' },
-  ] as const;
+  function focusMenu(node: HTMLElement) {
+    const previous = document.activeElement;
+    void tick().then(() => node.querySelector<HTMLButtonElement>('.close-btn')?.focus());
+    function handleKeys(event: KeyboardEvent) {
+      event.stopPropagation();
+      if (event.key === 'Escape') { event.preventDefault(); mobileMenuOpen = false; }
+      if (event.key !== 'Tab') return;
+      const buttons = Array.from(node.querySelectorAll<HTMLButtonElement>('.mobile-sheet button'));
+      const first = buttons[0];
+      const last = buttons[buttons.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    }
+    node.addEventListener('keydown', handleKeys);
+    return { destroy() {
+      node.removeEventListener('keydown', handleKeys);
+      if (previous instanceof HTMLElement && previous.isConnected) previous.focus({ preventScroll: true });
+    } };
+  }
 
   function setView(id: typeof s.view) {
     actions.setView(id);
@@ -71,12 +81,13 @@
     <span class="jump-arrow">→</span>
   </button>
 
-  <nav class="nav-scroll">
+  <nav class="nav-scroll" aria-label="Main navigation">
     <div class="nav-section">
       <button
         type="button"
         class="nav-btn"
         class:active={s.view === 'today'}
+    aria-current={s.view === 'today' ? 'page' : undefined}
         onclick={() => setView('today')}
       >
         <span>Today</span>
@@ -89,6 +100,7 @@
         type="button"
         class="nav-btn"
         class:active={s.view === 'week'}
+    aria-current={s.view === 'week' ? 'page' : undefined}
         onclick={() => setView('week')}
       >
         <span>This Week</span>
@@ -97,6 +109,7 @@
         type="button"
         class="nav-btn"
         class:active={s.view === 'roadmap'}
+        aria-current={s.view === 'roadmap' ? 'page' : undefined}
         onclick={() => setView('roadmap')}
       >
         <span>Roadmap</span>
@@ -109,6 +122,7 @@
         type="button"
         class="nav-btn"
         class:active={s.view === 'exercises'}
+    aria-current={s.view === 'exercises' ? 'page' : undefined}
         onclick={() => setView('exercises')}
       >
         <span>25 Exercises</span>
@@ -117,6 +131,7 @@
         type="button"
         class="nav-btn"
         class:active={s.view === 'vault'}
+        aria-current={s.view === 'vault' ? 'page' : undefined}
         onclick={() => setView('vault')}
       >
         <span>Video Vault</span>
@@ -125,6 +140,7 @@
         type="button"
         class="nav-btn"
         class:active={s.view === 'method'}
+        aria-current={s.view === 'method' ? 'page' : undefined}
         onclick={() => setView('method')}
       >
         <span>Method & Kit</span>
@@ -137,6 +153,7 @@
         type="button"
         class="nav-btn"
         class:active={s.view === 'progress'}
+        aria-current={s.view === 'progress' ? 'page' : undefined}
         onclick={() => setView('progress')}
       >
         <span>Stats & Streak</span>
@@ -145,6 +162,7 @@
         type="button"
         class="nav-btn"
         class:active={s.view === 'crew'}
+    aria-current={s.view === 'crew' ? 'page' : undefined}
         onclick={() => setView('crew')}
       >
         <span>The Crew</span>
@@ -200,11 +218,12 @@
 </aside>
 
 <!-- Mobile Sticky Bottom Nav (Visible on <= 860px) -->
-<div class="mobile-bottom-nav">
+<nav class="mobile-bottom-nav" aria-label="Mobile navigation">
   <button
     type="button"
     class="mobile-nav-btn"
     class:active={s.view === 'today'}
+    aria-current={s.view === 'today' ? 'page' : undefined}
     onclick={() => setView('today')}
   >
     <span class="m-icon"><Icon name="goal" size={20} /></span>
@@ -214,6 +233,7 @@
     type="button"
     class="mobile-nav-btn"
     class:active={s.view === 'week'}
+    aria-current={s.view === 'week' ? 'page' : undefined}
     onclick={() => setView('week')}
   >
     <span class="m-icon"><Icon name="calendar" size={20} /></span>
@@ -223,6 +243,7 @@
     type="button"
     class="mobile-nav-btn"
     class:active={s.view === 'exercises'}
+    aria-current={s.view === 'exercises' ? 'page' : undefined}
     onclick={() => setView('exercises')}
   >
     <span class="m-icon"><Icon name="ruler" size={20} /></span>
@@ -232,6 +253,7 @@
     type="button"
     class="mobile-nav-btn"
     class:active={s.view === 'crew'}
+    aria-current={s.view === 'crew' ? 'page' : undefined}
     onclick={() => setView('crew')}
   >
     <span class="m-icon"><Icon name="people" size={20} /></span>
@@ -241,16 +263,18 @@
     type="button"
     class="mobile-nav-btn"
     class:active={mobileMenuOpen}
+    aria-expanded={mobileMenuOpen}
+    aria-controls="more-views-menu"
     onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
   >
     <span class="m-icon">⋯</span>
     <span class="m-label">Menu</span>
   </button>
-</div>
+</nav>
 
 <!-- Mobile Drawer Sheet -->
 {#if mobileMenuOpen}
-  <div class="mobile-sheet-overlay" role="dialog" aria-modal="true" aria-label="More views menu">
+  <div use:focusMenu id="more-views-menu" class="mobile-sheet-overlay" role="dialog" aria-modal="true" aria-label="More views menu">
     <button type="button" class="backdrop-btn" onclick={() => (mobileMenuOpen = false)} aria-label="Close menu"></button>
     <div class="mobile-sheet">
       <div class="sheet-head">
@@ -258,7 +282,7 @@
           <img src="/android-chrome-192x192.png" alt="Imagination Gym" class="brand-logo-img-sm" />
           <span class="sheet-title">Imagination Gym</span>
         </div>
-        <button type="button" class="close-btn" aria-label="Dismiss menu" onclick={() => (mobileMenuOpen = false)}><Icon name="cancel" size={14} /></button>
+        <button type="button" class="close-btn" aria-label="Dismiss menu" onclick={() => (mobileMenuOpen = false)}><span aria-hidden="true">×</span></button>
       </div>
       <div class="sheet-links">
         <button class="sheet-btn start-mobile-btn" onclick={() => { mobileMenuOpen = false; actions.openOnboarding(); }}>
@@ -267,16 +291,20 @@
         <button class="sheet-btn profile-mobile-btn" onclick={() => { mobileMenuOpen = false; actions.openAuthModal(); }}>
           <Icon name="user" size={16} /> Your account ({s.userName})
         </button>
-        <button class="sheet-btn" class:active={s.view === 'roadmap'} onclick={() => setView('roadmap')}>
+        <button class="sheet-btn" class:active={s.view === 'roadmap'}
+        aria-current={s.view === 'roadmap' ? 'page' : undefined} onclick={() => setView('roadmap')}>
           Roadmap & 4-Phase Pipeline
         </button>
-        <button class="sheet-btn" class:active={s.view === 'vault'} onclick={() => setView('vault')}>
+        <button class="sheet-btn" class:active={s.view === 'vault'}
+        aria-current={s.view === 'vault' ? 'page' : undefined} onclick={() => setView('vault')}>
           Video Vault ({VAULT.reduce((count, group) => count + group.v.length, 0)} Videos)
         </button>
-        <button class="sheet-btn" class:active={s.view === 'progress'} onclick={() => setView('progress')}>
+        <button class="sheet-btn" class:active={s.view === 'progress'}
+        aria-current={s.view === 'progress' ? 'page' : undefined} onclick={() => setView('progress')}>
           Stats & 56-Day Calendar
         </button>
-        <button class="sheet-btn" class:active={s.view === 'method'} onclick={() => setView('method')}>
+        <button class="sheet-btn" class:active={s.view === 'method'}
+        aria-current={s.view === 'method' ? 'page' : undefined} onclick={() => setView('method')}>
           Method, Kit & Rubric
         </button>
       </div>
@@ -681,7 +709,9 @@
       width: 100%;
       background: var(--canvas);
       border-radius: 24px 24px 0 0;
-      padding: 24px 20px 48px;
+      padding: 24px 20px max(24px, env(safe-area-inset-bottom));
+      max-height: 90dvh;
+      overflow-y: auto;
       box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
       animation: sheetSlideUp 260ms var(--ease-drawer);
     }

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { actions } from '../lib/store';
-  import { EXERCISES, type Exercise } from '../lib/curriculum';
+  import { EXERCISES } from '../lib/curriculum';
   import Icon from './Icon.svelte';
 
   let selectedLevel = 0; // 0 = all
@@ -69,6 +69,7 @@
           type="button"
           class="filter-btn"
           class:active={selectedLevel === l.lvl}
+          aria-pressed={selectedLevel === l.lvl}
           onclick={() => (selectedLevel = l.lvl)}
         >
           {l.label}
@@ -108,21 +109,13 @@
             <span class="reps-val">{ex.reps}</span>
           </div>
 
-          <div class="pitfall-box">
-            <div class="item-line">
-              <Icon name="error" size={14} /> <strong>Pitfall:</strong> {ex.pit}
-            </div>
-            <div class="item-line fix-line">
-              <Icon name="checkmark" size={14} /> <strong>Fix:</strong> {ex.fix}
-            </div>
-          </div>
 
           <button
             type="button"
             class="open-drawer-btn"
             onclick={() => actions.openExerciseDrawer(ex.n)}
           >
-            Open Slide Drawer ↗
+            View exercise →
           </button>
         </div>
       {/each}
@@ -144,7 +137,7 @@
 
   .page-title {
     font-family: var(--font-display);
-    font-size: 64px;
+    font-size: clamp(36px, 4.5vw, 52px);
     line-height: 1.05;
     letter-spacing: 0.02em;
     margin: 0;
@@ -225,6 +218,7 @@
   }
 
   .filter-btn {
+    min-height: 44px;
     appearance: none;
     background: var(--card);
     border: 1px solid var(--line);
@@ -250,7 +244,7 @@
 
   .exercises-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
     gap: 20px;
   }
 
@@ -297,8 +291,8 @@
   }
 
   .ex-name {
-    font-family: var(--font-display);
-    font-size: 26px;
+    font-family: var(--font-body);
+    font-size: 22px;
     line-height: 1.15;
     letter-spacing: 0.02em;
     margin: 0;
@@ -325,28 +319,7 @@
 
   .reps-val {
     font-weight: 700;
-    color: var(--accent);
-  }
-
-  .pitfall-box {
-    background: var(--canvas);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-action);
-    padding: 12px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    font-size: var(--text-body);
-    line-height: var(--leading-body);
-  }
-
-  .item-line {
-    color: var(--ink-78);
-  }
-
-  .fix-line {
-    color: var(--ink);
-    font-weight: 500;
+    color: var(--accent-ink);
   }
 
   .open-drawer-btn {

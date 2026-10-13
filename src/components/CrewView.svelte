@@ -16,6 +16,8 @@
   let unsubscribeCrits: (() => void) | null = null;
   let subscribedRoom = '';
   let subscriptionError = '';
+  let membersLoaded = false;
+  let postsLoaded = false;
 
   // New Crit Post Form State
   let critPrompt = '';
@@ -42,6 +44,8 @@
     unsubscribeMembers = null;
     unsubscribeCrits = null;
     subscribedRoom = '';
+    membersLoaded = false;
+    postsLoaded = false;
     convexMembers = [];
     critPosts = [];
     subscriptionError = '';
@@ -59,10 +63,12 @@
       unsubscribeMembers = convex.onUpdate(api.crew.getMembers, { roomCode }, (members: CrewMember[]) => {
         if (subscribedRoom !== roomCode) return;
         convexMembers = members;
+        membersLoaded = true;
       }, onError);
       unsubscribeCrits = convex.onUpdate(api.crew.getCritPosts, { roomCode }, (posts: CritPost[]) => {
         if (subscribedRoom !== roomCode) return;
         critPosts = posts;
+        postsLoaded = true;
       }, onError);
     } catch (err) {
       console.warn('Convex subscription error:', err);
@@ -126,32 +132,6 @@
       </p>
     </div>
 
-    <!-- Room & Name Config -->
-    <div class="room-pill-box">
-      <div class="config-field">
-        <label for="room-code-input">Room Code</label>
-        <input
-          id="room-code-input"
-          type="text"
-          value={s.roomCode}
-          onchange={(e) => {
-            if (e.currentTarget instanceof HTMLInputElement) actions.setRoomCode(e.currentTarget.value);
-          }}
-        />
-      </div>
-      <div class="config-field">
-        <label for="user-name-input">Your Name</label>
-        <input
-          id="user-name-input"
-          type="text"
-          value={s.userName}
-          onchange={(e) => {
-            if (e.currentTarget instanceof HTMLInputElement) actions.setUserName(e.currentTarget.value);
-          }}
-        />
-      </div>
-
-    </div>
   </header>
 
   <!-- Pending Invitation Switch Banner -->
@@ -188,10 +168,40 @@
     </div>
   </div>
 
+    <!-- Room & Name Config -->
+    <details class="room-settings"><summary>Room & profile settings</summary><div class="room-pill-box">
+      <div class="config-field">
+        <label for="room-code-input">Room Code</label>
+        <input
+          id="room-code-input"
+          type="text"
+          value={s.roomCode}
+          onchange={(e) => {
+            if (e.currentTarget instanceof HTMLInputElement) actions.setRoomCode(e.currentTarget.value);
+          }}
+        />
+      </div>
+      <div class="config-field">
+        <label for="user-name-input">Your Name</label>
+        <input
+          id="user-name-input"
+          type="text"
+          value={s.userName}
+          onchange={(e) => {
+            if (e.currentTarget instanceof HTMLInputElement) actions.setUserName(e.currentTarget.value);
+          }}
+        />
+      </div>
+
+    </div>
+  </details>
+
   {#if inviteCopiedMsg}
     <div class="invite-toast">{inviteCopiedMsg}</div>
   {/if}
 
+  <h2 class="crew-section-title">Practising together</h2>
+  <p class="crew-section-desc">Current course position for each artist in this room.</p>
   <!-- Leaderboard Table -->
   <div class="table-card">
     <div class="table-header">
@@ -200,10 +210,13 @@
       <span class="col num-col">Week</span>
       <span class="col num-col">Day</span>
       <span class="col num-col">Hours</span>
-      <span class="col prog-col">Through</span>
+      <span class="col prog-col">Position</span>
     </div>
 
     <div class="table-rows">
+      {#if !crewReady}<p class="crew-empty">Crew is unavailable in this environment.</p>
+      {:else if !membersLoaded && !subscriptionError}<p class="crew-empty" role="status">Loading your crew…</p>
+      {:else if membersLoaded && displayMembers.length === 0}<p class="crew-empty">No artists have joined yet. Copy the invite link to practise together.</p>{/if}
       {#each displayMembers as member, idx}
         {@const pct = Math.min(100, Math.round((((member.week - 1) * 7 + member.day) / 56) * 100))}
         <div class="table-row" class:is-me={member.locked}>
@@ -214,9 +227,9 @@
               <span class="you-badge">YOU</span>
             {/if}
           </div>
-          <span class="col num-col">W{member.week}</span>
-          <span class="col num-col">D{member.day}</span>
-          <span class="col num-col">{member.hours}h</span>
+          <span class="col num-col" data-label="Week">{member.week}</span>
+          <span class="col num-col" data-label="Day">{member.day}</span>
+          <span class="col num-col" data-label="Hours">{member.hours}h</span>
           <div class="col prog-col progress-cell">
             <div class="row-progress-track">
               <div class="row-progress-fill" style="width: {pct}%"></div>
@@ -264,6 +277,7 @@
       <div class="upload-bottom">
         <input
           type="text"
+          aria-label="Feedback request"
           placeholder="What should the crew look at? (e.g. 'Struggling with cylinder minor axes on bottom row')"
           bind:value={critPrompt}
         />
@@ -284,7 +298,9 @@
 
     <!-- Feed of Posts -->
     <div class="crit-grid">
-      {#if critPosts.length === 0}
+      {#if crewReady && !postsLoaded && !subscriptionError}<div class="empty-crit-card" role="status">Loading sketches…</div>
+      {:else if subscriptionError && !postsLoaded}<div class="empty-crit-card">Sketches could not be loaded. Reopen Crew to try again.</div>
+      {:else if critPosts.length === 0}
         <div class="empty-crit-card">
           No sketches posted to this room yet. Be the first to drop a page from today's drills!
         </div>
@@ -311,6 +327,12 @@
 </div>
 
 <style>
+  .room-settings { margin: 0 0 28px; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+  .room-settings summary { min-height: 44px; padding: 12px 0; cursor: pointer; font-size: 14px; font-weight: 700; }
+  .crew-section-title { font-size: 30px; margin: 0 0 8px; }
+  .crew-section-desc { font-size: 14px; color: var(--ink-62); margin: 0 0 20px; }
+  .crew-empty { padding: 28px; color: var(--ink-62); font-size: 14px; }
+
   .crew-share-bar, .share-actions-group, .room-summary-chip {
     display: flex;
     align-items: center;
@@ -380,7 +402,7 @@
 
   .page-title {
     font-family: var(--font-display);
-    font-size: 64px;
+    font-size: clamp(36px, 4.5vw, 52px);
     line-height: 1.05;
     letter-spacing: 0.02em;
     margin: 0;
@@ -403,7 +425,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    min-width: 260px;
+    min-width: 0;
   }
 
   .config-field {
@@ -426,7 +448,8 @@
     border-radius: 8px;
     padding: 6px 10px;
     font-size: 13px;
-    width: 130px;
+    width: min(100%, 320px);
+    min-height: 44px;
     color: var(--ink);
   }
 
@@ -683,6 +706,15 @@
   }
 
   @media (max-width: 600px) {
+    .table-header { display: none; }
+    .table-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .rank-col { display: none; }
+    .name-col, .prog-col { grid-column: 1 / -1; min-width: 0; }
+    .num-col { width: auto; }
+    .num-col::before { content: attr(data-label); display: block; color: var(--ink-62); font-size: 11px; margin-bottom: 4px; }
+    .config-field { align-items: stretch; flex-direction: column; }
+    .config-field input { width: 100%; }
+
     .crew-view {
       padding: 24px 18px 80px;
     }

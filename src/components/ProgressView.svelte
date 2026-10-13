@@ -1,6 +1,7 @@
 <script lang="ts">
   import { state, actions, derivedStats } from '../lib/store';
   import { WEEKS, RUBRIC } from '../lib/curriculum';
+  import PracticeProgress from './PracticeProgress.svelte';
   import Icon from './Icon.svelte';
 
   let s = $state;
@@ -27,9 +28,11 @@
   <header class="progress-header">
     <h1 class="page-title">Progress & Accountability</h1>
     <p class="subtitle">
-      Measure volume and consistency over talent. Track your 56-day streak, bank milestones, and review your weekly reflection notes.
+      Measure volume and consistency over talent. See your completed sessions, practice XP, and the lessons you want to carry into your next drawing.
     </p>
   </header>
+
+  <div class="level-summary"><div><h2>Your practice adds up</h2><p>Every completed part earns 20 XP. Your level reflects practice, not a score for your art.</p></div><PracticeProgress /></div>
 
   <!-- Big 4 Metric Blocks -->
   <div class="metrics-grid">
@@ -49,9 +52,9 @@
       <span class="m-sub">{56 - stats.doneDaysCount} days remaining</span>
     </div>
     <div class="metric-card">
-      <span class="m-label">Active Streak</span>
+      <span class="m-label">Course Streak</span>
       <div class="m-value">{stats.streak}d</div>
-      <span class="m-sub">Daily habit compounding</span>
+      <span class="m-sub">Consecutive course days</span>
     </div>
   </div>
 
@@ -82,7 +85,7 @@
     <div class="cal-matrix-card">
       <div class="cal-days-header">
         <span class="w-col-label"></span>
-        <span>Day 1</span><span>Day 2</span><span>Day 3</span><span>Day 4</span><span>Day 5</span><span>Day 6</span><span>Day 7 (Play)</span>
+        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span>
       </div>
 
       <div class="cal-weeks">
@@ -173,6 +176,12 @@
 </div>
 
 <style>
+  .level-summary { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-card); padding: 24px; margin-bottom: 20px; }
+  .level-summary h2 { font-size: 28px; margin: 0 0 8px; }
+  .level-summary p { font-size: 14px; color: var(--ink-62); max-width: 46ch; margin: 0; line-height: 1.5; }
+  .pace-btn { min-height: 44px; }
+  @media (max-width: 600px) { .cal-matrix-card { padding: 12px; } .cal-days-header, .cal-week-row, .cal-cells-row { gap: 4px; } }
+
   .progress-view {
     padding: 36px 44px 80px;
     max-width: 1100px;
@@ -186,7 +195,7 @@
 
   .page-title {
     font-family: var(--font-display);
-    font-size: 64px;
+    font-size: clamp(36px, 4.5vw, 52px);
     line-height: 1.05;
     letter-spacing: 0.02em;
     margin: 0;
@@ -203,7 +212,7 @@
 
   .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
     margin-bottom: 48px;
   }
@@ -281,7 +290,7 @@
 
   .reflections-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
     gap: 14px;
   }
 
@@ -357,7 +366,7 @@
 
   .cal-days-header {
     display: grid;
-    grid-template-columns: 48px repeat(7, 1fr);
+    grid-template-columns: 28px repeat(7, minmax(0, 1fr));
     gap: 8px;
     font-size: 12px;
     font-weight: 700;
@@ -365,7 +374,7 @@
     text-align: center;
     padding-bottom: 12px;
     border-bottom: 1px solid var(--line);
-    min-width: 560px;
+    min-width: 0;
   }
 
   .cal-weeks {
@@ -373,12 +382,12 @@
     flex-direction: column;
     gap: 8px;
     margin-top: 12px;
-    min-width: 560px;
+    min-width: 0;
   }
 
   .cal-week-row {
     display: grid;
-    grid-template-columns: 48px 1fr;
+    grid-template-columns: 28px 1fr;
     gap: 8px;
     align-items: center;
   }
@@ -400,7 +409,7 @@
     border: 1px solid var(--line-2);
     background: var(--canvas);
     border-radius: var(--radius-control);
-    aspect-ratio: 1 / 1;
+    min-height: 48px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -444,7 +453,7 @@
 
   .counters-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
     gap: 14px;
   }
 
@@ -508,7 +517,7 @@
 
   .rubric-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
     gap: 16px;
   }
 
@@ -535,6 +544,7 @@
     color: var(--ink-78);
   }
 
+  @media (max-width: 700px) { .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } .metric-card { padding: 16px; } .m-label { font-size: 11px; } }
   @media (max-width: 600px) {
     .progress-view {
       padding: 24px 18px 80px;

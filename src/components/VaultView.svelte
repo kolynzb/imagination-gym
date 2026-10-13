@@ -3,12 +3,14 @@
   import Icon from './Icon.svelte';
 
   let searchQuery = '';
+  let selectedGroup = '';
+  let playingVideo: string | null = null;
 
   function getEmbedUrl(id: string): string {
-    return `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1`;
+    return `https://www.youtube-nocookie.com/embed/${id}?rel=0&autoplay=1`;
   }
 
-  $: filteredVault = VAULT.map((group) => {
+  $: filteredVault = VAULT.filter(group => !selectedGroup || group.g === selectedGroup).map((group) => {
     if (!searchQuery.trim()) return group;
     const q = searchQuery.toLowerCase().trim();
     const filteredVideos = group.v.filter(
@@ -46,7 +48,7 @@
           <button
             type="button"
             class="clear-search-btn"
-            onclick={() => (searchQuery = '')}
+            onclick={() => { searchQuery = ''; selectedGroup = ''; }}
             aria-label="Clear search"
           >
             <Icon name="cancel" size={12} />
@@ -57,6 +59,11 @@
         <span class="match-count">{totalVideos} video{totalVideos === 1 ? '' : 's'} found</span>
       {/if}
     </div>
+    <div class="phase-filters" aria-label="Video topics">
+      <button type="button" class:active={!selectedGroup} aria-pressed={!selectedGroup} onclick={() => { selectedGroup = ''; playingVideo = null; }}>All videos</button>
+      {#each VAULT as group}<button type="button" class:active={selectedGroup === group.g} aria-pressed={selectedGroup === group.g} onclick={() => { selectedGroup = group.g; playingVideo = null; }}>{group.g}</button>{/each}
+    </div>
+    <p class="library-count" aria-live="polite">{totalVideos} videos · Choose a lesson to watch</p>
   </header>
 
   {#if filteredVault.length === 0}
@@ -67,7 +74,7 @@
       <button
         type="button"
         class="reset-filter-btn"
-        onclick={() => (searchQuery = '')}
+        onclick={() => { searchQuery = ''; selectedGroup = ''; }}
       >
         Clear Search
       </button>
@@ -83,6 +90,7 @@
             {#each group.v as video}
               <div class="video-card">
                 <div class="player-wrapper">
+                  {#if playingVideo === video.id}
                   <iframe
                     src={getEmbedUrl(video.id)}
                     title={video.t}
@@ -90,6 +98,12 @@
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowfullscreen
                   ></iframe>
+                  {:else}
+                    <button class="video-preview" type="button" aria-label={`Watch ${video.t}`} onclick={() => playingVideo = video.id}>
+                      <img src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`} alt="" loading="lazy" />
+                      <span class="play-mark" aria-hidden="true">▶</span>
+                    </button>
+                  {/if}
                 </div>
                 <div class="video-info">
                   <h3 class="video-title">{video.t}</h3>
@@ -113,6 +127,14 @@
 </div>
 
 <style>
+  .phase-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .phase-filters button { border: 1px solid var(--line); background: var(--card); border-radius: var(--radius-pill); padding: 10px 14px; min-height: 44px; font-size: 13px; cursor: pointer; }
+  .phase-filters button.active { background: var(--ink); color: var(--canvas); }
+  .library-count { color: var(--ink-62); font-size: 13px; margin: 16px 0 0; }
+  .video-preview { border: 0; padding: 0; width: 100%; height: 100%; display: block; cursor: pointer; background: var(--ink); }
+  .video-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .play-mark { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--accent); color: var(--on-accent); box-shadow: 0 3px 20px #0005; }
+
   .vault-view {
     padding: 36px 44px 80px;
     max-width: 1100px;
@@ -126,7 +148,7 @@
 
   .page-title {
     font-family: var(--font-display);
-    font-size: 64px;
+    font-size: clamp(36px, 4.5vw, 52px);
     line-height: 1.05;
     letter-spacing: 0.02em;
     margin: 0;
@@ -238,7 +260,7 @@
 
   .videos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
     gap: 20px;
   }
 
@@ -283,6 +305,7 @@
   }
 
   .video-title {
+    font-family: var(--font-body);
     font-size: var(--text-body);
     font-weight: 700;
     line-height: var(--leading-body);
