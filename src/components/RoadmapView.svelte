@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { state, actions } from '../lib/store';
+  import { state } from '../lib/store';
   import { WEEKS, PIPELINE } from '../lib/curriculum';
+
+  export let onOpenWeek: (week: number) => void;
 
   let s = $state;
   $: s = $state;
@@ -37,15 +39,14 @@
           type="button"
           class="ladder-col"
           class:current={s.cw === week.n}
-          onclick={() => actions.jumpToDay(week.n, 1)}
+          onclick={() => onOpenWeek(week.n)}
         >
-          <div class="pct-label">{pct}%</div>
-          <div class="bar-track">
-            <div class="bar-fill" style="height: {pct}%"></div>
-          </div>
-          <span class="bar-num">W{week.n}</span>
+          <div class="week-card-top"><span class="bar-num">Week {week.n}</span><span class="pct-label">{s.cw === week.n ? 'Your current week' : pct === 100 ? 'Complete' : '7 sessions'}</span></div>
           <div class="col-title">{week.title}</div>
           <div class="col-sub">{week.sub}</div>
+          <p class="week-project">{week.project}</p>
+          <div class="bar-track"><div class="bar-fill" style="width: {pct}%"></div></div>
+          <div class="week-card-bottom"><span>{pct}% complete</span><strong>Explore week →</strong></div>
         </button>
       {/each}
     </div>
@@ -107,7 +108,7 @@
 
   .page-title {
     font-family: var(--font-display);
-    font-size: 64px;
+    font-size: clamp(36px, 4.5vw, 52px);
     line-height: 1.05;
     letter-spacing: 0.02em;
     margin: 0;
@@ -122,88 +123,22 @@
     margin: 12px 0 0;
   }
 
-  .ladder-section {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-panel);
-    padding: 24px;
-    margin-bottom: 48px;
-    overflow-x: auto;
-  }
-
-  .ladder-grid {
-    display: grid;
-    grid-template-columns: repeat(8, minmax(100px, 1fr));
-    gap: 12px;
-    min-width: 800px;
-  }
-
-  .ladder-col {
-    appearance: none;
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 8px 4px;
-    border-radius: 16px;
-    transition: background 0.15s ease;
-  }
-
-  .ladder-col:hover {
-    background: var(--canvas);
-  }
-
-  .pct-label {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--ink-62);
-    margin-bottom: 8px;
-  }
-
-  .bar-track {
-    width: 32px;
-    height: 140px;
-    background: var(--track);
-    border-radius: var(--radius-pill);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: flex-end;
-    margin-bottom: 8px;
-  }
-
-  .bar-fill {
-    width: 100%;
-    background: var(--ink);
-    border-radius: var(--radius-pill);
-    transition: height 0.3s ease;
-  }
-
-  .bar-num {
-    margin-bottom: 8px;
-    text-align: center;
-    font-family: var(--font-body);
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--ink);
-  }
-
-  .col-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--ink);
-    text-align: center;
-    line-height: 1.25;
-  }
-
-  .col-sub {
-    font-size: 11px;
-    color: var(--ink-62);
-    text-align: center;
-    margin-top: 3px;
-  }
+  .ladder-section { margin-bottom: 40px; }
+  .ladder-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .ladder-col { appearance: none; text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-card); padding: 24px; cursor: pointer; display: flex; flex-direction: column; transition: border-color 150ms ease, transform 150ms ease; }
+  .ladder-col:hover { border-color: var(--ink); transform: translateY(-2px); }
+  .ladder-col.current { border: 2px solid var(--accent); padding: 23px; }
+  .week-card-top, .week-card-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; font-size: 12px; }
+  .bar-num { font-weight: 700; color: var(--accent-ink); }
+  .pct-label { color: var(--ink-62); }
+  .col-title { font-family: var(--font-body); font-weight: 700; font-size: 22px; line-height: 1.25; margin: 16px 0 6px; }
+  .col-sub { font-size: 13px; color: var(--ink-62); }
+  .week-project { font-size: 14px; line-height: 1.5; color: var(--ink-78); margin: 18px 0 24px; flex: 1; }
+  .bar-track { width: 100%; height: 5px; background: var(--track); border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+  .bar-fill { height: 100%; background: var(--accent); }
+  .week-card-bottom { color: var(--ink-62); }
+  .week-card-bottom strong { color: var(--ink); }
+  @media (max-width: 600px) { .ladder-grid { grid-template-columns: 1fr; } }
 
   .section-title {
     font-family: var(--font-display);
@@ -219,7 +154,7 @@
 
   .pipeline-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
     gap: 16px;
   }
 

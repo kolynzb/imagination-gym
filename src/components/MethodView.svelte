@@ -29,9 +29,10 @@
     </button>
   </section>
 
+  <nav class="method-index" aria-label="Method sections"><a href="#method-rules">Practice principles</a><a href="#method-session">Daily session</a><a href="#method-kit">Drawing kit</a><a href="#method-scaffold">Adjust difficulty</a></nav>
   <!-- Three Anchor Rules -->
   <section class="section-block">
-    <h2 class="section-title">The Three Anchor Rules</h2>
+    <h2 id="method-rules" class="section-title">The Three Anchor Rules</h2>
     <div class="rules-grid">
       <div class="rule-card">
         <h3 class="rule-title">Medicine, not diet</h3>
@@ -52,7 +53,7 @@
       <div class="rule-card">
         <h3 class="rule-title">Whole-Arm Pivot</h3>
         <p class="rule-text">
-          Lock your wrist for long perspective lines and ellipses. Pivot from the shoulder and elbow joint. Drawing from the wrist produces timid, scratchy, chicken-scratch lines and will cause repetitive strain injury over an 8-week cycle.
+          For longer lines and ellipses, practise moving from your shoulder and elbow. Keep your grip relaxed and give your arm room to move. Use the demonstrations to explore a comfortable range of motion.
         </p>
         <span class="rule-source">Peter Han, The Dynamic Bible, pp. 4–10</span>
       </div>
@@ -70,6 +71,7 @@
       </div>
       <input
         type="date"
+        aria-label="Course start date"
         class="date-input"
         value={s.start}
         onchange={(e) => actions.setStartDate((e.target as HTMLInputElement).value)}
@@ -79,7 +81,7 @@
 
   <!-- 3 Parts Breakdown -->
   <section class="section-block">
-    <h2 class="section-title">The Anatomy of a Daily Session</h2>
+    <h2 id="method-session" class="section-title">The Anatomy of a Daily Session</h2>
     <div class="parts-grid">
       {#each PARTS_DOC as part}
         <div class="part-doc-card part-{part.k.toLowerCase()}">
@@ -96,7 +98,7 @@
 
   <!-- Traditional & Digital Kits -->
   <section class="section-block">
-    <h2 class="section-title">Physical & Digital Setup</h2>
+    <h2 id="method-kit" class="section-title">Physical & Digital Setup</h2>
     <div class="kit-grid">
       <!-- Traditional Kit -->
       <div class="kit-card">
@@ -153,7 +155,7 @@
 
   <!-- Goldilocks Scaffolding -->
   <section class="section-block">
-    <h2 class="section-title">Goldilocks Scaffolding Ladder</h2>
+    <h2 id="method-scaffold" class="section-title">Goldilocks Scaffolding Ladder</h2>
     <div class="scaffold-grid">
       {#each SCAFFOLD as s}
         <div class="scaffold-card">
@@ -183,6 +185,11 @@
 </div>
 
 <style>
+  .method-index { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 32px; }
+  .method-index a { min-height: 44px; display: inline-flex; align-items: center; padding: 10px 16px; border: 1px solid var(--line); border-radius: var(--radius-pill); color: var(--ink); text-decoration: none; font-size: 14px; background: var(--card); }
+  .method-index a:hover { border-color: var(--accent); }
+  .section-title { scroll-margin-top: 24px; }
+
   .method-view {
     padding: 36px 44px 80px;
     max-width: 1100px;
@@ -196,7 +203,7 @@
 
   .page-title {
     font-family: var(--font-display);
-    font-size: 64px;
+    font-size: clamp(36px, 4.5vw, 52px);
     line-height: 1.05;
     letter-spacing: 0.02em;
     margin: 0;
@@ -225,7 +232,7 @@
 
   .rules-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
     gap: 16px;
   }
 
@@ -300,7 +307,7 @@
 
   .parts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
     gap: 16px;
   }
 
@@ -350,7 +357,7 @@
 
   .kit-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
     gap: 20px;
   }
 
@@ -402,7 +409,7 @@
 
   .scaffold-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
     gap: 16px;
   }
 

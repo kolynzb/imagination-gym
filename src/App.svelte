@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from "svelte";
   import { initializeSession } from "./lib/session.svelte";
   initializeSession();
   import { state, actions, cloudStatus, savePending, progressConflicts } from './lib/store';
@@ -17,8 +18,27 @@
   import OnboardingModal from './components/OnboardingModal.svelte';
   import SignInModal from './components/SignInModal.svelte';
 
+  let requestedWeek: number | undefined;
   let s = $state;
   $: s = $state;
+  $: if (s.view !== 'week') requestedWeek = undefined;
+
+  function resetViewScroll(node: HTMLElement) {
+    let frame = 0;
+    void tick().then(() => {
+      frame = requestAnimationFrame(() => {
+        if (!node.isConnected) return;
+        const heading = node.querySelector('h1');
+        if (heading instanceof HTMLElement) {
+          heading.tabIndex = -1;
+          heading.focus({ preventScroll: true });
+        }
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        node.closest('main')?.scrollTo({ top: 0, behavior: 'instant' });
+      });
+    });
+    return { destroy: () => cancelAnimationFrame(frame) };
+  }
 
   function handleKeydown(e: KeyboardEvent) {
     const target = e.target;
@@ -63,13 +83,13 @@
       </div>
     {/if}
     {#key s.view}
-      <div class="view-enter">
+      <div class="view-enter" use:resetViewScroll>
         {#if s.view === 'today'}
           <TodayView />
         {:else if s.view === 'week'}
-          <WeekView />
+          <WeekView initialWeek={requestedWeek} />
         {:else if s.view === 'roadmap'}
-          <RoadmapView />
+          <RoadmapView onOpenWeek={(week) => { requestedWeek = week; actions.setView('week'); }} />
         {:else if s.view === 'exercises'}
           <ExercisesView />
         {:else if s.view === 'vault'}
@@ -125,6 +145,7 @@
     flex: 1;
     min-width: 0;
     overflow-y: auto;
+    overflow-anchor: none;
   }
 
   @media (max-width: 860px) {

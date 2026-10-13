@@ -1,24 +1,20 @@
 <script lang="ts">
   import { state, actions } from '../lib/store';
   import { WEEKS, type Week } from '../lib/curriculum';
+  import PracticeResources from './PracticeResources.svelte';
   import Icon from './Icon.svelte';
 
   let s = $state;
   $: s = $state;
 
-  let selectedWeek = s.cw;
+  export let initialWeek: number | undefined = undefined;
+  let selectedWeek = initialWeek ?? s.cw;
   $: week = WEEKS[selectedWeek - 1] as Week;
 
   function selectWeek(wNum: number) {
     selectedWeek = wNum;
   }
 
-  function getEmbedUrl(url: string): string {
-    const m = /[?&]v=([\w-]+)/.exec(url);
-    const t = /[?&]t=(\d+)s?/.exec(url);
-    if (!m) return url;
-    return `https://www.youtube-nocookie.com/embed/${m[1]}?rel=0&modestbranding=1${t ? '&start=' + t[1] : ''}`;
-  }
 </script>
 
 <div class="week-view">
@@ -29,9 +25,10 @@
         type="button"
         class="w-tab"
         class:active={selectedWeek === w.n}
+        aria-pressed={selectedWeek === w.n}
         onclick={() => selectWeek(w.n)}
       >
-        W{w.n}
+        Week {w.n}
       </button>
     {/each}
   </div>
@@ -41,6 +38,45 @@
     <h1 class="page-title">{week.title}</h1>
     <p class="objective-text">{week.objective}</p>
   </header>
+
+  <!-- Day by Day Listing -->
+  <section class="days-section">
+    <h2 class="section-title">Day by Day Progression</h2>
+    <div class="days-list">
+      {#each week.days as day, di}
+        {@const dayNum = di + 1}
+        {@const dayDone = day.parts.every((_, pi) => !!s.done[`w${week.n}d${dayNum}p${pi}`])}
+
+        <button
+          type="button"
+          class="day-row"
+          class:is-complete={dayDone}
+          class:is-current={week.n === s.cw && dayNum === s.cd}
+          aria-current={week.n === s.cw && dayNum === s.cd ? "step" : undefined}
+          onclick={() => actions.jumpToDay(week.n, dayNum)}
+        >
+          <div class="day-badge">
+            <span class="day-num">D{dayNum}</span>
+          </div>
+
+          <div class="day-details">
+            <div class="day-title">{day.t}</div>
+            <div class="day-parts-summary">
+              <span class="parts-count">{day.parts.reduce((sum, p) => sum + p.m, 0) || 'At your pace'}{day.parts.some(p => p.m) ? ' min' : ''} · {day.parts.filter((_, pi) => s.done[`w${week.n}d${dayNum}p${pi}`]).length}/{day.parts.length} parts complete</span>
+            </div>
+          </div>
+
+          <div class="status-marker">
+            {#if dayDone}
+              <Icon name="checkmark" size={14} /> Done
+            {:else}
+              {week.n === s.cw && dayNum === s.cd ? 'Continue →' : 'Open →'}
+            {/if}
+          </div>
+        </button>
+      {/each}
+    </div>
+  </section>
 
   <div class="top-grid">
     <!-- Why it matters -->
@@ -75,85 +111,13 @@
     </div>
   </div>
 
-  <!-- Day by Day Listing -->
-  <section class="days-section">
-    <h2 class="section-title">Day by Day Progression</h2>
-    <div class="days-list">
-      {#each week.days as day, di}
-        {@const dayNum = di + 1}
-        {@const dayDone = day.parts.every((_, pi) => !!s.done[`w${week.n}d${dayNum}p${pi}`])}
-
-        <button
-          type="button"
-          class="day-row"
-          class:is-complete={dayDone}
-          onclick={() => actions.jumpToDay(week.n, dayNum)}
-        >
-          <div class="day-badge">
-            <span class="day-num">D{dayNum}</span>
-          </div>
-
-          <div class="day-details">
-            <div class="day-title">{day.t}</div>
-            <div class="day-parts-summary">
-              {#each day.parts as p}
-                <span class="part-chip part-{p.k.toLowerCase()}">{p.k}</span>
-              {/each}
-              <span class="parts-count">{day.parts.length} part{day.parts.length === 1 ? '' : 's'}</span>
-            </div>
-          </div>
-
-          <div class="status-marker">
-            {#if dayDone}
-              <Icon name="checkmark" size={14} /> Done
-            {:else}
-              Open →
-            {/if}
-          </div>
-        </button>
-      {/each}
-    </div>
-  </section>
-
-  <!-- Reading & Study Resources -->
-  <div class="reading-grid">
-    <div class="info-card">
-      <div class="card-heading">Required Reading</div>
-      <div class="read-block">
-        <span class="read-book">brokendraw Companion Book</span>
-        <p class="read-pages">{week.book}</p>
-      </div>
-      <div class="divider"></div>
-      <div class="read-block">
-        <span class="read-book">The Dynamic Bible (Peter Han)</span>
-        <p class="read-pages">{week.han}</p>
-      </div>
-    </div>
-
-    <!-- YouTube Videos for Week -->
-    <div class="info-card">
-      <div class="card-heading">Watch & Study This Week</div>
-      <div class="videos-list">
-        {#each week.links.filter((l) => l.u.includes('youtube.com')) as vid}
-          <div class="vid-item">
-            <iframe
-              src={getEmbedUrl(vid.u)}
-              title={vid.l}
-              loading="lazy"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen
-            ></iframe>
-            <a href={vid.u} target="_blank" rel="noreferrer" class="vid-link">
-              {vid.l} ↗
-            </a>
-          </div>
-        {/each}
-      </div>
-    </div>
-  </div>
+  <section class="week-resources"><h2 class="section-title">Keep these nearby</h2><PracticeResources {week} /></section>
 </div>
 
 <style>
+  .day-row.is-current { border-color: var(--accent); box-shadow: inset 3px 0 var(--accent); }
+  .w-tab { min-height: 44px; }
+  .week-resources { margin-top: 32px; }
   .week-view {
     padding: 36px 44px 80px;
     max-width: 1100px;
@@ -203,7 +167,7 @@
 
   .page-title {
     font-family: var(--font-display);
-    font-size: 64px;
+    font-size: clamp(36px, 4.5vw, 52px);
     line-height: 1.05;
     letter-spacing: 0.02em;
     margin: 8px 0 0;
@@ -220,7 +184,7 @@
 
   .top-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
     gap: 20px;
     margin-bottom: 40px;
   }
@@ -355,22 +319,6 @@
     margin-top: 4px;
   }
 
-  .part-chip {
-    font-size: 10px;
-    font-weight: 700;
-    width: 18px;
-    height: 18px;
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .part-chip.part-a { background: var(--sulfur); color: var(--on-accent); }
-  .part-chip.part-b { background: var(--accent); color: var(--on-accent); }
-  .part-chip.part-c { background: var(--ink); color: var(--canvas); }
-  .part-chip.part-d { background: var(--line-3); color: var(--ink); }
-
   .parts-count {
     font-size: 12px;
     color: var(--ink-62);
@@ -386,60 +334,6 @@
   .day-row.is-complete .status-marker {
     color: var(--success);
     font-weight: 700;
-  }
-
-  .reading-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 20px;
-  }
-
-  .read-block {
-    margin-bottom: 8px;
-  }
-
-  .read-book {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--ink);
-  }
-
-  .read-pages {
-    font-size: var(--text-body);
-    color: var(--ink-78);
-    margin: 4px 0 0;
-    line-height: var(--leading-body);
-  }
-
-  .videos-list {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .vid-item {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .vid-item iframe {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border: 0;
-    border-radius: var(--radius-control);
-    background: var(--ink);
-  }
-
-  .vid-link {
-    min-height: 44px;
-    display: inline-flex;
-    align-items: center;
-    font-size: var(--text-control);
-    color: var(--accent-ink);
-    text-decoration: none;
-    border-bottom: 1px solid var(--accent-14);
-    align-self: flex-start;
   }
 
   @media (max-width: 600px) {

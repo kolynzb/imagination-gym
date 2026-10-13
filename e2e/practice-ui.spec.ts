@@ -120,7 +120,7 @@ test('captures rendered desktop and phone Today and Focus screens', async ({ pag
 
 test('exercise drawer isolates the background and restores keyboard focus', async ({ page }) => {
   await startCourse(page);
-  const opener = page.getByRole('button', { name: 'Ex 01 Drawer ↗', exact: true });
+  const opener = page.getByRole('button', { name: 'View exercise 01 →', exact: true });
   await opener.click();
   const drawer = page.getByRole('dialog', { name: 'Exercise details' });
   await expect(drawer.locator('.close-btn')).toBeFocused();
