@@ -46,10 +46,13 @@ test('video topics and search combine, and only the selected lesson mounts a pla
   await expect(page.locator('.video-card')).toHaveCount(30);
 });
 
-test('roadmap opens a week with sessions first and complete source resource cards', async ({ page }) => {
+test('roadmap browses without changing active practice and keeps source resource cards', async ({ page, cloud }) => {
   await startCourse(page);
   await page.getByRole('button', { name: 'Roadmap', exact: true }).click();
-  await page.locator('.ladder-col').first().click();
+  await page.locator('.ladder-col').nth(1).click();
+  await expect(page.getByRole('heading', { name: '3D Form Construction', exact: true })).toBeVisible();
+  expect(JSON.parse(cloud.progress).cw).toBe(1);
+  await page.getByRole('button', { name: 'Week 1', exact: true }).click();
   await expect(page.locator('.week-view')).toBeVisible();
   await expect(page.locator('.day-row')).toHaveCount(7);
   await expect(page.locator('.day-row[aria-current="step"]')).toContainText('0/3 parts complete');

@@ -18,8 +18,10 @@
   import OnboardingModal from './components/OnboardingModal.svelte';
   import SignInModal from './components/SignInModal.svelte';
 
+  let requestedWeek: number | undefined;
   let s = $state;
   $: s = $state;
+  $: if (s.view !== 'week') requestedWeek = undefined;
 
   function resetViewScroll(node: HTMLElement) {
     let frame = 0;
@@ -85,9 +87,9 @@
         {#if s.view === 'today'}
           <TodayView />
         {:else if s.view === 'week'}
-          <WeekView />
+          <WeekView initialWeek={requestedWeek} />
         {:else if s.view === 'roadmap'}
-          <RoadmapView />
+          <RoadmapView onOpenWeek={(week) => { requestedWeek = week; actions.setView('week'); }} />
         {:else if s.view === 'exercises'}
           <ExercisesView />
         {:else if s.view === 'vault'}

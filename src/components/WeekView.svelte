@@ -7,7 +7,8 @@
   let s = $state;
   $: s = $state;
 
-  let selectedWeek = s.cw;
+  export let initialWeek: number | undefined = undefined;
+  let selectedWeek = initialWeek ?? s.cw;
   $: week = WEEKS[selectedWeek - 1] as Week;
 
   function selectWeek(wNum: number) {

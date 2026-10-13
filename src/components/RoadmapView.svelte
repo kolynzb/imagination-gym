@@ -1,6 +1,8 @@
 <script lang="ts">
-  import { state, actions } from '../lib/store';
+  import { state } from '../lib/store';
   import { WEEKS, PIPELINE } from '../lib/curriculum';
+
+  export let onOpenWeek: (week: number) => void;
 
   let s = $state;
   $: s = $state;
@@ -37,7 +39,7 @@
           type="button"
           class="ladder-col"
           class:current={s.cw === week.n}
-          onclick={() => { actions.jumpToDay(week.n, 1); actions.setView('week'); }}
+          onclick={() => onOpenWeek(week.n)}
         >
           <div class="week-card-top"><span class="bar-num">Week {week.n}</span><span class="pct-label">{s.cw === week.n ? 'Your current week' : pct === 100 ? 'Complete' : '7 sessions'}</span></div>
           <div class="col-title">{week.title}</div>
