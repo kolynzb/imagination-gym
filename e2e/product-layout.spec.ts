@@ -30,9 +30,13 @@ for (const width of [390, 1440]) {
 }
 
 test('video topics and search combine, and only the selected lesson mounts a player', async ({ page }) => {
+  await page.route('https://i.ytimg.com/**', route => route.fulfill({ contentType: 'image/svg+xml', body: '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360"><rect width="480" height="360" fill="gray"/></svg>' }));
   await startCourse(page);
   await page.getByRole('button', { name: 'Video Vault', exact: true }).click();
   await expect(page.locator('.video-card iframe')).toHaveCount(0);
+  await expect.poll(() => page.locator('.video-preview img').first().evaluate((img: HTMLImageElement) => img.naturalWidth)).toBe(480);
+  const thumbnail = await page.locator('.player-wrapper').first().boundingBox();
+  expect(thumbnail!.width / thumbnail!.height).toBeCloseTo(16 / 9, 1);
   await page.locator('.video-preview').first().click();
   await expect(page.locator('.video-card iframe')).toHaveCount(1);
   await page.locator('.video-preview').first().click();
@@ -44,6 +48,10 @@ test('video topics and search combine, and only the selected lesson mounts a pla
   await expect(page.getByRole('heading', { name: /No videos match/ })).toBeVisible();
   await page.getByRole('button', { name: 'Clear Search', exact: true }).click();
   await expect(page.locator('.video-card')).toHaveCount(30);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('combobox', { name: 'Topic', exact: true }).selectOption({ index: 1 });
+  await expect(page.locator('.vault-group')).toHaveCount(1);
+  await expect(page.locator('.video-preview').first()).toBeInViewport();
 });
 
 test('roadmap browses without changing active practice and keeps source resource cards', async ({ page, cloud }) => {

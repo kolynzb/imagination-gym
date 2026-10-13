@@ -59,6 +59,12 @@
         <span class="match-count">{totalVideos} video{totalVideos === 1 ? '' : 's'} found</span>
       {/if}
     </div>
+    <label class="topic-select">Topic
+      <select bind:value={selectedGroup} onchange={() => playingVideo = null}>
+        <option value="">All videos</option>
+        {#each VAULT as group}<option value={group.g}>{group.g}</option>{/each}
+      </select>
+    </label>
     <div class="phase-filters" aria-label="Video topics">
       <button type="button" class:active={!selectedGroup} aria-pressed={!selectedGroup} onclick={() => { selectedGroup = ''; playingVideo = null; }}>All videos</button>
       {#each VAULT as group}<button type="button" class:active={selectedGroup === group.g} aria-pressed={selectedGroup === group.g} onclick={() => { selectedGroup = group.g; playingVideo = null; }}>{group.g}</button>{/each}
@@ -127,11 +133,13 @@
 </div>
 
 <style>
+  .topic-select { display: none; }
+  .topic-select select { width: 100%; min-width: 0; padding: 12px; min-height: 44px; border: 1px solid var(--line); border-radius: var(--radius-control); color: var(--ink); background: var(--card); font-size: 14px; }
   .phase-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
   .phase-filters button { border: 1px solid var(--line); background: var(--card); border-radius: var(--radius-pill); padding: 10px 14px; min-height: 44px; font-size: 13px; cursor: pointer; }
   .phase-filters button.active { background: var(--ink); color: var(--canvas); }
   .library-count { color: var(--ink-62); font-size: 13px; margin: 16px 0 0; }
-  .video-preview { border: 0; padding: 0; width: 100%; height: 100%; display: block; cursor: pointer; background: var(--ink); }
+  .video-preview { position: absolute; inset: 0; border: 0; padding: 0; width: 100%; height: 100%; display: block; cursor: pointer; background: var(--ink); }
   .video-preview img { width: 100%; height: 100%; object-fit: cover; }
   .play-mark { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--accent); color: var(--on-accent); box-shadow: 0 3px 20px #0005; }
 
@@ -282,6 +290,7 @@
   }
 
   .player-wrapper {
+    flex-shrink: 0;
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
@@ -379,6 +388,8 @@
   }
 
   @media (max-width: 600px) {
+    .phase-filters { display: none; }
+    .topic-select { display: grid; gap: 8px; margin-top: 18px; font-size: 13px; font-weight: 700; }
     .vault-view {
       padding: 24px 18px 80px;
     }
